@@ -1,0 +1,46 @@
+sobrantes
+0:20 'h-12' }
+0:30 'h-10' }
+0:40 'h-10' }
+
+
+0:40 h-
+1:00 h-20
+1:10 h-23
+1:20 h-25
+1:30 h-30
+1:40 h-32
+1:50 h-34
+2:00 h-40
+
+
+07:00
+07:03
+07:10
+07:20
+
+
+const match = clases.find(cls => (
+										//7.02
+										//7
+										cls.hour.split('.')[0] == hour 
+										&& (	cls.hour.split('.')[1] < (minuteMatch + 5)
+											&&	cls.hour.split('.')[1] > (minuteMatch - 5))
+									)
+									&& cls.day === day.id) ?? null;
+
+
+
+&& cls.hour.split('.')[1] <= (minute + 10)
+&& cls.hour.split('.')[1] >= (minute - 10)
+
+
+
+
+
+
+				<div className={`${hiddenStudent} border border-amber-50 h-12`}>
+					<p className={`${hiddenStudent} text-sm leading-none`}>
+						{student}
+					</p>
+				</div>
