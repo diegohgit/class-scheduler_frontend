@@ -14,11 +14,9 @@ const customStyles = {
 
 const SchoolProvider = ({children}) => {
 
-	const hola = 'holaaaa';
 	const [ modal, setModal ] = useState(0);
 	const [ time, setTime]    = useState([]);
-	const [ lastClass, setLastClass] = useState(0);
-	const [ crossHr, setCrossHr] = useState(0);
+	const [ classModal, setClassModal ] = useState(0);
 
 	const handleClickModal = () => {
 		setModal(!modal)
@@ -28,8 +26,8 @@ const SchoolProvider = ({children}) => {
 		setTime([{"day": day, "hour":hour}]);
 	}
 
-	const handleSetCrossHr = ({isCross}) => {
-		setCrossHr(isCross)
+	const handleClassModal = (classModal) => {
+		setClassModal(classModal)
 	}
 
 	return (
@@ -40,8 +38,8 @@ const SchoolProvider = ({children}) => {
 				modal,
 				handleSetTime,
 				time,
-				handleSetCrossHr,
-				crossHr
+				handleClassModal,
+				classModal
 			}}
 		>{children}
 		</SchoolContext.Provider>

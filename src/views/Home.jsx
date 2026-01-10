@@ -7,7 +7,7 @@ import { useState } from "react";
 Modal.setAppElement('#root')
 export default function Home() {
 
-	const { customStyles, handleClickModal, modal, handleSetTime } = useSchool();
+	const { customStyles, handleClickModal, modal, handleSetTime, handleClassModal } = useSchool();
 	const [ searchStudent, setSearchStudent ] = useState(0);
 
 	const days = [
@@ -27,10 +27,6 @@ export default function Home() {
 				{day: 2, hour: '11.00', last: 60, ends: '12.00', height:'h-20', student_id: 2, student: 'Carolina Alvarado Estudillo'},
 				{day: 5, hour: '10.00',  last: 90, ends: '11.00',  height:'h-20', student_id: 1, student: 'Diego Hernández Hernández'},
 			];
-
-	const handleSetSearch = (match) => {
-		setSearchStudent(match['match'].student_id)
-	}
 
 	const blocksPerHr = 6;
 	let print = 0;
@@ -199,9 +195,10 @@ export default function Home() {
 											isHighLighted = { isHighLighted }
 											classHeight = { classHeight }
 											onClick = {() => {
-												//handleClickModal(),
+												handleClickModal(),
 												handleSetTime({hour, day})
-												handleSetSearch({match})
+												handleClassModal(match)
+												//handleSetSearch({match})
 											}}
 										/>
 									)
@@ -213,9 +210,9 @@ export default function Home() {
 			</div>
 
 
-				<Modal isOpen={modal} style={customStyles}>
-						<ModalClass />
-				</Modal>
+			<Modal isOpen={modal} style={customStyles}>
+					<ModalClass />
+			</Modal>
 
 		</>
 	)

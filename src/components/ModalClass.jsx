@@ -2,7 +2,10 @@ import useSchool from "../hooks/useSchool";
 
 export default function ModalClass() {
 
-	const {time, handleClickModal} = useSchool();
+	const { time, handleClickModal, classModal } = useSchool();
+	const studentsName  = classModal?.student;
+	const ends  = classModal?.ends;
+	const start = classModal?.hour;
 
 	return (
 		<>
@@ -22,13 +25,34 @@ export default function ModalClass() {
 			</div>
 
 			<div>
-				<b>Student:</b> Diego Hernández Hernández
-				<br />
-				<b>Day:</b> {time[0].day.label} (Today)
-				<br />
-				<b>Start:</b> {time[0].hour}:00
-
+				<div>
+					<b>Student:</b>
+					<input  type="text"
+							className="input-base"
+							value={studentsName}
+					/>
+				</div>
+				<div className="mt-3">
+					<b>Day:</b> {time[0].day.label} (Today)
+				</div>
+				<div className="mt-3">
+					<b>Start:</b>
+					<input 	type="text" 
+							className="input-base !w-20 mx-2"
+							value={start}
+					/>
+					<b> Ends:</b>
+					<input 	type="text" 
+							className="input-base !w-20 mx-2"
+							value={ends}
+					/>
+				</div>
+				<div className="flex mt-2">
+					<b className="mr-2">Duration: </b>
+					<p className="mr-1">60 mins</p>
+				</div>
 			</div>
+
 			<div>
 				<button className="w-40 h-8 rounded 
 								bg-red-500 text-white font-bold 
