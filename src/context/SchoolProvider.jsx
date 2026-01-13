@@ -30,6 +30,10 @@ const SchoolProvider = ({children}) => {
 		setClassModal(classModal)
 	}
 
+	const today = new Date().toLocaleDateString("en-US", {
+					weekday: 'long'
+				});
+
 	return (
 		<SchoolContext.Provider 
 			value = {{
@@ -39,7 +43,8 @@ const SchoolProvider = ({children}) => {
 				handleSetTime,
 				time,
 				handleClassModal,
-				classModal
+				classModal,
+				today,
 			}}
 		>{children}
 		</SchoolContext.Provider>

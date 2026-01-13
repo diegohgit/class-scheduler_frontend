@@ -2,10 +2,12 @@ import useSchool from "../hooks/useSchool";
 
 export default function ModalClass() {
 
-	const { time, handleClickModal, classModal } = useSchool();
+	const { time, handleClickModal, classModal, today } = useSchool();
 	const studentsName  = classModal?.student;
 	const ends  = classModal?.ends;
 	const start = classModal?.hour;
+
+	const hiddenToday = classModal.dayLabel != today ? 'hidden' : '';
 
 	return (
 		<>
@@ -21,7 +23,7 @@ export default function ModalClass() {
 							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
 						</svg>
 					</button>
-				</div>				
+				</div>
 			</div>
 
 			<div>
@@ -29,22 +31,21 @@ export default function ModalClass() {
 					<b>Student:</b>
 					<input  type="text"
 							className="input-base"
-							value={studentsName}
+
 					/>
 				</div>
-				<div className="mt-3">
-					<b>Day:</b> {time[0].day.label} (Today)
+				<div className="flex mt-3">
+					<b className="mr-2">Day:</b> {time[0].day.label} 
+					<p className={`${hiddenToday} ml-2`}>(Today)</p>
 				</div>
 				<div className="mt-3">
 					<b>Start:</b>
 					<input 	type="text" 
 							className="input-base !w-20 mx-2"
-							value={start}
 					/>
 					<b> Ends:</b>
 					<input 	type="text" 
 							className="input-base !w-20 mx-2"
-							value={ends}
 					/>
 				</div>
 				<div className="flex mt-2">

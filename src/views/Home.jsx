@@ -22,10 +22,10 @@ export default function Home() {
 
 	const hours = [7, 8, 9, 10, 11];
 	const clases = [
-				{day: 1, hour: '7.15',  last: 90, ends: '8.10',  height:'h-20', student_id: 1, student: 'Diego Hernández Hernández'},
-				{day: 3, hour: '9.00',  last: 60, ends: '10.00', height:'h-20', student_id: 3, student: 'Marcela Alejandra Perez Briones Briones Briones' },
-				{day: 2, hour: '11.00', last: 60, ends: '12.00', height:'h-20', student_id: 2, student: 'Carolina Alvarado Estudillo'},
-				{day: 5, hour: '10.00',  last: 90, ends: '11.00',  height:'h-20', student_id: 1, student: 'Diego Hernández Hernández'},
+				{day: 1, dayLabel:"Monday", hour: '7.15',  last: 90, ends: '8.10',  height:'h-20', student_id: 1, student: 'Diego Hernández Hernández'},
+				{day: 3, dayLabel:"Wednesday", hour: '9.00',  last: 60, ends: '10.00', height:'h-20', student_id: 3, student: 'Marcela Alejandra Perez Briones Briones Briones' },
+				{day: 2, dayLabel:"Tuesday", hour: '11.00', last: 60, ends: '12.00', height:'h-20', student_id: 2, student: 'Carolina Alvarado Estudillo'},
+				{day: 6, dayLabel:"Saturday", hour: '10.00', last: 90, ends: '11.00', height:'h-20', student_id: 1, student: 'Diego Hernández Hernández'},
 			];
 
 	const blocksPerHr = 6;
