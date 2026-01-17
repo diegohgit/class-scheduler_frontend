@@ -2,17 +2,17 @@
 
 /* input-base */
 .input-base {
-  @apply w-full h-10 border-2 
-        rounded border-blue-600 px-2;
+	@apply 	w-full h-8 border-2 
+			rounded border-blue-600 px-2;
 }
 
 .textarea-base {
-  @apply w-full h-20 border-2 
-       border-blue-600 px-2 rounded
-        mb-4;
+	@apply 	w-full h-20 border-2 
+			border-blue-600 px-2 rounded
+			mb-4;
 }
 
 .circle-color {
-  @apply w-10 h-10 m-2 
-        rounded-full border-2 border-gray-400;
+	@apply 	w-10 h-10 m-2 
+			rounded-full border-2 border-gray-400;
 }

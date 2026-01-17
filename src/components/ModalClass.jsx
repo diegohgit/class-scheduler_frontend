@@ -1,13 +1,18 @@
 import useSchool from "../hooks/useSchool";
+import { useState } from 'react';
+import DivInput from "./DivInput";
 
 export default function ModalClass() {
 
 	const { time, handleClickModal, classModal, today } = useSchool();
-	const studentsName  = classModal?.student;
-	const ends  = classModal?.ends;
-	const start = classModal?.hour;
+	const [timer, setTimer] = useState('10:00');
+	const [duration, setDuration] = useState(0);
 
-	const hiddenToday = classModal.dayLabel != today ? 'hidden' : '';
+	const studentsName = classModal?.student;
+	const hiddenToday  = classModal.dayLabel != today ? 'hidden' : '';
+	const timeInput    = "!w-20 mx-2";
+	const start = classModal?.hour;
+	const ends  = classModal?.ends;
 
 	return (
 		<>
@@ -27,28 +32,33 @@ export default function ModalClass() {
 			</div>
 
 			<div>
-				<div>
+				<div className="h-15">
 					<b>Student:</b>
-					<input  type="text"
-							className="input-base"
-
-					/>
-				</div>
-				<div className="flex mt-3">
-					<b className="mr-2">Day:</b> {time[0].day.label} 
-					<p className={`${hiddenToday} ml-2`}>(Today)</p>
-				</div>
-				<div className="mt-3">
-					<b>Start:</b>
-					<input 	type="text" 
-							className="input-base !w-20 mx-2"
-					/>
-					<b> Ends:</b>
-					<input 	type="text" 
-							className="input-base !w-20 mx-2"
+					<DivInput
+						info = {studentsName}
 					/>
 				</div>
 				<div className="flex mt-2">
+					<b className="mr-2">Day:</b> {time[0].day.label} 
+					<p className={`${hiddenToday} ml-2`}>(Today)</p>
+				</div>
+				<div className="h-10 mt-3 flex">
+					<div className="w-5/12 flex">
+						<b className="mr-2">Start:</b>
+						<DivInput
+							info = {start}
+							style= {timeInput}
+						/>
+					</div>
+					<div className="w-5/12 flex">
+						<b className="ml-8 mr-2"> Ends:</b>
+						<DivInput
+							info = {ends}
+							style= {timeInput}
+						/>
+					</div>
+				</div>
+				<div className="flex">
 					<b className="mr-2">Duration: </b>
 					<p className="mr-1">60 mins</p>
 				</div>
