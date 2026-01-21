@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import Option from "./Option";
 
 export default function Sidebar() {
