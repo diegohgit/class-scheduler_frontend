@@ -1,22 +1,11 @@
 import DataTable from "react-data-table-component";
 import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { students } from "../data/students";
 
 export default function StudentList() {
 
-	const students = [
-					{id:1	, name:"Diego Hernández", level:"C1"},
-					{id:2	, name:"Marcela Briones", level:"B1"},
-					{id:3	, name:"Danae Reyes", 		level:"C2"},
-					{id:4	, name:"Eduardo García", 	level:"B2"},
-					{id:5	, name:"Brayan Cruz", 		level:"B2"},
-					{id:6	, name:"Metzi Castillo", 	level:"B2"},
-					{id:7	, name:"Pablo Indalta", 	level:"C2"},
-					{id:8	, name:"David Jauregui", 	level:"C2"},
-					{id:9	, name:"Fernando Cortez",	level:"B1"},
-					{id:10, name:"Jesús García",		level:"B2"},
-					{id:11, name:"Abraham Montalvo",level:"B2"},
-					{id:12, name:"Edgar Zamora",	  level:"B2"},
-	 			];
+
 
   const columns = [
     {
@@ -35,15 +24,28 @@ export default function StudentList() {
 
 	const handleChange = (e) => {
 		const filteredRecors = students.filter(record => {
-			return record.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-						 record.level.toLowerCase().includes(e.target.value.toLowerCase());
+			return  record.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+					record.level.toLowerCase().includes(e.target.value.toLowerCase());
 		})
 
 		setRecords(filteredRecors)
 	}
 
+	const navigate = useNavigate();
+	const location = useLocation();
+
+
   return (
 	<>
+
+		{location.state?.error && (
+			<div className="w-6/12 mx-auto my-2 p-2
+							bg-red-200 text-red-800 font-bold
+							border border-red-800 rounded">
+				{location.state.error}
+			</div>
+		)}
+
 		<h1 className="text-center font-bold text-4xl">Students</h1>
 
 		<div className="w-6/12 h-90 mx-auto my-3">
@@ -67,9 +69,15 @@ export default function StudentList() {
 				pagination
 				paginationPerPage={10}
 				onRowClicked={(row, e) => {
-						console.log(row.id);
+					navigate(`/students/${row.id}`)
 				}}
 			/>
+
+			<button className="w-40 h-8 my-4  rounded 
+								bg-blue-500 text-white font-bold
+								hover:cursor-pointer hover:bg-blue-600">
+				Add Student
+			</button>
 		</div>
 
 	</>
