@@ -2,27 +2,33 @@
 
 /* input-base */
 .input-base {
-	@apply 	w-full h-8 border border-gray-300
-			focus:border focus:border-blue-600
-			rounded px-2;
+  @apply 	w-full h-8 border border-gray-300
+      focus:border focus:border-blue-600
+      rounded px-2;
 }
 
 .textarea-base {
-	@apply 	w-full h-20 border border-gray-300
-			focus:border-2 focus:border-blue-600 px-2 
-			rounded mb-4;
+  @apply 	w-full h-20 border border-gray-300
+      focus:border-2 focus:border-blue-600 px-2 
+      rounded mb-4;
 }
 
 .circle-color {
-	@apply 	w-10 h-10 m-2 
-			rounded-full border-2 border-gray-400;
+  @apply 	w-10 h-10 m-2 
+      rounded-full border-2 border-gray-400;
 }
 
 .rdt_TableRow{
-	@apply  hover:cursor-pointer hover:bg-blue-100 
-		   odd:bg-white even:bg-gray-100 text-xl
+  @apply  hover:cursor-pointer hover:bg-blue-100 
+       odd:bg-white even:bg-gray-100 text-xl
 }
 
 .rdt_TableHeadRow{
-	@apply text-lg font-bold
+  @apply text-lg font-bold
+}
+
+.button-base {
+  @apply w-40 h-8 rounded 
+			 text-white font-bold 
+				m-2 hover:cursor-pointer;
 }
