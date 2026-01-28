@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import useSchool from "../hooks/useSchool";
 
 type Student = {
   name:      string;
@@ -39,7 +40,6 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     }
   })
 
-  const watchName = watch("name");
 
   useEffect(() => {
     if(initialValues){
@@ -60,7 +60,15 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     {id: 9, value:"fuchsia", class: "bg-fuchsia-300", ring: "peer-checked:ring-fuchsia-300"},
   ]
 
+  const { useChangesProtection } = useSchool();
+
   const navigate = useNavigate();
+
+  const watchName = watch("name");
+
+  const [isDirty, setIsDirty] =  useState(false);
+  useChangesProtection(isDirty);
+
 
   return (
   <>
@@ -72,14 +80,17 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       <form 
         onSubmit={handleSubmit(onSubmit)}
         className="w-8/12">
+
         <div className=" mb-4">
           <p className="font-bold mb-1">Name:</p>
           <input 
             {...register("name")}
             className="input-base"
             placeholder="Student's name"
+            onChange={() => setIsDirty(true)}
              />
         </div>
+
         <div className="flex">
           <div className="w-6/12 mb-4 mr-3">
             <p className="font-bold mb-1">Age:</p>
@@ -87,13 +98,17 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
               {...register("age")}
               className="input-base"
               placeholder="Student's age"
+              onChange={() => setIsDirty(true)}
             />
           </div>
+
           <div className="w-6/12 mb-4">
             <p className="font-bold mb-1">English level:</p>
             <select 
               {...register("level")}
-              className="input-base">
+              className="input-base"
+              onChange={() => setIsDirty(true)}
+              >
               <option value="1">A1</option>
               <option value="2">A2</option>
               <option value="3">B1</option>
@@ -110,11 +125,10 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             {...register("homework")}
             className="textarea-base"
             name="homework"
-            id="homework">
-          </textarea>          
+            id="homework"
+            onChange={() => setIsDirty(true)}
+            ></textarea>
         </div>
-
-
 
         <p className="font-bold mb-1">Schedule Color:</p>
         <div className="flex gap-3 mb-4">
@@ -125,12 +139,13 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
               className="cursor-pointer">
               <input 
                 {...register("color")}
+                id={color.id.toString()} 
                 className="peer" 
                 hidden
                 type="radio"
                 name="color"
                 value={color.id}
-                id={color.id.toString()} />
+                onChange={() => setIsDirty(true)} />
               <span className={`${color.class} block w-10 
                               h-10 rounded-full transition
                               duration-300 peer-checked:ring-2 peer-checked:ring-offset-2
@@ -171,13 +186,14 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           </div>
         </div>
 
-
         <p className="font-bold mb-1">General Progress:</p>
         <textarea 
           {...register("progress")}
           className="textarea-base" 
           name="progress" 
-          id="progress"></textarea>
+          id="progress"
+          onChange={() => setIsDirty(true)}
+          ></textarea>
 
         <div className="items-center justify-center flex mt-4">
           <button 
@@ -188,11 +204,13 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             }}>
             Back to list
           </button>
+
           <button 
             type="submit"
             className="button-base mx-auto bg-green-500 hover:bg-green-600">
             {mode === "create" ? "Create Student" : "Save Changes"}
           </button>
+
           <button 
             type="button"
             className={`${mode === "edit" ? "block" : "hidden"}
