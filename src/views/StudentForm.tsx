@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useSchool from "../hooks/useSchool";
 
@@ -69,6 +69,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   const [isDirty, setIsDirty] =  useState(false);
   useChangesProtection(isDirty);
 
+  const { id } = useParams();
 
   return (
   <>
@@ -186,14 +187,27 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           </div>
         </div>
 
-        <p className="font-bold mb-1">General Progress:</p>
-        <textarea 
-          {...register("progress")}
-          className="textarea-base" 
-          name="progress" 
-          id="progress"
-          onChange={() => setIsDirty(true)}
-          ></textarea>
+        <div>
+          <div className="flex">
+            <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
+            <button 
+              type="button"
+              onClick={() => {
+                navigate(`/students/${id}/progress`);
+              }}
+              className={`${mode === "edit" ? "block" : "hidden"}
+                         button-base mx-auto bg-blue-500 hover:bg-blue-600`}>
+              See progress
+            </button>
+          </div>
+          <textarea 
+            {...register("progress")}
+            className="textarea-base" 
+            name="progress" 
+            id="progress"
+            onChange={() => setIsDirty(true)}
+            ></textarea>     
+        </div>
 
         <div className="items-center justify-center flex mt-4">
           <button 

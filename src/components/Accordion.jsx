@@ -16,26 +16,31 @@ export default function Accordion({mode, title, subtopics}) {
       </div>
 
       {subtopics.map( (subtopics) => (
-        
-        <div 
+        <div
           key={subtopics.id}
           className={`${isOpen
-                        ? 'grid-rows-[1fr] opacity-100' 
+                        ? 'grid-rows-[1fr] opacity-100'
                         : 'grid-rows-[0fr] opacity-0' }
                       grid overflow-hidden transition-all
-                      duration-300 ease-in-out `}
+                      duration-300 ease-in-out`}
         >
-          <div className="overflow-hidden">
-          <label
-            htmlFor={subtopics.id}
-            className="w-full block hover:cursor-pointer 
-                     hover:bg-gray-300">
-            <input
-              type="checkbox"
-              id={subtopics.id}
-              className="mx-2" />
-            {subtopics.subtitle}
-          </label>
+          <div className="flex overflow-hidden">
+            <label
+              htmlFor={subtopics.id}
+              className="w-8/12 block hover:cursor-pointer 
+                      hover:bg-gray-300">
+              <input
+                type="checkbox"
+                id={subtopics.id}
+                className={`${mode === "manage" ? 'hidden' : 'mr-2' } `}
+                checked={Boolean(subtopics.seenAt)}
+                />
+              {subtopics.subtitle}
+            </label>
+            <p className={`${!subtopics.seenAt ? 'hidden' : '' } 
+                          text-sm text-gray-600 ml-4`}>
+                Seen at {subtopics.seenAt}
+            </p>
           </div>
         </div>
       ))}

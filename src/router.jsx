@@ -5,6 +5,7 @@ import Topics from './views/Topics'
 import StudentList from './views/StudentList'
 import EditStudent from './views/EditStudent'
 import CreateStudent from './views/CreateStudent'
+import StudentProgress from './views/StudentProgress'
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,10 @@ const router = createBrowserRouter([
           },
           {
             path: ':id',
-            element: <EditStudent />
+            element: <EditStudent />,
+          },{
+            path: ':id/progress',
+            element: <StudentProgress />
           },
           {
             path: 'create_student',
