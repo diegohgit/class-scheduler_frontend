@@ -27,20 +27,22 @@ export default function Accordion({mode, title, subtopics}) {
           <div className="flex overflow-hidden">
             <label
               htmlFor={subtopics.id}
-              className="w-8/12 block hover:cursor-pointer 
-                      hover:bg-gray-300">
+              className="w-full grid grid-cols-12 items-center 
+                          hover:cursor-pointer hover:bg-gray-300">
               <input
                 type="checkbox"
                 id={subtopics.id}
-                className={`${mode === "manage" ? 'hidden' : 'mr-2' } `}
-                checked={Boolean(subtopics.seenAt)}
+                className={`${mode === "manage" ? 'hidden' : 'mr-2' } col-span-1 `}
+                defaultChecked={Boolean(subtopics.seenAt)}
                 />
-              {subtopics.subtitle}
-            </label>
-            <p className={`${!subtopics.seenAt ? 'hidden' : '' } 
-                          text-sm text-gray-600 ml-4`}>
+              <span className={`${!subtopics.seenAt ? 'col-span-11' : 'col-span-7' }`}>
+                {subtopics.subtitle}
+              </span>
+              <span className={`${!subtopics.seenAt ? 'hidden' : '' } 
+                               col-span-4 text-right text-sm text-gray-600 ml-4`}>
                 Seen at {subtopics.seenAt}
-            </p>
+              </span>
+            </label>
           </div>
         </div>
       ))}
