@@ -1,11 +1,24 @@
 import DataTable from "react-data-table-component";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { students } from "../data/students";
+import axiosClient from "../config/axios";
 
 export default function StudentList() {
+  
+  const getStudents = async () => {
+    try{
+      const {data} = await axiosClient('/api/students');
+      setRecords(data.data)
+    }catch(error){
+      console.log(error)
+    }
+  }
+  
+  const [records, setRecords] = useState([])
 
-
+  useEffect(() => {
+    getStudents();
+  }, []);
 
   const columns = [
     {
@@ -20,10 +33,9 @@ export default function StudentList() {
     },
   ]
 
-  const [records, setRecords] = useState(students)
 
   const handleChange = (e) => {
-    const filteredRecors = students.filter(record => {
+    const filteredRecors = records.filter(record => {
       return  record.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
           record.level.toLowerCase().includes(e.target.value.toLowerCase());
     })
@@ -45,7 +57,7 @@ export default function StudentList() {
       </div>
     )}
 
-    <h1 className="text-center font-bold text-4xl">Students</h1>
+    <h1 className="text-center font-bold text-4xl my-4">Students</h1>
 
     <div className="w-6/12 h-90 mx-auto my-3">
       <div class="relative w-64 mx-auto">
