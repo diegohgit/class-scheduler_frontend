@@ -2,15 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useSchool from "../hooks/useSchool";
+import { Student } from "../types/Student";
 
-type Student = {
-  name:      string;
-  age?:      number | null;
-  level:     number;
-  color:     string;
-  homework?: string | null;
-  progress?: string | null;
-}
 
 type Props = {
   initialValues?: Student | undefined;
@@ -31,12 +24,14 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     reset
   } = useForm<Student>({
     defaultValues: { 
-      name:     "",
-      age:      null,
-      level:    1,
-      homework: null,
-      color:    defaultColor.toString(),
-      progress: null
+      name:      "",
+      birthdate: null,
+      level:     1,
+      homework:  null,
+      //Parse color to string because in the radio inputs this 
+      //field must be a string so the selection can be shown
+      color:     defaultColor.toString(),
+      progress:  null
     }
   })
 
@@ -96,9 +91,9 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           <div className="w-6/12 mb-4 mr-3">
             <p className="font-bold mb-1">Age:</p>
             <input 
-              {...register("age")}
+              {...register("birthdate")}
               className="input-base"
-              placeholder="Student's age"
+              placeholder="Student's birthdate"
               onChange={() => setIsDirty(true)}
             />
           </div>
@@ -145,7 +140,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
                 hidden
                 type="radio"
                 name="color"
-                value={color.id}
+                value={color.id.toString()}
                 onChange={() => setIsDirty(true)} />
               <span className={`${color.class} block w-10 
                               h-10 rounded-full transition
