@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormGetValues } from "react-hook-form";
 import useSchool from "../hooks/useSchool";
 import { Student } from "../types/Student";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 
 type Props = {
@@ -66,6 +70,65 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   const { id } = useParams();
 
+  const { registerForm, setValue} = useForm<FormValues>();
+  const [birthdate, setBirthdate] = useState<string>("");
+
+  const formatBirthdate = (value:string) => {
+    //Leave numbers only
+    const digits: string = value.replace(/\D/g, "").slice(0, 8);
+
+    //Fragment date string to get day, month and year
+    const month:string = digits.slice(0, 2);
+    const day:string   = digits.slice(2, 4);
+    const year:string  = digits.slice(4, 8);
+
+    //Concatenating a "/" every two digits 
+    // to get the date format
+    if(digits.length <= 2) return month;
+    if(digits.length <= 4) return `${month}/${day}`;
+    return `${month}/${day}/${year}`;
+  }
+
+  const handleBirthDate = (value:string) => {
+    const date: string = formatBirthdate(value)
+    
+    //Include the date in the form values
+    setBirthdate(date);
+    setValue("birthdate", date);
+  }
+
+
+  const [markInput, setMarkInput] = useState<boolean>(false)
+  dayjs.extend(customParseFormat);
+
+  const handleDateValidation = (date:string) => {
+    //Use dayjs to work with dates
+    const parsedDate = dayjs(date, "MM/DD/YYYY", true);
+    const valid = parsedDate.isValid();
+    
+    if(date != ""){
+      if(!valid){
+        toast.error('Invalid date')
+        setMarkInput(true)
+        return;
+      }
+      else{
+        //Validate that the birthdate is more than 
+        //2 years ago and less than 100 years ago.
+        const twoYearsAgo = dayjs().subtract(2, "year");
+        const aHundredYearsAgo = dayjs().subtract(100, "year");
+
+        if(parsedDate.isAfter(twoYearsAgo) || parsedDate.isBefore(aHundredYearsAgo)){
+          toast.error("You must try another year");
+          setMarkInput(true);
+          return;
+        }
+      }      
+    }
+    setMarkInput(false);
+  };
+
+
   return (
   <>
     <h1 className="text-center font-bold text-4xl">
@@ -89,12 +152,20 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
         <div className="flex">
           <div className="w-6/12 mb-4 mr-3">
-            <p className="font-bold mb-1">Age:</p>
-            <input 
+            <p className="font-bold mb-1">Birthdate:</p>
+            <input
               {...register("birthdate")}
-              className="input-base"
-              placeholder="Student's birthdate"
-              onChange={() => setIsDirty(true)}
+              className={`input-base ${markInput === true ? "focus:border-0! border-red-500! border-2!":"" } `}
+              placeholder="MM/DD/YYYY"
+              type="string"
+              value={birthdate}
+              onChange={(e) => {
+                setIsDirty(true),
+                handleBirthDate(e.target.value)
+              }}
+              onBlur={(e) => {
+                handleDateValidation(e.target.value)
+              }}
             />
           </div>
 
@@ -200,6 +271,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             className="textarea-base" 
             name="progress" 
             id="progress"
+            placeholder="Write something about this student level"
             onChange={() => setIsDirty(true)}
             ></textarea>     
         </div>

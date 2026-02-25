@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.13.5",
+    "dayjs": "^1.11.19",
     "dom": "^0.0.3",
     "react": "^19.2.0",
     "react-data-table-component": "^7.7.0",
@@ -18,7 +19,8 @@
     "react-hook-form": "^7.71.1",
     "react-modal": "^3.16.3",
     "react-router": "^6.30.3",
-    "react-router-dom": "^6.30.3"
+    "react-router-dom": "^6.30.3",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

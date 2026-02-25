@@ -1,7 +1,7 @@
 export interface Student {
   id: number;
   name: string;
-  birthdate?: number | null;
+  birthdate?: Date | null;
   level: number;
   color: string;
   homework?: string | null;
