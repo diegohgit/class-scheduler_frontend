@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react"
 import { useBlocker } from "react-router-dom";
+import axiosClient from "../config/axios";
 
 const SchoolContext = createContext();
 const customStyles = {
@@ -69,6 +70,18 @@ const SchoolProvider = ({children}) => {
     }, [isDirty]);
   }
 
+  const [students, setStudents] = useState([])
+  const getStudents = async (id = null) => {
+    try{
+      const url = id ? `/api/students/${id}` : '/api/students/';
+      const {data} = await axiosClient(url);
+      setStudents(data.data)
+    }catch(error){
+      console.log("OCURRIO UN ERROR");
+      console.log(error)
+    }
+  }
+
   return (
     <SchoolContext.Provider 
       value = {{
@@ -81,6 +94,8 @@ const SchoolProvider = ({children}) => {
         classModal,
         today,
         useChangesProtection,
+        getStudents,
+        students
       }}
     >{children}
     </SchoolContext.Provider>

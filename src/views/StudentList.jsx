@@ -1,24 +1,24 @@
 import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import axiosClient from "../config/axios";
+import { useNavigate, useLocation } from "react-router-dom";
+import useSchool from "../hooks/useSchool";
 
 export default function StudentList() {
   
-  const getStudents = async () => {
-    try{
-      const {data} = await axiosClient('/api/students');
-      setRecords(data.data)
-    }catch(error){
-      console.log(error)
-    }
-  }
-  
-  const [records, setRecords] = useState([])
+  const { getStudents, students } = useSchool();
 
+  //Get the students when the component is mounted
   useEffect(() => {
     getStudents();
   }, []);
+
+  //Update the "records" state when the "students" state is updated
+  useEffect(() => {
+    setRecords(students);
+  }, [students]);
+
+  //Create a state to manage the searches 
+  const [records, setRecords] = useState(students);
 
   const columns = [
     {
@@ -35,12 +35,15 @@ export default function StudentList() {
 
 
   const handleChange = (e) => {
-    const filteredRecors = records.filter(record => {
-      return  record.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-          record.level.toLowerCase().includes(e.target.value.toLowerCase());
+    const inpValue = e.target.value.toLowerCase();
+
+    const filteredRecords = students.filter(student => {
+      return  student.name.toLowerCase().includes(inpValue) ||
+              student.level.toLowerCase().includes(inpValue);
     })
 
-    setRecords(filteredRecors)
+    //Modify "records" state to not alter the original "students" state
+    setRecords(filteredRecords)
   }
 
   const navigate = useNavigate();
@@ -75,11 +78,11 @@ export default function StudentList() {
         </div>
       </div>
       <DataTable 
-        columns={columns}
-        data={records}
+        columns = {columns}
+        data    = {records}
         pagination
-        paginationPerPage={10}
-        onRowClicked={(row, e) => {
+        paginationPerPage = {10}
+        onRowClicked      = {(row, e) => {
           navigate(`/students/${row.id}`)
         }}
       />
@@ -93,9 +96,7 @@ export default function StudentList() {
           Add Student
         </button>        
       </div>
-
     </div>
-
   </>
   )
 }
