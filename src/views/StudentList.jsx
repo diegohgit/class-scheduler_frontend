@@ -4,8 +4,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 
 export default function StudentList() {
-  
-  const { getStudents, students } = useSchool();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { getStudents, students, loading } = useSchool();
+  //Create a state to manage the searches 
+  const [records, setRecords] = useState([]);
+
 
   //Get the students when the component is mounted
   useEffect(() => {
@@ -16,22 +21,6 @@ export default function StudentList() {
   useEffect(() => {
     setRecords(students);
   }, [students]);
-
-  //Create a state to manage the searches 
-  const [records, setRecords] = useState(students);
-
-  const columns = [
-    {
-      name: "Name",
-      selector: row => row.name,
-      sortable: true,
-    },
-    {
-      name: "Level",
-      selector: row => row.level,
-      sortable: true,
-    },
-  ]
 
 
   const handleChange = (e) => {
@@ -46,8 +35,19 @@ export default function StudentList() {
     setRecords(filteredRecords)
   }
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  //Columns for the DataTable component
+  const columns = [
+    {
+      name: "Name",
+      selector: row => row.name,
+      sortable: true,
+    },
+    {
+      name: "Level",
+      selector: row => row.level,
+      sortable: true,
+    },
+  ]
 
 
   return (
@@ -78,6 +78,8 @@ export default function StudentList() {
         </div>
       </div>
       <DataTable 
+        progressPending = {loading}
+        progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
         data    = {records}
         pagination
@@ -94,7 +96,7 @@ export default function StudentList() {
                 onClick={() => navigate('/students/create_student')}
                   >
           Add Student
-        </button>        
+        </button>
       </div>
     </div>
   </>

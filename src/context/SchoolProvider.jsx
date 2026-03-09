@@ -71,7 +71,11 @@ const SchoolProvider = ({children}) => {
   }
 
   const [students, setStudents] = useState([])
+  const [loading, setLoading] = useState(false);
+  
   const getStudents = async (id = null) => {
+    setLoading(true);
+
     try{
       const url = id ? `/api/students/${id}` : '/api/students/';
       const {data} = await axiosClient(url);
@@ -80,6 +84,8 @@ const SchoolProvider = ({children}) => {
       console.log("OCURRIO UN ERROR");
       console.log(error)
     }
+
+    setLoading(false);
   }
 
   return (
@@ -95,7 +101,8 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
-        students
+        students,
+        loading
       }}
     >{children}
     </SchoolContext.Provider>
