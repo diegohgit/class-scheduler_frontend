@@ -1,6 +1,8 @@
-import { Navigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import StudentForm from "./StudentForm"
-import { students } from "../data/students";
+import useSchool from "../hooks/useSchool";
+import { useEffect, useState } from "react";
+import { Student } from "../types/Student";
 
 
 
@@ -8,19 +10,31 @@ export default function EditStudent() {
 
   //Access to the id included on the URL with useParams()
   const { id } = useParams();
-  const student = students.find(student => student.id === Number(id));
+  const { getStudents } = useSchool();
 
+  const [ student, setStudent ] = useState<Student | undefined>(undefined);
+  const navigate = useNavigate();
 
-  if(!student){
-    //replace avoids going back to the previous page with the browser back button
-    //and tells React Router to replace the current entry in the browser history 
-    //instead of adding a new one.
-    return <Navigate 
-              to="/students"
-              replace
-              state={{ error: "Student not found" }}
-            />;
-  }
+  useEffect(() => {
+    const fetchStudent = async () => {
+      //Run getStudents with the student id
+      //When the response is received, store it in the state
+      const response = await getStudents(id);
+      setStudent(response)
+
+      //If theres no response
+      //redirect to the student list and show an error msg
+      if(!response){
+        navigate("/students", {
+          replace: true,
+          state: { error: "Student not found"}
+          });
+        return
+      }
+    };
+
+    fetchStudent();
+  }, []);
 
   return (
     <>

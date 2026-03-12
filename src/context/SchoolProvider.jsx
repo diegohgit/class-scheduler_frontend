@@ -70,22 +70,25 @@ const SchoolProvider = ({children}) => {
     }, [isDirty]);
   }
 
-  const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(false);
-  
+
+  //Function to get students from DB
+  //If it receives an id, it will return only that student
+  //otherwise, it will return all the students
   const getStudents = async (id = null) => {
     setLoading(true);
 
     try{
       const url = id ? `/api/students/${id}` : '/api/students/';
-      const {data} = await axiosClient(url);
-      setStudents(data.data)
+      const { data } = await axiosClient(url);
+
+      return data.data;
     }catch(error){
       console.log("OCURRIO UN ERROR");
-      console.log(error)
+      console.log(error);
+    }finally{
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
@@ -101,7 +104,6 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
-        students,
         loading
       }}
     >{children}

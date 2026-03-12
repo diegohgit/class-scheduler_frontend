@@ -7,32 +7,33 @@ export default function StudentList() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { getStudents, students, loading } = useSchool();
-  //Create a state to manage the searches 
+  const { getStudents, loading } = useSchool();
   const [records, setRecords] = useState([]);
-
-
-  //Get the students when the component is mounted
+  //Create a state to manage the searches 
+  const [ filter, setFilter ] =useState([]);
+  
   useEffect(() => {
-    getStudents();
-  }, []);
+    const fetchStudents = async () => {
+      const response = await getStudents();
 
-  //Update the "records" state when the "students" state is updated
-  useEffect(() => {
-    setRecords(students);
-  }, [students]);
+      setRecords(response);
+      setFilter(response)
+    }
+    
+    fetchStudents();
+  }, [])
 
 
   const handleChange = (e) => {
     const inpValue = e.target.value.toLowerCase();
 
-    const filteredRecords = students.filter(student => {
+    const filteredRecords = records.filter(student => {
       return  student.name.toLowerCase().includes(inpValue) ||
               student.level.toLowerCase().includes(inpValue);
     })
 
-    //Modify "records" state to not alter the original "students" state
-    setRecords(filteredRecords)
+    //Modify "filter" state to not alter the original "students" state
+    setFilter(filteredRecords)
   }
 
   //Columns for the DataTable component
@@ -63,7 +64,7 @@ export default function StudentList() {
     <h1 className="text-center font-bold text-4xl my-4">Students</h1>
 
     <div className="w-6/12 h-90 mx-auto my-3">
-      <div class="relative w-64 mx-auto">
+      <div className="relative w-64 mx-auto">
         <input
           type="text"
           className="input-base my-2 text-sm"
@@ -71,7 +72,7 @@ export default function StudentList() {
           onChange={handleChange}
         />
 
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
@@ -81,7 +82,7 @@ export default function StudentList() {
         progressPending = {loading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
-        data    = {records}
+        data    = {filter}
         pagination
         paginationPerPage = {10}
         onRowClicked      = {(row, e) => {
