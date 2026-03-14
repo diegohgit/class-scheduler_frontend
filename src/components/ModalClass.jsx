@@ -1,16 +1,15 @@
 import useSchool from "../hooks/useSchool";
 import { useState } from 'react';
 import DivInput from "./DivInput";
+import TimeSelector from "./TimeSelector";
 
 export default function ModalClass() {
 
 	const { time, handleClickModal, classModal, today } = useSchool();
-	const [timer, setTimer] = useState('10:00');
 	const [duration, setDuration] = useState(0);
 
 	const studentsName = classModal?.student;
-	const hiddenToday  = classModal.dayLabel != today ? 'hidden' : '';
-	const timeInput    = "!w-20 mx-2";
+	const hiddenToday  = classModal?.dayLabel != today ? 'hidden' : '';
 	const start = classModal?.hour;
 	const ends  = classModal?.ends;
 
@@ -45,16 +44,14 @@ export default function ModalClass() {
 				<div className="h-10 mt-3 flex">
 					<div className="w-5/12 flex">
 						<b className="mr-2">Start:</b>
-						<DivInput
-							info = {start}
-							style= {timeInput}
+						<TimeSelector 
+							initialTime={start}
 						/>
 					</div>
 					<div className="w-5/12 flex">
 						<b className="ml-8 mr-2"> Ends:</b>
-						<DivInput
-							info = {ends}
-							style= {timeInput}
+						<TimeSelector 
+							initialTime={ends}
 						/>
 					</div>
 				</div>
@@ -65,14 +62,10 @@ export default function ModalClass() {
 			</div>
 
 			<div>
-				<button className="w-40 h-8 rounded 
-								bg-red-500 text-white font-bold 
-								m-2 hover:cursor-pointer hover:bg-red-600">
+				<button className="button-base bg-red-500 hover:bg-red-600">
 					Cancel Class
 				</button>
-				<button className="w-40 h-8 rounded 
-								bg-indigo-500 text-white font-bold 
-								m-2 hover:cursor-pointer hover:bg-indigo-600">
+				<button className="button-base bg-indigo-500 hover:bg-indigo-600">
 					Ok
 				</button>
 			</div>
