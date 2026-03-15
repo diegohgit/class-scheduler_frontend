@@ -56,6 +56,7 @@ export default function Home() {
   let print = 0;
   let matchActive = 0;
   let matchEnds   = 0;
+  let nextClassMin  = '';
 
   return (
     <>
@@ -87,7 +88,7 @@ export default function Home() {
 
             {/* Rows for time blocks */}
             {hours.map((hour) => (
-              // Create an array (12 blocks of 5 minutes each)
+              // Create an array (12 blocks of 5 minutes each one to divide the hour)
               Array.from({ length: blocksPerHr }).map((value, i) => {
 
                 // Calculate the minute for each block (0, 5, 10, ..., 55)
@@ -114,7 +115,7 @@ export default function Home() {
                 // and get the matchEnds from the class.
                 if(match){
                   matchActive = 1;
-                  matchEnds	= match.ends
+                  matchEnds	= match.ends;
                 }else{
                   // Check if we should print an empty class
                   print = matchActive == 0 && minute == 0 ? 1 : 0;
@@ -124,29 +125,19 @@ export default function Home() {
                 if(matchActive){
                   let [h, m] = matchEnds.split('.').map(Number);
 
-                  const blockEnd  = String(m).padStart(2, '0');
-                  const classEnds = h +'.'+ blockEnd === hour +'.'+ minute ? 1 : 0
+                  //Define when we are at the classEnds point
+                  const nextClassMin  = String(m).padStart(2, '0');
+                  const classEnds = h +'.'+ nextClassMin === hour +'.'+ minute ? 1 : 0
 
                   if(classEnds) {
-                    // If the current cycle matches a classEnds
-                    // we deactivate matchActive and activate print
-                    // to now print an empty class
+                    // Deactivate matchActive and activate print
                     print = 1;
                     matchActive = 0;
 
                     // DEFINING HEIGHT OF EMPTY CLASS
                     // (BEFORE THE START OF THE NEXT CLASS)
-                    // We get the minute in which the class ended
-                    // to define the height of the empty class
-                    // exclude the 00 because that case
-                    // already has a height defined previously ('h-20')
                     if(minute != '00'){
-                      //Defining the classHeight variable 
-                      //Example: if the class ends at 8:20
-                      // the next block will have class classHeight = 'h-15' 
-                      // thus representing the space left 
-                      // between 8:20 and 9:00
-                      classHeight = spaceAfterClass(blockEnd);										
+                      classHeight = spaceAfterClass(nextClassMin);										
                     }
                   
                   //If we reach the column limit, reset 
@@ -161,35 +152,39 @@ export default function Home() {
                 if(print && matchActive == 0){
                   //DEFINING HEIGHT OF EMPTY CLASS
                   //(BEFORE THE START OF THE NEXT CLASS)
-                  //We obtain the next class that matches
-                  //the current cycle hour and day.
+                  //Search for the next class getting just the hour part of "starts"
+                  //and compare if it matches with the current hour
                   const nextClass = classes.filter(cls => cls.hour.split('.')[0] == hour
-                                                         && cls.day === day.id);
+                                                          && cls.day === day.id);
 
                   if(nextClass[0]){
-                    //Obtaining the minute in which the next class starts
                     const startMinute = nextClass[0].hour.split('.')[1];
 
-                    //Defining the height that the empty class box will have
-                    // taking as reference the minute in which the class starts.
                     classHeight = spaceBeforeClass(startMinute);
-                  }
-                }
 
+                    //Store the minute when the next class starts
+                    nextClassMin = startMinute;
+                  }else{nextClassMin = '';}//Clean nextClassMin
+                }
+                
                 if(match || print){
+                  //If nextClassMin has a value, store it in emptyClassEnd
+                  //else, set emptyClassEnd as null
+                  const emptyClassEnd = nextClassMin != '' ? nextClassMin : null;
+                  const currTime = hour+'.'+minute
                   return(
-                    <Class 
-                      key  = {`${day.id}-${hour}-${minute}`}
+                    <Class
+                      key    = {`${day.id}-${hour}-${minute}`}
                       minute = { minute }
-                      hour = { hour }
-                      day  = { day }
+                      hour   = { hour }
+                      day    = { day }
                       match  = { match }
                       isHighLighted = { isHighLighted }
-                      classHeight = { classHeight }
+                      classHeight   = { classHeight }
                       onClick = {() => {
-                        handleClickModal(),
-                        handleSetTime({hour, day})
-                        handleClassModal(match)
+                        handleClickModal();
+                        handleSetTime({day, currTime, emptyClassEnd});
+                        handleClassModal(match);
                         //handleSetSearch({match})
                       }}
                     />
@@ -201,11 +196,9 @@ export default function Home() {
         ))}
       </div>
 
-
       <Modal isOpen={modal} style={customStyles}>
           <ModalClass />
       </Modal>
-
     </>
   )
 }

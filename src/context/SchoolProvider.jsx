@@ -20,14 +20,26 @@ const SchoolProvider = ({children}) => {
   const [ time, setTime]    = useState([]);
   const [ classModal, setClassModal ] = useState(0);
 
+  //State to show/hide the modal 
   const handleClickModal = () => {
     setModal(!modal)
   }
 
-  const handleSetTime = ({day, hour}) => {
-    setTime([{"day": day, "hour":hour}]);
+  //Get all the time parameters to be displayed on the modal
+  const handleSetTime = ({day, currTime, emptyClassEnd}) => {
+    //Get the hour part from currTime to calculate nextHour
+    const currHour = currTime.split('.')[0]
+    const nextHour = parseInt(currHour) + 1;
+
+    // IF emptyClassEnd has a value, ends will be the start of the next class 
+    // that starts in the same hour (currentHour + emptyClassEnd)
+    // ELSE, ends will be the start of the next block (nextHour + '.00')
+    const ends = emptyClassEnd ? currHour+'.'+emptyClassEnd : nextHour+'.00';
+
+    setTime([{"day": day, "time":currTime, "ends": ends}]);
   }
 
+  //State used to send class information to the modal
   const handleClassModal = (classModal) => {
     setClassModal(classModal)
   }

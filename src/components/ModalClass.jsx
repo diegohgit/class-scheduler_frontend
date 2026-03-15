@@ -8,10 +8,10 @@ export default function ModalClass() {
 	const { time, handleClickModal, classModal, today } = useSchool();
 	const [duration, setDuration] = useState(0);
 
-	const studentsName = classModal?.student;
+	const studentsName = classModal?.student || null;
 	const hiddenToday  = classModal?.dayLabel != today ? 'hidden' : '';
-	const start = classModal?.hour;
-	const ends  = classModal?.ends;
+	const start = classModal?.hour || time[0].time ;
+	const ends  = classModal?.ends || time[0].ends;	
 
 	return (
 		<>
