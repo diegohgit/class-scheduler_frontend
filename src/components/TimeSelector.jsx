@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useSchool from "../hooks/useSchool";
 
-export default function TimeSelector({initialTime}) {
+export default function TimeSelector({initialTime, auxiliar}) {
 
   //States to define if the hour/minute selector will be shown.
   const [showHr, setShowHr]   = useState(0);
   const [showMin, setShowMin] = useState(0);
-
   //Get hour and minute from the initialTime prop.
-  const [h, m] = initialTime.split('.').map(Number);
+  const [h, m] = initialTime.split(':').map(Number);
 
   //States to handle the selected hour and minute.
   const [selHr,  setSelHr]  = useState(h.toString().padStart(2, '0'));
@@ -15,6 +15,15 @@ export default function TimeSelector({initialTime}) {
 
   //State to show the selected time.
   const [time, setTime] = useState(selHr+':'+selMin);
+
+  const { setClassStart, setClassEnd } = useSchool();
+
+  //Update "classStart" and "classEnd" states to calculate "duration" state
+  useEffect(() => {
+    if(auxiliar ==="start") setClassStart(time)
+    else if(auxiliar ==="end") setClassEnd(time)
+
+  }, [time, auxiliar])
 
   return (
     <>

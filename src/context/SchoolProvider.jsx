@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect } from "react"
 import { useBlocker } from "react-router-dom";
 import axiosClient from "../config/axios";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
 const SchoolContext = createContext();
 const customStyles = {
@@ -25,24 +27,58 @@ const SchoolProvider = ({children}) => {
     setModal(!modal)
   }
 
+  //State used to send class information to the modal
+  const handleClassModal = (classModal) => {
+    setClassModal(classModal)
+  }
+
   //Get all the time parameters to be displayed on the modal
   const handleSetTime = ({day, currTime, emptyClassEnd}) => {
     //Get the hour part from currTime to calculate nextHour
-    const currHour = currTime.split('.')[0]
+    const currHour = currTime.split(':')[0]
     const nextHour = parseInt(currHour) + 1;
 
     // IF emptyClassEnd has a value, ends will be the start of the next class 
     // that starts in the same hour (currentHour + emptyClassEnd)
     // ELSE, ends will be the start of the next block (nextHour + '.00')
-    const ends = emptyClassEnd ? currHour+'.'+emptyClassEnd : nextHour+'.00';
+    const ends = emptyClassEnd ? currHour+':'+emptyClassEnd : nextHour+':00';
 
     setTime([{"day": day, "time":currTime, "ends": ends}]);
   }
 
-  //State used to send class information to the modal
-  const handleClassModal = (classModal) => {
-    setClassModal(classModal)
+  //State to show the duration of a class
+  const [classLength, setClassLength] = useState('');
+
+  const [ classStart, setClassStart ] = useState(null);
+  const [ classEnd,   setClassEnd   ] = useState(null);
+
+  dayjs.extend(duration);
+  const getDuration = (startTime, endTime) => {
+    //To calculate duration dayjs() requires any date 
+    //in order to work with a "yyyy-mm-dd 00:00" format
+    const baseDate = "2026-01-01";
+
+    let start = dayjs(`${baseDate} ${startTime}`);
+    let end   = dayjs(`${baseDate} ${endTime}`);
+
+    //In case we were working with an start hour in one day
+    //and end hour in the next day
+    if(end.isBefore(start)){
+      end = end.add(1, "day");
+    }
+
+    //Get total minutes and hours
+    const diff = dayjs.duration(end.diff(start));
+    const totalH = diff.hours()   ? diff.hours()+'hr' : '';
+    const totalM = diff.minutes() ? diff.minutes()+'min' : '';
+
+    setClassLength(totalH+' '+totalM);
   }
+
+  //Get calculation of class duration
+  useEffect(() => {
+    getDuration(classStart, classEnd);
+  }, [classStart, classEnd])
 
   const today = new Date().toLocaleDateString("en-US", {
           weekday: 'long'
@@ -111,6 +147,12 @@ const SchoolProvider = ({children}) => {
         modal,
         handleSetTime,
         time,
+        getDuration,
+        classLength,
+        classStart,
+        setClassStart,
+        classEnd,
+        setClassEnd,
         handleClassModal,
         classModal,
         today,

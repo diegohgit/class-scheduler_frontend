@@ -99,7 +99,7 @@ export default function Home() {
                 //VALIDATE IF THE CURRENT CYCLE IS THE START OF A CLASS
                 const match = classes.find(cls => {
                         // Split the hour string of the class into hours and minutes
-                        const [h, m] = cls.hour.split('.').map(Number);
+                        const [h, m] = cls.hour.split(':').map(Number);
 
                         // With this instruction we define the block in which it starts
                         const blockStart = String(m).padStart(2, '0');
@@ -123,11 +123,11 @@ export default function Home() {
 
                 // DEFINING CLASS-ENDS
                 if(matchActive){
-                  let [h, m] = matchEnds.split('.').map(Number);
+                  let [h, m] = matchEnds.split(':').map(Number);
 
                   //Define when we are at the classEnds point
                   const nextClassMin  = String(m).padStart(2, '0');
-                  const classEnds = h +'.'+ nextClassMin === hour +'.'+ minute ? 1 : 0
+                  const classEnds = h +':'+ nextClassMin === hour +':'+ minute ? 1 : 0
 
                   if(classEnds) {
                     // Deactivate matchActive and activate print
@@ -142,7 +142,7 @@ export default function Home() {
                   
                   //If we reach the column limit, reset 
                   // print and matchActive values
-                  }else if(hour +'.'+ minute == '11.55'){
+                  }else if(hour +':'+ minute == '11:55'){
                     print = 0;
                     matchActive = 0;
                   }
@@ -154,11 +154,11 @@ export default function Home() {
                   //(BEFORE THE START OF THE NEXT CLASS)
                   //Search for the next class getting just the hour part of "starts"
                   //and compare if it matches with the current hour
-                  const nextClass = classes.filter(cls => cls.hour.split('.')[0] == hour
+                  const nextClass = classes.filter(cls => cls.hour.split(':')[0] == hour
                                                           && cls.day === day.id);
 
                   if(nextClass[0]){
-                    const startMinute = nextClass[0].hour.split('.')[1];
+                    const startMinute = nextClass[0].hour.split(':')[1];
 
                     classHeight = spaceBeforeClass(startMinute);
 
@@ -171,7 +171,7 @@ export default function Home() {
                   //If nextClassMin has a value, store it in emptyClassEnd
                   //else, set emptyClassEnd as null
                   const emptyClassEnd = nextClassMin != '' ? nextClassMin : null;
-                  const currTime = hour+'.'+minute
+                  const currTime = hour+':'+minute
                   return(
                     <Class
                       key    = {`${day.id}-${hour}-${minute}`}
