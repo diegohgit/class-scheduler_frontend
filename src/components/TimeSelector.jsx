@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useSchool from "../hooks/useSchool";
 
 export default function TimeSelector({initialTime, auxiliar}) {
@@ -25,6 +25,32 @@ export default function TimeSelector({initialTime, auxiliar}) {
 
   }, [time, auxiliar])
 
+  const divRef = useRef(null);
+  useEffect(() => {
+    function handleClickOutside(event){
+      //divRef.current is used to validate if the current div exists.
+      //This must be validated before the second condition
+      //because if divRef.current is null the app would crush
+      //when the second condition was being read.
+      //event.target is the element that was clicked, so we check if
+      //the element clicked was inside or outside divRef
+      if(divRef.current && !divRef.current.contains(event.target)){
+        setShowHr(0);
+        setShowMin(0);
+      }
+    }
+
+    //If showHr or showMin are active
+    //add the "mousedown" event listener to the document
+    //if user does a mousedown on any part of document, run handleClickOutside()
+    if(showHr || showMin){
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    //Cleanup function
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showHr, showMin]);
+
   return (
     <>
       {/*Div to show selected time*/}
@@ -42,7 +68,8 @@ export default function TimeSelector({initialTime, auxiliar}) {
       </div>
 
       {/*Div to show the HOUR selector*/}
-      <div className={`${showHr ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
+      <div  ref={divRef}
+            className={`${showHr ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
                       border-2 border-sky-200 bg-white 
                       shadow-xl rounded absolute 
                       w-40 bottom-3 transition-opacity duration-300`}
@@ -53,7 +80,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
           { Array.from({ length: 24 }).map((value, i) => {
 
             const hour = i.toString().padStart(2, '0');
-            return  <button 
+            return  <button
                       key={hour}
                       className={`${ hour === selHr ? 'bg-sky-200' : '' }
                                   border border-sky-200 h-7 
