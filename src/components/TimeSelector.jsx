@@ -22,20 +22,25 @@ export default function TimeSelector({initialTime, auxiliar}) {
   useEffect(() => {
     if(auxiliar ==="start") setClassStart(time)
     else if(auxiliar ==="end") setClassEnd(time)
-
   }, [time, auxiliar])
 
-  const divRef = useRef(null);
+  //State to manage the showing/hidding of time selector
+  //when user clicks outside of it.
+  const divHrRef  = useRef(null);
+  const divMinRef = useRef(null);
   useEffect(() => {
     function handleClickOutside(event){
-      //divRef.current is used to validate if the current div exists.
+      //divHrRef.current is used to validate if the current div exists.
       //This must be validated before the second condition
-      //because if divRef.current is null the app would crush
-      //when the second condition was being read.
+      //because if divHrRef.current is null the app would crush
+      //when the second condition is being be read.
       //event.target is the element that was clicked, so we check if
-      //the element clicked was inside or outside divRef
-      if(divRef.current && !divRef.current.contains(event.target)){
+      //the element clicked was inside or outside divHrRef
+      if(divHrRef.current && !divHrRef.current.contains(event.target)){
         setShowHr(0);
+      }
+      
+      if(divMinRef.current && !divMinRef.current.contains(event.target)){
         setShowMin(0);
       }
     }
@@ -51,7 +56,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showHr, showMin]);
 
-  //Render the time selector title example "Select Hour"
+  //Render the time selector title. Example: "Select Hour"
   const getTittle = (title) => {
     return <div className="relative flex items-center">
               <p className="w-full text-center font-bold ">Select {title}</p>
@@ -59,8 +64,10 @@ export default function TimeSelector({initialTime, auxiliar}) {
               {/*Time selector close button*/}
               <button 
                 className="absolute h-6 right-0 hover:bg-gray-200 hover:cursor-pointer"
-                onClick={() => {setShowHr(0);
-                                setShowMin(0);
+                onClick={() => {
+                          setShowHr(0);
+                          setShowMin(0);
+                          setSelHr(h.toString().padStart(2, '0'))
                         }}
                 >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
@@ -89,7 +96,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
       </div>
 
       {/*Div to show the HOUR selector*/}
-      <div  ref={divRef}
+      <div  ref={divHrRef}
             className={`${showHr ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
                       border-2 border-sky-200 bg-white 
                       shadow-xl rounded absolute 
@@ -121,12 +128,12 @@ export default function TimeSelector({initialTime, auxiliar}) {
       </div>
 
       {/*Div to show the MINUTE selector*/}
-      <div className={`${showMin ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
+      <div  ref={divMinRef}
+            className={`${showMin ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
                       border-2 border-sky-200 bg-white 
                       shadow-xl rounded absolute 
                       w-40 bottom-3 transition-opacity duration-300`}
       >
-        
         {getTittle("Minute")}
         {/*Grid to show minutes*/}
         <div className="grid grid-cols-3">
@@ -135,14 +142,14 @@ export default function TimeSelector({initialTime, auxiliar}) {
             const minute = every5Min.toString().padStart(2, '0');
             return  <button 
                       key={minute}
-                      className={`${ minute === selMin ? 'bg-sky-200' : '' }
+                      className={`${ minute === selMin ? 'bg-sky-400' : '' }
                                   border border-sky-200 h-7 
                                 hover:bg-sky-200 hover:cursor-pointer`}
                       onClick={() => {
-                                setShowMin(0);
-                                setSelMin(minute);
-                                setTime(selHr+':'+minute);
-                              }}
+                        setSelMin(minute);
+                        setTime(selHr+':'+minute);
+                        setShowMin(0);
+                      }}
                     >
                         {minute}
                     </button>;
