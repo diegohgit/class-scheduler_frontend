@@ -51,6 +51,27 @@ export default function TimeSelector({initialTime, auxiliar}) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showHr, showMin]);
 
+  //Render the time selector title example "Select Hour"
+  const getTittle = (title) => {
+    return <div className="relative flex items-center">
+              <p className="w-full text-center font-bold ">Select {title}</p>
+
+              {/*Time selector close button*/}
+              <button 
+                className="absolute h-6 right-0 hover:bg-gray-200 hover:cursor-pointer"
+                onClick={() => {setShowHr(0);
+                                setShowMin(0);
+                        }}
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                  viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
+                  className="w-6 h-6 ">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+           </div>
+  }
+
   return (
     <>
       {/*Div to show selected time*/}
@@ -74,7 +95,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
                       shadow-xl rounded absolute 
                       w-40 bottom-3 transition-opacity duration-300`}
       >
-        <p className="text-center font-bold ">Select Hour</p>
+        {getTittle("Hour")}
         {/*Grid to show hours*/}
         <div className="grid grid-cols-6">
           { Array.from({ length: 24 }).map((value, i) => {
@@ -106,7 +127,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
                       w-40 bottom-3 transition-opacity duration-300`}
       >
         
-        <p className="text-center font-bold ">Select Minute</p>
+        {getTittle("Minute")}
         {/*Grid to show minutes*/}
         <div className="grid grid-cols-3">
           { Array.from({ length: 12 }).map((value, i) => {
