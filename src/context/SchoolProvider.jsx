@@ -123,11 +123,14 @@ const SchoolProvider = ({children}) => {
   //Function to get students from DB
   //If it receives an id, it will return only that student
   //otherwise, it will return all the students
-  const getStudents = async (id = null) => {
+  const getStudents = async (id = null, search = null) => {
     setLoading(true);
 
     try{
-      const url = id ? `/api/students/${id}` : '/api/students/';
+      const studentUrl = id ? `/api/students/${id}` : '/api/students/';
+      const searchUrl  = search ? `/api/students/?search=${search}` : null;
+      const url = searchUrl ? searchUrl : studentUrl;
+
       const { data } = await axiosClient(url);
 
       return data.data;
