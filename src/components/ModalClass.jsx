@@ -2,14 +2,14 @@ import useSchool from "../hooks/useSchool";
 import { useEffect } from 'react';
 import DivInput from "./DivInput";
 import TimeSelector from "./TimeSelector";
+import SelectDay from "./SelectDay";
 
 export default function ModalClass() {
 
   const { time, classLength, handleClickModal, classModal, 
-          today, setClassStart, setClassEnd } = useSchool();
+          setClassStart, setClassEnd } = useSchool();
 
   const studentsName = classModal?.student || null;
-  const hiddenToday  = classModal?.dayLabel != today ? 'hidden' : '';
 
   //Get time from the class loaded to de modal
   //if the modal is showing an empty block, take time from "time" state
@@ -48,8 +48,8 @@ export default function ModalClass() {
           />
         </div>
         <div className="flex mt-2">
-          <b className="mr-2">Day:</b> {time[0].day.label} 
-          <p className={`${hiddenToday} ml-2`}>(Today)</p>
+          <b className="mr-2">Day:</b> 
+          <SelectDay info={time[0].day} />
         </div>
         <div className="h-10 mt-3 flex">
           <div className="w-5/12 flex">
