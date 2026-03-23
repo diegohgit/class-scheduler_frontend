@@ -62,11 +62,6 @@ export default function DivInput({info, style = ""}) {
         setShowResults(0);
         inputRef.current.value = selStudent;
         setEditInfo(0);
-      }else{
-        console.log("1", divResultsRef.current)
-        console.log("2", !divResultsRef.current.contains(e.target))
-        console.log("showResults", showResults)
-        console.log("editInfo", editInfo)
       }
     }
 
