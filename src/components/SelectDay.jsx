@@ -55,7 +55,7 @@ export default function SelectDay( {info} ) {
       <select 
         ref={selectRef}
         className={`${showSelect ? '' : 'hidden'}`}
-        value={selDay.id}
+        defaultValue={selDay.id}
       >
         {/* Render select options */}
         {days.map((day) => {
