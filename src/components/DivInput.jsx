@@ -20,7 +20,7 @@ export default function DivInput({info, style = ""}) {
 
   }, [editInfo, info]);
 
-  const { getStudents } = useSchool()
+  const { getStudents, loading } = useSchool()
   /*States to:
     - Store search results
     - Show/hide div which shows search results
@@ -65,7 +65,7 @@ export default function DivInput({info, style = ""}) {
       }
     }
 
-    if(showResults){
+    if(showResults || editInfo){
       document.addEventListener("mousedown", handleClickOutside);
     }
 
@@ -106,14 +106,19 @@ export default function DivInput({info, style = ""}) {
                         w-9/10 bg-white absolute 
                         rounded-b-lg border border-sky-300`}
         >
-          <li className={`${!results.length && showResults ? '':'hidden'} h-8 text-center`}>
+          <li className={`${!results.length && showResults && !loading ? '':'hidden'} 
+                          h-8 text-center`}>
             No matches found.
+          </li>
+          <li className={`${loading && showResults ? '':'hidden'} h-8 text-center`}>
+            Searching...
           </li>
 
           {results.map((result) => {
             return <li  key={result.id}
-                        className="h-8 hover:bg-gray-200 hover:cursor-pointer
-                                  pl-2"
+                        className={`${loading ? 'hidden' : ''}
+                                  h-8 hover:bg-gray-200 hover:cursor-pointer
+                                  pl-2`}
                         onClick={() => {
                   {/* If user clicks a result
                       - Set selStudent state to the selected student.	
