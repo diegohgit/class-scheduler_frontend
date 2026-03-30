@@ -14,15 +14,16 @@ export default function TimeSelector({initialTime, auxiliar}) {
   const [selMin, setSelMin] = useState(m.toString().padStart(2, '0'));
 
   //State to show the selected time.
-  const [time, setTime] = useState(selHr+':'+selMin);
+  const [selTime, setSelTime] = useState(selHr+':'+selMin);
 
-  const { setClassStart, setClassEnd } = useSchool();
+  const { setTime } = useSchool();
 
-  //Update "classStart" and "classEnd" states to calculate "duration" state
+  //Update 'time' state to calculate 'duration' state.
   useEffect(() => {
-    if(auxiliar ==="start") setClassStart(time)
-    else if(auxiliar ==="end") setClassEnd(time)
-  }, [time, auxiliar])
+    //Modify only 'starts' or only 'ends' from the time state.
+    if(auxiliar ==="start")    setTime(prev => ({...prev, 'starts': selTime}));
+    else if(auxiliar ==="end") setTime(prev => ({...prev, 'ends': selTime}));
+  }, [selTime, auxiliar]);
 
   //State to manage the showing/hidding of time selector
   //when user clicks outside of it.
@@ -88,7 +89,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
             onClick={() => setShowHr(1)}
       >
         <p className=" underline underline-offset-2">
-          {time}
+          {selTime}
         </p>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -147,7 +148,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
                                 hover:bg-sky-200 hover:cursor-pointer`}
                       onClick={() => {
                         setSelMin(minute);
-                        setTime(selHr+':'+minute);
+                        setSelTime(selHr+':'+minute);
                         setShowMin(0);
                       }}
                     >

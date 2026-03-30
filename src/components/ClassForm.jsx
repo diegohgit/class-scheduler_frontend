@@ -5,8 +5,7 @@ import useSchool from "../hooks/useSchool";
 
 export default function ClassForm({ onSubmit }) {
 
-  const { time, classLength, classStart, classEnd,
-          selStudent, selDay } = useSchool();
+  const { time, classLength, selStudent, selDay } = useSchool();
 
   function handleSubmit(e){
     e.preventDefault();
@@ -16,8 +15,8 @@ export default function ClassForm({ onSubmit }) {
     onSubmit({
         student_id : selStudent.id,
         day_id     : selDay.id,
-        starts     : classStart,
-        ends       : classEnd, 
+        starts     : time.starts,
+        ends       : time.ends, 
     });
   }
 

@@ -68,21 +68,19 @@ const SchoolProvider = ({children}) => {
     }
   }
 
+
   //State to show the duration of a class.
   const [classLength, setClassLength] = useState('');
 
-  const [ classStart, setClassStart ] = useState(null);
-  const [ classEnd,   setClassEnd   ] = useState(null);
-
   //Function to calculate the duration of a class.
   dayjs.extend(duration);
-  const getDuration = (startTime, endTime) => {
+  const getDuration = (time) => {
     //To calculate duration dayjs() requires any date 
     //in order to work with a "yyyy-mm-dd 00:00" format.
     const baseDate = "2026-01-01";
 
-    let start = dayjs(`${baseDate} ${startTime}`);
-    let end   = dayjs(`${baseDate} ${endTime}`);
+    let start = dayjs(`${baseDate} ${time.starts}`);
+    let end   = dayjs(`${baseDate} ${time.ends}`);
 
     //In case we were working with an start hour in one day
     //and end hour in the next day.
@@ -100,8 +98,8 @@ const SchoolProvider = ({children}) => {
 
   //Get calculation of class duration
   useEffect(() => {
-    getDuration(classStart, classEnd);
-  }, [classStart, classEnd])
+    getDuration(time);
+  }, [time])
 
   //Variable to show if the current day has been selected.
   const today = new Date().toLocaleDateString("en-US", {
@@ -178,11 +176,9 @@ const SchoolProvider = ({children}) => {
         selStudent, setSelStudent,
         selDay, setSelDay,
         handleSetTime,
-        time,
+        time, setTime,
         getDuration,
         classLength,
-        classStart, setClassStart,
-        classEnd, setClassEnd,
         handleClassModal,
         classModal,
         today,
