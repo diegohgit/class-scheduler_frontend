@@ -7,28 +7,30 @@ import useSchool from "../hooks/useSchool";
 export default function DivInput({info, style = ""}) {
 
   //editInfo state is used to show the search input 
-  // and show the <p> element which displays the student's name.
+  //and show the <p> element which displays the student's name.
   const [ editInfo, setEditInfo ] = useState(0)
   const inputRef = useRef(null);
 
   //Manage search input's behavior and hide search results list
   useEffect(() => {
-    //Select all text contained in the search input 
-    //when user wants to edit student
-    //or focus input If the block selected doesn't have info.
-    if(editInfo || !info) inputRef.current?.select();
+    /*Select all text contained in the search input 
+       when user wants to edit student
+       or focus input If the block selected doesn't have info. */
+    if(editInfo || !info.length) inputRef.current?.select();
 
   }, [editInfo, info]);
 
-  const { getStudents, loading } = useSchool()
+  const { getStudents, loading, selStudent, setSelStudent } = useSchool()
   /*States to:
-    - Store search results
-    - Show/hide div which shows search results
-    - Store selected student
+    - Store search results.
+    - Show/hide div which shows search results.
   */
   const [results, setResults] = useState([]);
   const [showResults, setShowResults] = useState(0);
-  const [selStudent, setSelStudent] 	= useState(info);
+
+  useEffect(() => {
+    setSelStudent(info);
+  }, [])
 
   //Send request to search for students 
   const handleSearch = (value) => {
@@ -55,12 +57,12 @@ export default function DivInput({info, style = ""}) {
          && (showResults || editInfo))
       {
         /*- Hide divResults and search input.
-          - Set inputRef value back to selStudent
+          - Set inputRef value back to selStudent.name
             in case the user had written something.
           - Deactivate editInfo state.
         */
         setShowResults(0);
-        inputRef.current.value = selStudent;
+        inputRef.current.value = selStudent.name;
         setEditInfo(0);
       }
     }
@@ -80,11 +82,12 @@ export default function DivInput({info, style = ""}) {
            or when theres no selStudent, which means that the user 
            opened an empty block.
       */}
-      <div className={`${editInfo || !selStudent ? 'hidden':''} flex hover:cursor-pointer`}
+      <div className={`${editInfo || !selStudent?.name ? 'hidden':''} flex hover:cursor-pointer`}
            onClick={() => setEditInfo(1)}
+           title="Click to edit student"
       >
         <p className="underline underline-offset-2 mr-2">
-          {selStudent}
+          {selStudent.name}
         </p>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -95,8 +98,8 @@ export default function DivInput({info, style = ""}) {
       <div ref={divResultsRef}>
         {/* search input */}
         <input type="text" 
-            className={`${editInfo || !selStudent ? '':'hidden'} input-base ${style}`}
-            defaultValue={selStudent}
+            className={`${editInfo || !selStudent?.name ? '':'hidden'} input-base ${style}`}
+            defaultValue={selStudent.name}
             placeholder="Search for student..."
             ref={inputRef}
             onChange={(e) => handleSearch(e.target.value)}
@@ -127,7 +130,7 @@ export default function DivInput({info, style = ""}) {
                       - Set search input's value to the selected student
                         in case the user wanted to make another search.
                   */}
-                          setSelStudent(result.name);
+                          setSelStudent(result);
                           setEditInfo(0);
                           setShowResults(0);
                           inputRef.current.value = result.name;

@@ -5,11 +5,10 @@ import { days } from "../data/days";
 //This component is used to display and modify data.
 //When its displaying data the user can click on it
 //and it will switch to a select usefull to pick the class day.
-export default function SelectDay( {info} ) {
+export default function SelectDay() {
 
   //Show if the class day is today.
-  const { today } = useSchool();
-  const [selDay, setSelDay] = useState(info);
+  const { today, selDay, setSelDay } = useSchool();
   const hiddenToday = selDay.label != today ? 'hidden' : '';
 
   //Hide select when user clicks outside of it.
@@ -54,6 +53,7 @@ export default function SelectDay( {info} ) {
       {/* Select with list of days */}
       <select 
         ref={selectRef}
+        name='day_id'
         className={`${showSelect ? '' : 'hidden'}`}
         defaultValue={selDay.id}
       >
