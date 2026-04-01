@@ -2,11 +2,34 @@ import Class from "../components/Class";
 import ModalClass from "../components/ModalClass";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
-import { useState } from "react";
-import { classes } from "../data/classes";
+import { useState, useEffect } from "react";
+//import { classes } from "../data/classes";
+import { days } from "../data/days";
+import axiosClient from "../config/axios";
 
 Modal.setAppElement('#root')
 export default function Home() {
+
+  const getClasses = async () => {
+    try{
+      const url = '/api/student_classes/';
+      const data = await axiosClient(url);
+      return data.data;
+    }catch(error){
+      console.log("OCURRIO UN ERROR");
+      console.log(error);
+    }
+  }
+
+  const [ classes, setClasses ] = useState([]);
+
+  useEffect(() =>{
+    const fetchClasses = async () => {
+      const response = await getClasses();
+      setClasses(response);
+    }
+    fetchClasses();
+  }, [])
 
   const { customStyles, handleClickModal, modal, handleSetTime, handleClassModal } = useSchool();
   const [ searchStudent, setSearchStudent ] = useState(0);
@@ -39,24 +62,13 @@ export default function Home() {
     return classHeightAC;
   }
 
-
-  const days = [
-          {id:1	, label:"Monday"},
-          {id:2	, label:"Tuesday"},
-          {id:3	, label:"Wednesday"},
-          {id:4	, label:"Thursday"},
-          {id:5	, label:"Friday"},
-          {id:6	, label:"Saturday"},
-          {id:7	, label:"Sunday"}
-         ];
-
   const hours = [7, 8, 9, 10, 11];
-
   const blocksPerHr = 12;
+
   let print = 0;
-  let matchActive = 0;
-  let matchEnds   = 0;
-  let nextClassMin  = '';
+  let matchActive  = 0;
+  let matchEnds    = 0;
+  let nextClassMin = '';
 
   return (
     <>
@@ -99,16 +111,18 @@ export default function Home() {
                 //VALIDATE IF THE CURRENT CYCLE IS THE START OF A CLASS
                 const match = classes.find(cls => {
                         // Split the hour string of the class into hours and minutes
-                        const [h, m] = cls.hour.split(':').map(Number);
+                        const [h, m] = cls.starts.split(':').map(Number);
 
                         // With this instruction we define the block in which it starts
                         const blockStart = String(m).padStart(2, '0');
 
                         // Validate if the current cycle (hour and minute) matches the start of a class
-                        return h === hour && blockStart === minute && cls.day === day.id;
+                        return h === hour && blockStart === minute && cls.day_id === day.id;
                       }) ?? null;
 
-                let classHeight = match ? match.height : 'h-20';
+                //let classHeight = match ? match.height : 'h-20';
+                let classHeight = 'h-20';
+
                 const isHighLighted = match && searchStudent == match.student_id ? 1 : 0;
 
                 // If we have a match, we activate matchActive
@@ -154,11 +168,13 @@ export default function Home() {
                   //(BEFORE THE START OF THE NEXT CLASS)
                   //Search for the next class getting just the hour part of "starts"
                   //and compare if it matches with the current hour
-                  const nextClass = classes.filter(cls => cls.hour.split(':')[0] == hour
-                                                          && cls.day === day.id);
+                  //Example: if we are in the 08:10 block, we look for a class in the 
+                  // same hour range, like 08:30
+                  const nextClass = classes.filter(cls => cls.starts.split(':')[0] == hour
+                                                          && cls.day_id === day.id);
 
                   if(nextClass[0]){
-                    const startMinute = nextClass[0].hour.split(':')[1];
+                    const startMinute = nextClass[0].starts.split(':')[1];
 
                     classHeight = spaceBeforeClass(startMinute);
 
@@ -166,12 +182,10 @@ export default function Home() {
                     nextClassMin = startMinute;
                   }else{nextClassMin = '';}//Clean nextClassMin
                 }
-                
+
                 if(match || print){
-                  //If nextClassMin has a value, store it in emptyClassEnd
-                  //else, set emptyClassEnd as null
                   const emptyClassEnd = nextClassMin != '' ? nextClassMin : null;
-                  const currTime = hour+':'+minute
+                  const currTime = hour.toString().padStart(2, '0')+':'+minute
                   return(
                     <Class
                       key    = {`${day.id}-${hour}-${minute}`}
@@ -183,7 +197,7 @@ export default function Home() {
                       classHeight   = { classHeight }
                       onClick = {() => {
                         handleClickModal();
-                        handleSetTime({day, currTime, emptyClassEnd});
+                        handleSetTime({day, currTime, emptyClassEnd, match});
                         handleClassModal(match);
                         //handleSetSearch({match})
                       }}

@@ -21,8 +21,8 @@ export default function TimeSelector({initialTime, auxiliar}) {
   //Update 'time' state to calculate 'duration' state.
   useEffect(() => {
     //Modify only 'starts' or only 'ends' from the time state.
-    if(auxiliar ==="start")    setTime(prev => ({...prev, 'starts': selTime}));
-    else if(auxiliar ==="end") setTime(prev => ({...prev, 'ends': selTime}));
+    if(auxiliar === "start")    setTime(prev => ({...prev, 'starts': selTime}));
+    else if(auxiliar === "end") setTime(prev => ({...prev, 'ends': selTime}));
   }, [selTime, auxiliar]);
 
   //State to manage the showing/hidding of time selector

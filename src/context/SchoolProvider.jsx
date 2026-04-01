@@ -64,7 +64,7 @@ const SchoolProvider = ({children}) => {
 
       setTime({"starts":currTime, "ends": ends});
     }else{
-      setTime({"starts":match.hour, "ends": match.ends});
+      setTime({"starts":match.starts, "ends": match.ends});
     }
   }
 
