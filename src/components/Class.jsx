@@ -1,8 +1,8 @@
 export default function Class({onClick, minute, hour, day, isHighLighted, match, classHeight}) {
 
   //Formato para mostrar label cuando un cuadro está vacío
-  const dayLabel 		  = day.label.slice(0,3);  
-  const color 		    = match ? 'bg-red-500' : 'bg-gray-300'
+  const dayLabel 		  = day.label.slice(0,3);
+  const color 		    = match ? match.color : '#d1d5db';
   const hiddenStudent = match ? '' : 'hidden'
   const student 	= match ? match.student : '';
   const matchEnds = match ? ' - '+match.ends : '';
@@ -25,7 +25,8 @@ export default function Class({onClick, minute, hour, day, isHighLighted, match,
   const timeShow = match ? match.starts : hour+":"+minute;
   return (
     <>
-      <div className={`${color}
+      <div style = {{backgroundColor:color}}
+           className={`
                ${classHeight}
                ${borderHiglited}
               text-center
@@ -34,7 +35,8 @@ export default function Class({onClick, minute, hour, day, isHighLighted, match,
         onClick={onClick}>
         <div className={`${hiddenStudent}h-12`}>
           <p className={`${hiddenStudent} 
-                  text-sm leading-none line-clamp-3`}>
+                        mx-auto w-11/12 text-sm 
+                        text-center leading-none line-clamp-3`}>
             {student}
           </p>
         </div>

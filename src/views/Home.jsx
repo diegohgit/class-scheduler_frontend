@@ -10,28 +10,22 @@ import axiosClient from "../config/axios";
 Modal.setAppElement('#root')
 export default function Home() {
 
-  const getClasses = async () => {
-    try{
-      const url = '/api/student_classes/';
-      const data = await axiosClient(url);
-      return data.data;
-    }catch(error){
-      console.log("OCURRIO UN ERROR");
-      console.log(error);
-    }
-  }
+
 
   const [ classes, setClasses ] = useState([]);
+  const { customStyles, handleClickModal, modal, handleSetTime,
+          handleClassModal, getResources } = useSchool();
 
+  //Fetch classes.
   useEffect(() =>{
     const fetchClasses = async () => {
-      const response = await getClasses();
+      const response = await getResources('api/student_classes/');
       setClasses(response);
     }
     fetchClasses();
   }, [])
 
-  const { customStyles, handleClickModal, modal, handleSetTime, handleClassModal } = useSchool();
+
   const [ searchStudent, setSearchStudent ] = useState(0);
 
   //function to calculate the space before each class

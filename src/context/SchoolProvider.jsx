@@ -167,6 +167,21 @@ const SchoolProvider = ({children}) => {
     }
   }
 
+  //Universal function to get any resource from DB.
+  const getResources = async (url) => {
+    setLoading(true);
+
+    try{
+      const data = await axiosClient(url);
+      return data.data;
+    }catch(error){
+      console.log("OCURRIO UN ERROR");
+      console.log(error);
+    }finally{
+      setLoading(false);
+    }
+  }
+
   return (
     <SchoolContext.Provider 
       value = {{
@@ -184,6 +199,7 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
+        getResources,
         loading
       }}
     >{children}

@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
-
 type Props = {
   initialValues?: Student | undefined;
   mode: "create" | "edit";
@@ -49,20 +48,17 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     }
   }, [initialValues, reset]);
 
+  const { useChangesProtection, getResources, loading } = useSchool();
+  const [ colors, setColors ] = useState<Array<{id: number, name: string}>>([]);
 
-  const colors = [
-    {id: 1, value:"red",     class: "bg-red-400",     ring: "peer-checked:ring-red-400"},
-    {id: 2, value:"amber",   class: "bg-amber-500",   ring: "peer-checked:ring-amber-500"},
-    {id: 3, value:"yellow",  class: "bg-yellow-300",  ring: "peer-checked:ring-yellow-300"},
-    {id: 4, value:"lime",    class: "bg-lime-300",    ring: "peer-checked:ring-lime-300"},
-    {id: 5, value:"teal",    class: "bg-teal-300",    ring: "peer-checked:ring-teal-300"},
-    {id: 6, value:"cyan",    class: "bg-cyan-300",    ring: "peer-checked:ring-cyan-300"},
-    {id: 7, value:"blue",    class: "bg-blue-500",    ring: "peer-checked:ring-blue-500"},
-    {id: 8, value:"indigo",  class: "bg-indigo-300",  ring: "peer-checked:ring-indigo-300"},
-    {id: 9, value:"fuchsia", class: "bg-fuchsia-300", ring: "peer-checked:ring-fuchsia-300"},
-  ]
-
-  const { useChangesProtection } = useSchool();
+  //Fetch colors.
+  useEffect(() => {
+    const fetchColors = async () =>{
+      const response = await getResources('api/colors/');
+      setColors(response);
+    }
+    fetchColors();
+  }, []);
 
   const watchName = watch("name");
 
@@ -263,26 +259,28 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
         <p className="font-bold mb-1">Schedule Color:</p>
         <div className="flex gap-3 mb-4">
-          {colors.map((color)=>(
-            <label
-              key={color.id}
-              htmlFor={color.id.toString()} 
-              className="cursor-pointer">
-              <input 
-                {...register("color")}
-                id={color.id.toString()} 
-                className="peer" 
-                hidden
-                type="radio"
-                name="color"
-                value={color.id.toString()}
-                onChange={() => setIsDirty(true)} />
-              <span className={`${color.class} block w-10 
-                              h-10 rounded-full transition
-                              duration-300 peer-checked:ring-2 peer-checked:ring-offset-2
-                              ${color.ring} `}></span>
-            </label>
-            ))
+          <p className={`${loading ? "" : "hidden"}`}>Loading colors...</p>
+          {colors.map((color)=>{
+              return <label
+                      key={color.id}
+                      htmlFor={color.id.toString()}
+                      className="cursor-pointer">
+                        <input
+                          {...register("color")}
+                          id={color.id.toString()}
+                          className="peer"
+                          hidden
+                          type="radio"
+                          name="color"
+                          value={color.id.toString()}
+                          onChange={() => setIsDirty(true)} />
+                        <span className="block w-10 h-10
+                                        rounded-full transition duration-300 
+                                        peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-gray-300"
+                              style = {{backgroundColor: color.name}}
+                                    ></span>
+                    </label>
+            })
           }
         </div >
 
