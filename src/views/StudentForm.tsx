@@ -62,8 +62,9 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   const watchName = watch("name");
 
-  const [isDirty, setIsDirty] =  useState(false);
-  useChangesProtection(isDirty);
+  const [isDirty, setIsDirty] =  useState<Boolean>(false);
+  //Why was I calling this function from here?
+  //useChangesProtection(isDirty);
 
   //get the id that comes in the url
   const { id } = useParams();
@@ -94,7 +95,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   const [markInput, setMarkInput] = useState<boolean>(false)
   const [validDate, setValidDate] = useState<boolean>(false)
-  const [birthdate, setBirthdate] = useState<Date>();
+  const [birthdate, setBirthdate] = useState<Date>('' as unknown as Date);
 
   dayjs.extend(customParseFormat);
 
@@ -145,6 +146,10 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       const parsedDate = dayjs(initialValues.birthdate, "MM/DD/YYYY", true);
       const age = dayjs().diff(parsedDate, "year");
       setAge(age);
+
+      //Set the birthdate when initialValues is loaded so the user 
+      // can see a value in the birthdate input when the user is in edit mode.
+      setTempBirthdate(initialValues.birthdate.toString());
     }
   }, [initialValues, mode])
 
@@ -200,11 +205,12 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         <div className=" mb-4">
           <p className="font-bold mb-1">Name:</p>
           <input 
-            {...register("name")}
+            {...register("name",{
+              onChange:() => setIsDirty(true)
+            })}
             className="input-base"
             placeholder="Student's name"
-            onChange={() => setIsDirty(true)}
-             />
+          />
         </div>
 
         <div className="flex">
@@ -212,18 +218,18 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             <p className="font-bold mb-1">Birthdate (MM/DD/YYYY):</p>
             <div className="flex">
               <input
-                {...register("birthdate")}
+                {...register("birthdate",{
+                    onChange: (e) => {
+                            setIsDirty(true);
+                            handleBirthDate(e.target.value);
+                    },
+                    onBlur: (e) => handleDateValidation(e.target.value),
+                  }
+                )}
                 className={`input-base w-3/6! ${markInput === true ? "focus:border-0! border-red-500! border-2!":"" } `}
                 placeholder="(optional)"
-                type="string"
-                value={`${mode === "create" ? tempBirthdate : ""}`}
-                onChange={(e) => {
-                  setIsDirty(true),
-                  handleBirthDate(e.target.value)
-                }}
-                onBlur={(e) => {
-                  handleDateValidation(e.target.value)
-                }}
+                type="text"
+                value={tempBirthdate}
               />
               <p className={`${age > 0 ? 'ml-4' : 'hidden' }`}>({`${age}`} years old)</p>              
             </div>
@@ -232,10 +238,11 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           <div className="w-6/12 mb-4">
             <p className="font-bold mb-1">English level:</p>
             <select 
-              {...register("level")}
+              {...register("level", {
+                onChange:() => setIsDirty(true)    
+              })}
               className="input-base"
-              onChange={() => setIsDirty(true)}
-              >
+            >
               <option value="1">A1</option>
               <option value="2">A2</option>
               <option value="3">B1</option>
@@ -249,12 +256,13 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         <div className={`${mode === "create" ? "hidden" : ""}`}>
           <p className="font-bold">Homework:</p>
           <textarea 
-            {...register("homework")}
+            {...register("homework",{
+              onChange:() => setIsDirty(true)
+            })}
             className="textarea-base"
             name="homework"
             id="homework"
-            onChange={() => setIsDirty(true)}
-            ></textarea>
+          ></textarea>
         </div>
 
         <p className="font-bold mb-1">Schedule Color:</p>
@@ -266,14 +274,16 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
                       htmlFor={color.id.toString()}
                       className="cursor-pointer">
                         <input
-                          {...register("color")}
+                          {...register("color",{
+                            onChange:() => setIsDirty(true)
+                          })}
                           id={color.id.toString()}
                           className="peer"
                           hidden
                           type="radio"
                           name="color"
                           value={color.id.toString()}
-                          onChange={() => setIsDirty(true)} />
+                        />
                         <span className="block w-10 h-10
                                         rounded-full transition duration-300 
                                         peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-gray-300"
@@ -329,13 +339,14 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             </button>
           </div>
           <textarea 
-            {...register("progress")}
+            {...register("progress", {
+              onChange:() => setIsDirty(true)
+            })}
             className="textarea-base" 
             name="progress" 
             id="progress"
             placeholder="Write something about this student level (optional)"
-            onChange={() => setIsDirty(true)}
-            ></textarea>     
+          ></textarea>     
         </div>
 
         <div className="items-center justify-center flex mt-4">
