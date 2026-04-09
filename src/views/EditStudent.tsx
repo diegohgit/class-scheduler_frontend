@@ -1,3 +1,4 @@
+import axiosClient from "../config/axios";
 import { useNavigate, useParams } from "react-router";
 import StudentForm from "./StudentForm"
 import useSchool from "../hooks/useSchool";
@@ -17,7 +18,7 @@ export default function EditStudent() {
 
   useEffect(() => {
     const fetchStudent = async () => {
-      //Run getStudents with the student id
+      //Run getStudents with the student id.
       //When the response is received, store it in the state
       const response = await getStudents(id);
       setStudent(response)
@@ -36,14 +37,24 @@ export default function EditStudent() {
     fetchStudent();
   }, []);
 
+  async function handleSubmitEditStudent(data: Student):Promise<boolean>{
+    try {
+      await axiosClient.put('api/students/'+id, data);
+      console.log("Student edited");
+      return true;
+    } catch (error) {
+      console.log("An error has ocurred.");
+      console.log(error);
+      return false;
+    }
+  }
+
   return (
     <>
       <StudentForm 
         mode = "edit"
         initialValues = {student}
-        onSubmit={(data) => {
-          console.log("Edited student data:", data);
-        }}
+        onSubmit={(data:Student) => handleSubmitEditStudent(data)}
       />
     </>
   )
