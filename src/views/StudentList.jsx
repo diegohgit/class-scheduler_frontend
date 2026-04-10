@@ -61,7 +61,7 @@ export default function StudentList() {
       </div>
     )}
 
-    <h1 className="text-center font-bold text-4xl my-4">Students</h1>
+    <h1 className="title-base">Students</h1>
 
     <div className="w-6/12 h-90 mx-auto my-3">
       <div className="relative w-64 mx-auto">

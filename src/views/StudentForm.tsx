@@ -45,7 +45,6 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     }
   })
 
-  const watchName = watch("name");
 
   /*Some data comes from Backend as null, but forms handle this as "".
     With this we create a copy of the data that comes from backend
@@ -223,8 +222,8 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   return (
   <>
-    <h1 className="text-center font-bold text-4xl">
-      {mode === "create" ? "New Student" : watchName}
+    <h1 className="title-base">
+      {mode === "create" ? "New Student" : watch("name")}
     </h1>
 
     <div className="flex items-center justify-center">

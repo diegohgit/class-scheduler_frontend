@@ -66,7 +66,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="grid grid-cols-8 gap-2">
+      <div className="mt-15 grid grid-cols-8 gap-2">
         {/* Fixed time column */}
         <div className="w-20">
           <div className="text-center font-semibold bg-gray-300 

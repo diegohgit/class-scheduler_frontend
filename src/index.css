@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+.title-base {
+  @apply 	mt-14 text-center font-bold text-4xl my-4;
+}
+
 /* input-base */
 .input-base {
   @apply 	w-full h-8 border border-gray-300
@@ -29,6 +33,6 @@
 
 .button-base {
   @apply w-40 h-8 rounded 
-			 text-white font-bold 
-				m-2 hover:cursor-pointer;
+			 text-white font-bold m-2 
+       hover:cursor-pointer shadow-xl;
 }

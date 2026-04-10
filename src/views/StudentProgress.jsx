@@ -14,7 +14,7 @@ export default function StudentProgress() {
       // Return a new subtopic object that includes the "seen" property.
       return {
         ...subtopic,
-        seenAt: Boolean(seenAt),
+        seen: Boolean(seenAt),
         seenAt,
       };
     }),
@@ -22,7 +22,7 @@ export default function StudentProgress() {
 
   return (
   <>
-    <h1 className="text-center font-bold text-4xl my-4">Topics</h1>
+    <h1 className="title-base">Topics</h1>
 
     <div className="w-8/12 p-4 mx-auto bg-gray-200 rounded-lg">
       {progress.map( (topic) => (
