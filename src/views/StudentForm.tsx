@@ -13,7 +13,7 @@ type Props = {
   //onSubmit is a function that receives a Student object 
   //and returns a Promise that resolves to nothing.
   //its a promise because our parent function is async
-  onSubmit: (data: Student) => Promise<boolean>;
+  onSubmit: (data: Student) => Promise<any>;
 }
 
 
@@ -36,11 +36,11 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     defaultValues: {
       name:      "",
       birthdate: "",
-      level:     "1",
+      level_id:  "1",
       homework:  null,
       //Parse color to string because in the radio inputs this 
       //field must be a string so the selection can be shown
-      color:     defaultColor.toString(),
+      color_id:  defaultColor.toString(),
       progress:  null
     }
   })
@@ -85,9 +85,14 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   const [age, setAge]                     = useState<number>(0);
   const [tempBirthdate, setTempBirthdate] = useState<string>("");
+  const [validDate, setValidDate]         = useState<boolean>(false)
 
   //Format the birthdate typed by the user
   const formatBirthdate = (value:string) => {
+    //set validDate to false every time the user starts to 
+    //type a new date.
+    setValidDate(false);
+
     //Get only numbers and limit to 8 digits
     const digits = value?.replace(/\D/g, "")?.slice(0, 8);
 
@@ -103,13 +108,12 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     return `${month}/${day}/${year}`;
   }
 
+  //Include the date in the form values
   const handleBirthDate = (value:string) => {
-    //Include the date in the form values
     setTempBirthdate(formatBirthdate(value));
   }
   
   const [markInput, setMarkInput]   = useState<boolean>(false)
-  const [validDate, setValidDate]   = useState<boolean>(false)
   const [ageMessage, setAgeMessage] = useState<String>("");
 
   dayjs.extend(customParseFormat);
@@ -121,10 +125,12 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     const valid = parsedDate.isValid();
     
     if(date !== ""){
+
       if(!valid){
         setAgeMessage('Invalid date')
         setMarkInput(true)
         return;
+
       }else{
         //Validate that the birthdate is more than 
         //2 years ago and less than 100 years ago.xz
@@ -132,10 +138,10 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         const aHundredYearsAgo = dayjs().subtract(100, "year");
 
         if(parsedDate.isAfter(twoYearsAgo) || parsedDate.isBefore(aHundredYearsAgo)){
-
           setAgeMessage("Invalid year");
           setMarkInput(true);
           return;
+
         }else{
           //If the birthdate is valid
           //calculate age and store it in the state.
@@ -162,6 +168,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       const parsedDate = dayjs(initialValues.birthdate, "MM/DD/YYYY", true);
       const age = dayjs().diff(parsedDate, "year");
       setAge(age);
+      setValidDate(true);
 
       //Set the birthdate when initialValues is loaded so the user 
       // can see a value in the birthdate input when the user is in edit mode.
@@ -172,25 +179,25 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   //Validate form data (name and birthdate in this case).
   const validation = (): boolean => {
 
-    if(watchName === ""){
+    if(watch("name") === ""){
       toast.error("Name is required");
       return false;
     }
 
-    if(!validDate && tempBirthdate !== ""){
+    if(!validDate && tempBirthdate !== "" ){
       toast.error("You must enter a valid birthdate");
       return false;
     }else return true;
   }
 
   const navigate = useNavigate();
-
   const [shouldNavigate, setShouldNavigate] = useState<boolean>(false)
 
   //Run navigation in a useEffect because it takes a little time 
   //until isDirty gets updated.
   useEffect(() => {
-    if(shouldNavigate && !isDirty)navigate("/students");
+
+    if(shouldNavigate && !isDirty) navigate("/students");
   }, [shouldNavigate, isDirty]);
 
 
@@ -198,24 +205,34 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   const submit = async (data:Student) => {
 
     if(validation()){
+      //Show a loading notification.
+      const notification = toast.loading("Please wait...")
 
       //Normalize data so it can be processed by backend.
       const normalizeToBackend = {
         ...data,
-        birthdate: data.birthdate || null,
+        birthdate: data.birthdate ? data.birthdate: null,
         homework:  data.homework || null,
         progress:  data.progress || null,
-        level:     Number(data.level),
+        level_id:  Number(data.level_id),
+        color_id:  Number(data.color_id),
       };
 
-      const res = await onSubmit(normalizeToBackend);
-      if(res){
+      const { success , message } = await onSubmit(normalizeToBackend);
+
+      if(success){
         //reset(data) will switch isDirty to "false".
-        //navigate() can't be used here because isDirty isn't updated yet
+        //navigate() can't be used here because isDirty isn't updated yet.
         reset(data);
-        toast.success("Student modified");
         setShouldNavigate(true);
       }
+
+      //Hide the loading notification and show the result message.
+      toast.update(notification, {  render: message, 
+                                    type: success ? "success" : "error", 
+                                    isLoading: false,
+                                    autoClose: 3000,
+                                  });
     }
   }
 
@@ -269,7 +286,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           <div className="w-6/12 mb-6">
             <p className="font-bold mb-1">English level:</p>
             <select 
-              {...register("level")}
+              {...register("level_id")}
               className="input-base"
             >
               <option value="1">A1</option>
@@ -301,7 +318,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
                       htmlFor={color.id.toString()}
                       className="cursor-pointer">
                         <input
-                          {...register("color")}
+                          {...register("color_id")}
                           id={color.id.toString()}
                           className="peer"
                           hidden
@@ -368,7 +385,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             className="textarea-base" 
             name="progress" 
             id="progress"
-            placeholder="Write something about this student level (optional)"
+            placeholder="Write something about this student's level (optional)."
           ></textarea>
         </div>
 

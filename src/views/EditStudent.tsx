@@ -3,8 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import StudentForm from "./StudentForm"
 import useSchool from "../hooks/useSchool";
 import { useEffect, useState } from "react";
-import { Student } from "../types/Student";
-
+import { UpdateStudentDTO, Student } from "../types/Student";
 
 
 export default function EditStudent() {
@@ -16,6 +15,7 @@ export default function EditStudent() {
   const [ student, setStudent ] = useState<Student | undefined>(undefined);
   const navigate = useNavigate();
 
+  //Fetch student when the component is mounted.
   useEffect(() => {
     const fetchStudent = async () => {
       //Run getStudents with the student id.
@@ -37,15 +37,22 @@ export default function EditStudent() {
     fetchStudent();
   }, []);
 
-  async function handleSubmitEditStudent(data: Student):Promise<boolean>{
+  type Result = {
+    success: boolean;
+    message: string;
+  };
+
+  async function handleSubmitEditStudent(data: Student): Promise<Result>{
+
     try {
-      await axiosClient.put('api/students/'+id, data);
-      console.log("Student edited");
-      return true;
-    } catch (error) {
-      console.log("An error has ocurred.");
-      console.log(error);
-      return false;
+      await axiosClient.put('api/students/'+id, data as UpdateStudentDTO);
+      return {success: true, message: "Student modified."};
+
+    } catch (error: any){
+      if(error.response?.status === 422){
+        return { success: false, message: error.response.data.message };
+
+      }else return { success: false, message: "An error has occurred" };
     }
   }
 
