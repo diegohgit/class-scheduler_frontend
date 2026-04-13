@@ -323,7 +323,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
                           className="peer"
                           hidden
                           type="radio"
-                          name="color"
+                          name="color_id"
                           value={color.id.toString()}
                         />
                         <span className="block w-10 h-10
