@@ -2,22 +2,43 @@ import DivInput from "./DivInput";
 import TimeSelector from "./TimeSelector";
 import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function ClassForm({ onSubmit }) {
 
-  const { time, classLength, selStudent, selDay } = useSchool();
+  const { time, classLength, classModal, selStudent,
+          selDay, setModal, fetchClasses } = useSchool();
 
-  function handleSubmit(e){
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
+    const notification = toast.loading("Please wait...")
+
+    const method = classModal?.id ? "PUT" : "POST"; 
+
     //Use the states to set the data 
-    // wich is going to be sent in the post request.
-    onSubmit({
-        student_id : selStudent.id,
-        day_id     : selDay.id,
-        starts     : time.starts,
-        ends       : time.ends, 
-    });
+    //wich is going to be sent in the post request.
+    const classData = { id         : classModal?.id || null,
+                        student_id : selStudent.id,
+                        day_id     : selDay.id,
+                        starts     : time.starts,
+                        ends       : time.ends, 
+                    };
+
+    const { success , message } = await onSubmit( classData, method, classModal?.id );
+
+    if(success){
+      setModal(false);
+
+      fetchClasses();
+    }
+
+    //Hide the loading notification and show the result message.
+    toast.update(notification, {  render: message, 
+                                  type: success ? "success" : "error", 
+                                  isLoading: false,
+                                  autoClose: 3000,
+                                });
   }
 
   return (

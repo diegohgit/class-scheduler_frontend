@@ -6,26 +6,41 @@ export default function ModalClass() {
 
   const { handleClickModal } = useSchool();
 
-  //Async function to make a post request and schedule a new class.
-  async function handleSubmitClass(data){
+  //Async function to send requests to schedule or modify a class.
+  async function handleSubmitClass(data, method, id){
+
     try{
-      await axiosClient.post('/api/student_classes', data);
-      console.log('class created');
-    } catch(error){
-      console.log(error);
+      const url = id
+                  ? `/api/student_classes/${id}` 
+                  : '/api/student_classes';
+
+      await axiosClient({ method: method,
+                          url:    url,
+                          data:   data
+                        });
+
+      const action = method === "POST" ? "scheduled." : "modified.";
+      return { success: true, message: "Class "+action }
+
+      } catch (error){
+        if(error.response?.status === 422){
+          return { success: false, message: error.response.data.message };
+  
+        }else return { success: false, message: "An error has occurred" };
+      }
     }
-  }
+
 
   return (
     <>
       <div className="flex mb-5">
         <h2 className="w-11/12 text-2xl font-bold">Class Information</h2>
         <div className="flex justify-end">
-          <button 
+          <button
             className="hover:cursor-pointer"
             onClick={handleClickModal}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
-              viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
+              viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
               className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>

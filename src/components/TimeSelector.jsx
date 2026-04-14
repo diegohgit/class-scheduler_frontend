@@ -64,6 +64,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
 
               {/*Time selector close button*/}
               <button 
+                type="button"
                 className="absolute h-6 right-0 hover:bg-gray-200 hover:cursor-pointer"
                 onClick={() => {
                           setShowHr(0);
@@ -110,6 +111,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
 
             const hour = i.toString().padStart(2, '0');
             return  <button
+                      type="button"
                       key={hour}
                       className={`${ hour === selHr ? 'bg-sky-200' : '' }
                                   border border-sky-200 h-7 
@@ -142,6 +144,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
             const every5Min = i*5;
             const minute = every5Min.toString().padStart(2, '0');
             return  <button 
+                      type="button"
                       key={minute}
                       className={`${ minute === selMin ? 'bg-sky-400' : '' }
                                   border border-sky-200 h-7 

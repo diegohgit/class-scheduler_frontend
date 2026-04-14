@@ -89,7 +89,7 @@ const SchoolProvider = ({children}) => {
     }
 
     //Get total minutes and hours
-    const diff = dayjs.duration(end.diff(start));
+    const diff   = dayjs.duration(end.diff(start));
     const totalH = diff.hours()   ? diff.hours()+'hr' : '';
     const totalM = diff.minutes() ? diff.minutes()+'min' : '';
 
@@ -167,6 +167,13 @@ const SchoolProvider = ({children}) => {
     }
   }
 
+  const [ classes, setClasses ] = useState([]);
+
+  const fetchClasses = async () => {
+    const response = await getResources('api/student_classes/');
+    setClasses(response);
+  }
+
   //Universal function to get any resource from DB.
   const getResources = async (url) => {
     setLoading(true);
@@ -187,7 +194,9 @@ const SchoolProvider = ({children}) => {
       value = {{
         customStyles,
         handleClickModal,
-        modal,
+        modal, setModal,
+        classes, setClasses,
+        fetchClasses,
         selStudent, setSelStudent,
         selDay, setSelDay,
         handleSetTime,

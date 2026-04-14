@@ -3,28 +3,18 @@ import ModalClass from "../components/ModalClass";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import { useState, useEffect } from "react";
-//import { classes } from "../data/classes";
 import { days } from "../data/days";
-import axiosClient from "../config/axios";
 
 Modal.setAppElement('#root')
 export default function Home() {
 
-
-
-  const [ classes, setClasses ] = useState([]);
   const { customStyles, handleClickModal, modal, handleSetTime,
-          handleClassModal, getResources } = useSchool();
+          handleClassModal, fetchClasses, classes } = useSchool();
 
-  //Fetch classes.
   useEffect(() =>{
-    const fetchClasses = async () => {
-      const response = await getResources('api/student_classes/');
-      setClasses(response);
-    }
+
     fetchClasses();
   }, [])
-
 
   const [ searchStudent, setSearchStudent ] = useState(0);
 
