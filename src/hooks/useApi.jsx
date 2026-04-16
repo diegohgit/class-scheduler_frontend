@@ -3,7 +3,7 @@ import axiosClient from "../config/axios";
 
 export const useApi = () => {
 
-  const request = async (method, url, data = null, msg = null) =>{
+  const request = async (method, url, data, msg) =>{
     
     let success  = false;
     let message  = "An error has occurred.";
@@ -11,7 +11,7 @@ export const useApi = () => {
     let notification = null;
 
     //There will be cases where notifications will not be required
-    if(msg) { notification = toast.loading("Please wait..."); }
+    if(msg) notification = toast.loading("Please wait...");
 
     try{
       response = await axiosClient({method, url, data});
@@ -31,7 +31,7 @@ export const useApi = () => {
                         autoClose: 3000,
                     });
 
-      }else toast.error(message);
+      }else if(!success) toast.error(message);
     }
 
     return { success, message, response };

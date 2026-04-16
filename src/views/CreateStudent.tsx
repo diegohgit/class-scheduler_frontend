@@ -1,26 +1,20 @@
 import axiosClient from "../config/axios";
 import StudentForm from "./StudentForm";
 import { CreateStudentDTO, Student } from "../types/Student";
+import { useApi } from "../hooks/useApi";
 
 export default function CreateStudent() {
 
-  type Result = {
-    success: boolean;
-    message: string;
-  };
+  const { request } = useApi();
+  //Send request to create a student.
+  async function handleSubmitCreateStudent(data: Student): Promise<boolean>{
 
-  async function handleSubmitCreateStudent(data: Student): Promise<Result>{
+    const { success } = await request("POST", 
+                                      "api/students/", 
+                                      data as CreateStudentDTO,
+                                      "Student created." );
 
-    try {
-      await axiosClient.post('/api/students', data as CreateStudentDTO);
-      return {success: true, message: "Student created."};
-
-    } catch (error: any){
-      if(error.response?.status === 422){
-        return { success: false, message: error.response.data.message };
-
-      }else return { success: false, message: "An error has occurred" };
-    }
+    return success;
   }
 
   return (

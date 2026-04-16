@@ -6,6 +6,7 @@ import { Student } from "../types/Student";
 import { ToastContainer, toast } from "react-toastify";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useApi } from "../hooks/useApi";
 
 type Props = {
   initialValues?: Student | undefined;
@@ -53,10 +54,11 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   const normalizeFromBackend = (data: any) => ({
     ...data,
     birthdate: data?.birthdate ?? "",
-    homework:  data?.homework ?? "",
-    progress:  data?.progress ?? "",
-    //Level comes from Backend as integer so we must switch it to string
-    level:     data?.level != null ? String(data.level) : "",
+    homework:  data?.homework  ?? "",
+    progress:  data?.progress  ?? "",
+    //Color_id comes from Backend as integer so we must switch it to string
+    //so it can be seen in the colors list.
+    color_id:     data?.color_id != null ? String(data.color_id) : "",
   })
 
   //When initialValues is loaded, normalize it and pass it to reset().
@@ -67,18 +69,20 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     reset(normalizeFromBackend(initialValues));
   }, [initialValues]);
 
-  const { useChangesProtection, getResources, loading } = useSchool();
+  const { useChangesProtection, loading } = useSchool();
 
   //Handle form changes
   useChangesProtection(isDirty);
 
+  const { request } = useApi();
   const [ colors, setColors ] = useState<Array<{id: number, name: string}>>([]);
 
   //Fetch colors.
   useEffect(() => {
     const fetchColors = async () =>{
-      const response = await getResources('api/colors/');
-      setColors(response);
+      const { success, response } = await request('GET', 'api/colors/');
+
+      if(success) setColors(response?.data);
     }
     fetchColors();
   }, []);
@@ -205,9 +209,6 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   const submit = async (data:Student) => {
 
     if(validation()){
-      //Show a loading notification.
-      const notification = toast.loading("Please wait...")
-
       //Normalize data so it can be processed by backend.
       const normalizeToBackend = {
         ...data,
@@ -218,21 +219,14 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         color_id:  Number(data.color_id),
       };
 
-      const { success , message } = await onSubmit(normalizeToBackend);
+      const success = await onSubmit(normalizeToBackend);
 
       if(success){
-        //reset(data) will switch isDirty to "false".
+        //reset(data) will switch isDirty to "false" so we can navigate().
         //navigate() can't be used here because isDirty isn't updated yet.
         reset(data);
         setShouldNavigate(true);
       }
-
-      //Hide the loading notification and show the result message.
-      toast.update(notification, {  render: message, 
-                                    type: success ? "success" : "error", 
-                                    isLoading: false,
-                                    autoClose: 3000,
-                                  });
     }
   }
 
@@ -309,7 +303,10 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           ></textarea>
         </div>
 
-        <p className="font-bold mb-1">Schedule Color:</p>
+        
+        <p className={`${colors.length ? "font-bold mb-1" : "hidden"}`}>
+          Schedule Color:
+        </p>
         <div className="flex gap-3 mb-4">
           <p className={`${loading ? "" : "hidden"}`}>Loading colors...</p>
           {colors.map((color)=>{
