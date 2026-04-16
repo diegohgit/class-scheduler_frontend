@@ -199,9 +199,9 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
-        getResources,
         loading
       }}
+
     >{children}
     </SchoolContext.Provider>
   )
