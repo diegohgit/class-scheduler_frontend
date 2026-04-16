@@ -3,42 +3,43 @@ import TimeSelector from "./TimeSelector";
 import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
 import { ToastContainer, toast } from "react-toastify";
+import { useApi } from "../hooks/useApi";
 
-export default function ClassForm({ onSubmit }) {
+export default function ClassForm() {
 
   const { time, classLength, classModal, selStudent,
           selDay, setModal, fetchClasses } = useSchool();
 
+  const { request } = useApi();
+
+  //Async function to send requests to schedule or modify a class.
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-    const notification = toast.loading("Please wait...")
-
-    const method = classModal?.id ? "PUT" : "POST"; 
-
+    const classId = classModal?.id ?? null;
+    const method  = classId ? "PUT" : "POST"; 
+    const url     = classId ? `/api/student_classes/${classId}` 
+                            : "/api/student_classes";
     //Use the states to set the data 
     //wich is going to be sent in the post request.
-    const classData = { id         : classModal?.id || null,
+    const classData = { id         : classId,
                         student_id : selStudent.id,
                         day_id     : selDay.id,
                         starts     : time.starts,
                         ends       : time.ends, 
-                    };
+                      };
+    const message   = classId ? "Class modified."
+                              : "Class scheduled.";
 
-    const { success , message } = await onSubmit( classData, method, classModal?.id );
+    const { success } = await request( method,
+                                       url,
+                                       classData,
+                                       message );
 
     if(success){
       setModal(false);
-
       fetchClasses();
     }
-
-    //Hide the loading notification and show the result message.
-    toast.update(notification, {  render: message, 
-                                  type: success ? "success" : "error", 
-                                  isLoading: false,
-                                  autoClose: 3000,
-                                });
   }
 
   return (
