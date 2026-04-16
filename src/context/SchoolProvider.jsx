@@ -3,6 +3,7 @@ import { useBlocker } from "react-router-dom";
 import axiosClient from "../config/axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { useApi } from "../hooks/useApi";
 
 const SchoolContext = createContext();
 const customStyles = {
@@ -141,6 +142,8 @@ const SchoolProvider = ({children}) => {
     }, [isDirty]);
   }
 
+  const { request } = useApi();
+
   const [loading, setLoading] = useState(false);
 
   /*  Function to get students from DB
@@ -170,23 +173,11 @@ const SchoolProvider = ({children}) => {
   const [ classes, setClasses ] = useState([]);
 
   const fetchClasses = async () => {
-    const response = await getResources('api/student_classes/');
-    setClasses(response);
-  }
 
-  //Universal function to get any resource from DB.
-  const getResources = async (url) => {
-    setLoading(true);
+    const url = 'api/student_classes/';
+    const { success, response } = await request("GET", url, null, "Classes loaded.");
 
-    try{
-      const data = await axiosClient(url);
-      return data.data;
-    }catch(error){
-      console.log("OCURRIO UN ERROR");
-      console.log(error);
-    }finally{
-      setLoading(false);
-    }
+    if(success && response?.data) setClasses(response.data);
   }
 
   return (
