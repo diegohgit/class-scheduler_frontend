@@ -6,16 +6,6 @@ import duration from "dayjs/plugin/duration";
 import { useApi } from "../hooks/useApi";
 
 const SchoolContext = createContext();
-const customStyles = {
-    content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    },
-  };
 
 const SchoolProvider = ({children}) => {
 
@@ -179,11 +169,19 @@ const SchoolProvider = ({children}) => {
 
     if(success && response?.data) setClasses(response.data);
   }
+  
+  //States and handler to show/hide modal chapter.
+  const [modalChapter, setModalChapter] = useState(0);
+ 
+  const handleModalChapter = () => {
+    setModalChapter(!modalChapter);
+  }
+
+
 
   return (
     <SchoolContext.Provider 
       value = {{
-        customStyles,
         handleClickModal,
         modal, setModal,
         classes, setClasses,
@@ -199,7 +197,9 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
-        loading
+        loading,
+        modalChapter, setModalChapter,
+        handleModalChapter,
       }}
 
     >{children}

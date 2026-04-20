@@ -6,7 +6,7 @@ export default function Sidebar() {
   const options = [
             {label:"Schedule", route:"/"},
             {label:"Students", route:"/students"},
-            {label:"Topics",   route:"/topics"},
+            {label:"Content",   route:"/content"},
           ];
 
   const [path, setPath] = useState('');
@@ -21,8 +21,8 @@ export default function Sidebar() {
   }, [])
 
   return (
-  <div className="h-14 w-full flex z-10 fixed
-                bg-indigo-900 ">
+  <div className="h-14 w-full flex 
+                  z-10 fixed bg-indigo-900 ">
     <div className="flex mx-auto items-center">
       {
         options.map(option => (

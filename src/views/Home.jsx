@@ -8,7 +8,7 @@ import { days } from "../data/days";
 Modal.setAppElement('#root')
 export default function Home() {
 
-  const { customStyles, handleClickModal, modal, handleSetTime,
+  const { handleClickModal, modal, handleSetTime,
           handleClassModal, fetchClasses, classes } = useSchool();
 
   useEffect(() =>{
@@ -93,7 +93,7 @@ export default function Home() {
                 const minute = String(i * 5).padStart(2, '0');
 
                 //VALIDATE IF THE CURRENT CYCLE IS THE START OF A CLASS
-                const match = classes.find(cls => {
+                const match = classes?.find(cls => {
                         // Split the hour string of the class into hours and minutes
                         const [h, m] = cls.starts.split(':').map(Number);
 
@@ -194,7 +194,7 @@ export default function Home() {
         ))}
       </div>
 
-      <Modal isOpen={modal} style={customStyles}>
+      <Modal isOpen={modal}  className="modal-base w-95 h-80">
           <ModalClass />
       </Modal>
     </>

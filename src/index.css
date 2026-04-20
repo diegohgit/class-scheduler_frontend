@@ -1,30 +1,37 @@
 @import 'tailwindcss';
 
 .title-base {
-  @apply 	mt-14 text-center font-bold text-4xl my-4;
+  @apply mt-14 text-center font-bold text-4xl my-4;
+}
+
+.modal-base {
+  @apply  bg-white absolute  top-1/2
+          left-1/2 -translate-x-1/2 -translate-y-1/2
+          inset-0 shadow-xl rounded-2xl 
+          outline-none!;
 }
 
 /* input-base */
 .input-base {
   @apply 	w-full h-8 border border-gray-300
-      focus:border focus:border-blue-600
-      rounded px-2;
+          focus:border focus:border-blue-600
+          rounded px-2 mt-2;
 }
 
 .textarea-base {
   @apply 	w-full h-20 border border-gray-300
-      focus:border-2 focus:border-blue-600 px-2 
-      rounded mb-4;
+          focus:border focus:border-blue-600 px-2 
+          rounded mb-4 mt-2;
 }
 
 .circle-color {
-  @apply 	w-10 h-10 m-2 
-      rounded-full border-2 border-gray-400;
+  @apply  w-10 h-10 m-2 
+          rounded-full border-2 border-gray-400;
 }
 
 .rdt_TableRow{
   @apply  hover:cursor-pointer hover:bg-blue-100 
-       odd:bg-white even:bg-gray-100 text-xl
+        odd:bg-white even:bg-gray-100 text-xl
 }
 
 .rdt_TableHeadRow{
@@ -32,7 +39,7 @@
 }
 
 .button-base {
-  @apply w-40 h-8 rounded 
-			 text-white font-bold m-2 
-       hover:cursor-pointer shadow-xl;
+  @apply  w-40 h-8 rounded 
+			  text-white font-bold m-2
+          hover:cursor-pointer shadow-lg ;
 }
