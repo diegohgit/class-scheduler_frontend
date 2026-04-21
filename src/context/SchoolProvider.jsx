@@ -178,6 +178,15 @@ const SchoolProvider = ({children}) => {
   }
 
 
+  //Validate strings
+  const validString = (text) => {
+    if(text){
+      const spacesFree = text.trim();
+
+      if(spacesFree.length) return true;
+    }
+  }
+
 
   return (
     <SchoolContext.Provider 
@@ -200,6 +209,7 @@ const SchoolProvider = ({children}) => {
         loading,
         modalChapter, setModalChapter,
         handleModalChapter,
+        validString,
       }}
 
     >{children}
