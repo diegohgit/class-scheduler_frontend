@@ -4,7 +4,7 @@ import { useApi } from "../hooks/useApi";
 
 export default function ModalChapter(info) {
 
-  const { handleModalChapter, validString } = useSchool();
+  const { handleModalChapter, validString, fetchChapters } = useSchool();
 
   const inputRef = useRef(null);
 
@@ -38,7 +38,10 @@ export default function ModalChapter(info) {
                                          dataName,
                                          "Chapter created.");
 
-      if(success) handleModalChapter();
+      if(success) {
+        handleModalChapter();
+        fetchChapters();
+      }
     }else setValidName(0)
   }
 

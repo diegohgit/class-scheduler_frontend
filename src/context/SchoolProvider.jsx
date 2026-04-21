@@ -160,6 +160,7 @@ const SchoolProvider = ({children}) => {
     }
   }
 
+
   const [ classes, setClasses ] = useState([]);
 
   const fetchClasses = async () => {
@@ -169,7 +170,8 @@ const SchoolProvider = ({children}) => {
 
     if(success && response?.data) setClasses(response.data);
   }
-  
+
+
   //States and handler to show/hide modal chapter.
   const [modalChapter, setModalChapter] = useState(0);
  
@@ -177,6 +179,19 @@ const SchoolProvider = ({children}) => {
     setModalChapter(!modalChapter);
   }
 
+
+  //Staters and function to fetch chapters.
+  const [ chapters, setChapters ] = useState([]);
+  const [ loadingChapters, setLoadingChapters ] = useState(0);
+
+  const fetchChapters = async () => {
+    setLoadingChapters(1);
+    const url = 'api/chapters/';
+    const { success, response } = await request("GET", url, null, "Content loaded.");
+
+    if(success && response?.data) setChapters(response.data);
+    setLoadingChapters(0);
+  }
 
   //Validate strings
   const validString = (text) => {
@@ -210,6 +225,9 @@ const SchoolProvider = ({children}) => {
         modalChapter, setModalChapter,
         handleModalChapter,
         validString,
+        fetchChapters,
+        chapters, setChapters,
+        loadingChapters
       }}
 
     >{children}
