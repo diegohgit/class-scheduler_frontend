@@ -174,7 +174,8 @@ const SchoolProvider = ({children}) => {
 
   //States and handler to show/hide modal chapter.
   const [modalChapter, setModalChapter] = useState(0);
- 
+  const [ selChapter, setSelChapter ]   = useState([]);
+
   const handleModalChapter = () => {
     setModalChapter(!modalChapter);
   }
@@ -224,6 +225,7 @@ const SchoolProvider = ({children}) => {
         loading,
         modalChapter, setModalChapter,
         handleModalChapter,
+        selChapter, setSelChapter,
         validString,
         fetchChapters,
         chapters, setChapters,

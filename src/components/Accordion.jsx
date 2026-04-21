@@ -1,19 +1,25 @@
-import { useState } from "react"; 
+import { useState } from "react";
+import useSchool from "../hooks/useSchool";
 
 export default function Accordion({mode, chapter, sections}) {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const { handleModalChapter, setSelChapter } = useSchool();
   return (
     <>
       <div className="group p-2  hover:cursor-pointer text-lg font-bold flex
                        justify-between w-full bg-gray-200 hover:bg-gray-300"
            onClick={() => setIsOpen(!isOpen)}
         >
-        <span className="text-lg font-bold">{chapter}</span>
+        <span className="text-lg font-bold">{chapter.name}</span>
         <div className="flex items-center gap-2">
-          <span className="hidden group-hover:block hover:underline 
-                           text-base font-medium">Edit</span>
+          <span className="hidden group-hover:block hover:underline
+                           text-base font-medium"
+                onClick={() => {setSelChapter(chapter);
+                                handleModalChapter();
+                               }}
+          >Edit</span>
           <span className="hidden group-hover:block hover:underline
                            text-base font-medium">Delete</span>
           {isOpen ? <span className="">-</span> : <span>+</span>}

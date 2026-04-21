@@ -2,9 +2,10 @@ import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 
-export default function ModalChapter(info) {
+export default function ModalChapter() {
 
-  const { handleModalChapter, validString, fetchChapters } = useSchool();
+  const { handleModalChapter, validString, fetchChapters,
+          selChapter, setSelChapter } = useSchool();
 
   const inputRef = useRef(null);
 
@@ -13,9 +14,8 @@ export default function ModalChapter(info) {
     /*Select all text contained in inputRef 
       when user wants to edit a chapter or focus input 
       if user wants to create a new chapter. */
-    if(!info.length) inputRef.current?.select();
-
-  }, [info]);
+    inputRef.current?.select();
+  }, []);
 
   //State useful to mark Name input in red if name is missing.
   const [ validName, setValidName ] = useState(1);
@@ -31,16 +31,26 @@ export default function ModalChapter(info) {
     if(validString(name)) {
       setValidName(1)
 
-      const dataName = {"name": name};
+      const id = selChapter?.id ?? null;
 
-      const { success } = await request( "POST",
-                                         "/api/chapters",
+      const method   = id ? "PUT" : "POST";
+      const url      = id ? "/api/chapters/"+id : "/api/chapters";
+      const dataName = { "name" : name };
+      const message  = id ? "Chapter updated." : "Chapter created.";
+
+      const { success } = await request( method,
+                                         url,
                                          dataName,
-                                         "Chapter created.");
+                                         message );
 
+      //If request is succeded:
+      //- Close modal.
+      //- Update list of chapters.
+      //- Clean state selChapter.
       if(success) {
         handleModalChapter();
         fetchChapters();
+        setSelChapter([]);
       }
     }else setValidName(0)
   }
@@ -48,19 +58,24 @@ export default function ModalChapter(info) {
   return (
     <>
       <div className="flex m-4">
-        <h2 className="text-center w-full text-2xl font-bold">New Chapter</h2>
+        <h2 className="text-center w-full text-2xl font-bold">
+          { selChapter?.id ? "Edit Chapter" : "New Chapter"}
+        </h2>
+
         <div className="flex justify-end">
           <button
             className="hover:cursor-pointer"
-            onClick={handleModalChapter}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
-              viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
+            onClick={() => {handleModalChapter(); 
+                            setSelChapter([]);}}>
+            {/* "Close" icon  */}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
               className="w-8 h-8">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
+
 
       <form onSubmit={handleSubmit}
             className="w-11/12 mx-auto"
@@ -69,8 +84,10 @@ export default function ModalChapter(info) {
         <input  ref={inputRef}
                 name="name"
                 id="name"
+                defaultValue={selChapter?.name ?? null}
                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
                 maxLength={150}
+                onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
         />
         <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Name is required</p>
 
@@ -90,7 +107,6 @@ export default function ModalChapter(info) {
           </button>
         </div>
       </form>
-      
     </>
   )
 }

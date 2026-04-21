@@ -26,7 +26,7 @@ export default function Content() {
           <Accordion 
             key={chapter.id} 
             mode="manage"
-            chapter={chapter.name}
+            chapter={chapter}
             sections={chapter.section}/>
         ))
       ) : ( loadingChapters ? <span>Fetching chapters...</span> 
@@ -37,10 +37,12 @@ export default function Content() {
       <div className="flex items-center justify-center">
       <button 
         type="button"
-        onClick={handleModalChapter}
+        onClick={() => {handleModalChapter();
+                        setSelChapter([]);}}
         className="button-base flex items-center 
                     justify-center bg-indigo-500 hover:bg-indigo-600"
         >
+        {/* "Plus" icon  */}
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="size-4 mr-1">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
@@ -51,6 +53,7 @@ export default function Content() {
         className="button-base flex items-center 
                     justify-center bg-indigo-500 hover:bg-indigo-600"
         >
+        {/* "Plus" icon  */}
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="size-4 mr-1">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
