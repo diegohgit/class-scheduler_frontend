@@ -1,8 +1,46 @@
 import useSchool from "../hooks/useSchool";
+import { useState, useRef, useEffect } from "react";
+import { useApi } from "../hooks/useApi";
 
-export default function ModalChapter() {
+export default function ModalChapter(info) {
 
-  const { handleModalChapter } = useSchool();
+  const { handleModalChapter, validString } = useSchool();
+
+  const inputRef = useRef(null);
+
+  //Manage Name input's behavior.
+  useEffect(() => {
+    /*Select all text contained in inputRef 
+      when user wants to edit a chapter or focus input 
+      if user wants to create a new chapter. */
+    if(!info.length) inputRef.current?.select();
+
+  }, [info]);
+
+  //State useful to mark Name input in red if name is missing.
+  const [ validName, setValidName ] = useState(1);
+  const { request } = useApi();
+
+  //Async function to send requests to create an student.
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const name     = formData.get('name');
+
+    if(validString(name)) {
+      setValidName(1)
+
+      const dataName = {"name": name};
+
+      const { success } = await request( "POST",
+                                         "/api/chapters",
+                                         dataName,
+                                         "Chapter created.");
+
+      if(success) handleModalChapter();
+    }else setValidName(0)
+  }
 
   return (
     <>
@@ -21,19 +59,22 @@ export default function ModalChapter() {
         </div>
       </div>
 
-      <form 
+      <form onSubmit={handleSubmit}
             className="w-11/12 mx-auto"
       >
         <b >Chapter name:</b>
-        <input name="" 
-                  id=""
-                  className="input-base"
-                  >
-        </input>
+        <input  ref={inputRef}
+                name="name"
+                id="name"
+                className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
+                maxLength={150}
+        />
+        <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Name is required</p>
+
         <div className=" flex mt-2">
           <button
             type="button"
-            onClick={() => console.log(selStudent)}
+            onClick={() => console.log("Cancel")}
             className="button-base bg-red-500 hover:bg-red-600"
           >
             Cancel
