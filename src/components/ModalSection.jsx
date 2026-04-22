@@ -50,7 +50,7 @@ export default function ModalSection() {
       if(success) {
         handleModalSection();
         fetchChapters();
-        setSelChapter([]);
+        setSelSection([]);
       }
     }else setValidName(0)
   }
@@ -60,7 +60,7 @@ export default function ModalSection() {
     <>
       <div className="flex m-4">
         <h2 className="text-center w-full text-2xl font-bold">
-          Section
+          { selSection?.id ? "Edit Section" : "New Section"}
         </h2>
 
         {/* Close button */}
@@ -86,6 +86,7 @@ export default function ModalSection() {
         <select className="input-base focus:border-2!"
                 name="chapter_id"
                 id="chapter_id"
+                defaultValue={selSection?.chapter_id}
         >
             {chapters.map((chapter) =>
               <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
@@ -93,18 +94,20 @@ export default function ModalSection() {
         </select>
       </div>
 
-      <b>Section name:</b>
-      <input ref={inputRef}
-             name="name"
-             id="name"
-             defaultValue={selSection?.name ?? null}
-             className={` input-base ` }
-             maxLength={150}
-             onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
-      />
-      <p className={`hidden text-md text-red-500` }>Section field is required</p>
+      <div className="h-22">
+        <b>Section name:</b>
+        <input ref={inputRef}
+               name="name"
+               id="name"
+               defaultValue={selSection?.name ?? null}
+               className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
+               maxLength={150}
+               onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
+        />
+        <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Section field is required.</p>
+      </div>
 
-      <div className=" flex mt-2">
+      <div className=" flex ">
         <button
           type="button"
           onClick={() => console.log("Cancel")}

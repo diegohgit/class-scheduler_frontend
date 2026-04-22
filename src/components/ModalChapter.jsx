@@ -21,7 +21,7 @@ export default function ModalChapter() {
   const [ validName, setValidName ] = useState(1);
   const { request } = useApi();
 
-  //Async function to send requests to create an student.
+  //Async function to send requests to create/update a chapter.
   const handleSubmit = async(e) => {
     e.preventDefault();
 
@@ -80,17 +80,18 @@ export default function ModalChapter() {
       <form onSubmit={handleSubmit}
             className="w-11/12 mx-auto"
       >
-        <b >Chapter name:</b>
-        <input  ref={inputRef}
-                name="name"
-                id="name"
-                defaultValue={selChapter?.name ?? null}
-                className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-                maxLength={150}
-                onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
-        />
-        <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Name is required</p>
-
+        <div className="h-22">
+          <b >Chapter name:</b>
+          <input  ref={inputRef}
+                  name="name"
+                  id="name"
+                  defaultValue={selChapter?.name ?? null}
+                  className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
+                  maxLength={150}
+                  onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
+          />
+          <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Name is required</p>
+        </div>
         <div className=" flex mt-2">
           <button
             type="button"

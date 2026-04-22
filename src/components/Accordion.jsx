@@ -5,7 +5,8 @@ export default function Accordion({mode, chapter, sections}) {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const { handleModalChapter, setSelChapter } = useSchool();
+  const { handleModalChapter, setSelChapter, setSelSection,
+          handleModalSection } = useSchool();
   return (
     <>
       <div className="group p-2  hover:cursor-pointer text-lg font-bold flex
@@ -59,8 +60,8 @@ export default function Accordion({mode, chapter, sections}) {
               <div className="flex items-center gap-2">
                 <span className="hidden group-hover:block hover:underline
                                 text-base font-medium"
-                      onClick={() => {setSelChapter(chapter);
-                                      handleModalChapter();
+                      onClick={() => {setSelSection(section);
+                                      handleModalSection();
                                     }}
                 >Edit</span>
                 <span className="hidden group-hover:block hover:underline
