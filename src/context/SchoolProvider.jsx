@@ -181,7 +181,7 @@ const SchoolProvider = ({children}) => {
   }
 
 
-  //Staters and function to fetch chapters.
+  //States and function to fetch chapters.
   const [ chapters, setChapters ] = useState([]);
   const [ loadingChapters, setLoadingChapters ] = useState(0);
 
@@ -193,6 +193,16 @@ const SchoolProvider = ({children}) => {
     if(success && response?.data) setChapters(response.data);
     setLoadingChapters(0);
   }
+
+
+  //states to handle section's modal.
+  const [modalSection, setModalSection] = useState(0);
+  const [ selSection, setSelSection ]   = useState([]);
+
+  const handleModalSection = () => {
+    setModalSection(!modalSection);
+  }
+
 
   //Validate strings
   const validString = (text) => {
@@ -229,7 +239,10 @@ const SchoolProvider = ({children}) => {
         validString,
         fetchChapters,
         chapters, setChapters,
-        loadingChapters
+        loadingChapters,
+        modalSection, setModalSection,
+        handleModalSection,
+        selSection, setSelSection,
       }}
 
     >{children}

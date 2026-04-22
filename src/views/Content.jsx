@@ -3,13 +3,15 @@ import Accordion from "../components/Accordion";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import ModalChapter from "../components/ModalChapter";
+import ModalSection from "../components/ModalSection";
 import { useEffect, useState } from "react";
 
 export default function Content() {
 
   const { handleModalChapter, modalChapter, setModalChapter,
           fetchChapters, chapters, setChapters, 
-          loadingChapters } = useSchool();
+          loadingChapters, modalSection, setModalSection,
+          handleModalSection, setSelSection} = useSchool();
 
   useEffect(() =>  {
 
@@ -50,6 +52,8 @@ export default function Content() {
       </button>
       <button 
         type="button"
+        onClick={() => {handleModalSection();
+                        setSelSection([]);}}
         className="button-base flex items-center 
                     justify-center bg-indigo-500 hover:bg-indigo-600"
         >
@@ -65,6 +69,10 @@ export default function Content() {
 
       <Modal isOpen={modalChapter} className="modal-base w-95 h-55">
           <ModalChapter />
+      </Modal>
+
+      <Modal isOpen={modalSection} className="modal-base w-95 h-68">
+          <ModalSection />
       </Modal>
   </>
   )
