@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { days } from "../data/days";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import LoadingMessage from "../components/LoadingMessage";
 
 Modal.setAppElement('#root')
 export default function Home() {
@@ -73,6 +74,8 @@ export default function Home() {
 
   return (
     <>
+      {isLoading && <LoadingMessage text="Classes"/>}
+
       <div className="mt-15 grid grid-cols-8 gap-2">
         {/* Fixed time column */}
         <div className="w-20">
