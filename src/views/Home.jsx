@@ -4,18 +4,35 @@ import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import { useState, useEffect } from "react";
 import { days } from "../data/days";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 Modal.setAppElement('#root')
 export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
-          handleClassModal, fetchClasses, classes } = useSchool();
+          handleClassModal, fetchClassesReactQuery, /*classes*/ } = useSchool();
 
-  useEffect(() =>{
+  const { data:classes = [],
+          isLoading,
+          isSuccess,
+          isError,
+          error,
+  } = useQuery({ 
+        queryKey:  ["classes"],
+        queryFn:   fetchClassesReactQuery,
+        staleTime: Infinity,
+        gcTime:    1000 * 60 * 90,//1hr 30min
+      });
 
-    fetchClasses();
-  }, [])
 
+  useEffect(() => {
+
+    if(isError){
+      toast.error(error?.message || "Something went wrong.");
+    }
+  }, [isError, error]);
+                  
   const [ searchStudent, setSearchStudent ] = useState(0);
 
   //function to calculate the space before each class

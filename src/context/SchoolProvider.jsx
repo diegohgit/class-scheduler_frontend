@@ -171,6 +171,14 @@ const SchoolProvider = ({children}) => {
     if(success && response?.data) setClasses(response.data);
   }
 
+  const fetchClassesReactQuery = async () => {
+    const url = 'api/tudent_classes/';
+
+    const { success, response } = await request("GET", url, null, "Classes loaded.");
+
+    if(!success) throw new Error("Failed to fetch clases");
+    return response.data;
+  }
 
   //States and handler to show/hide modal chapter.
   const [modalChapter, setModalChapter] = useState(0);
@@ -221,6 +229,7 @@ const SchoolProvider = ({children}) => {
         modal, setModal,
         classes, setClasses,
         fetchClasses,
+        fetchClassesReactQuery,
         selStudent, setSelStudent,
         selDay, setSelDay,
         handleSetTime,
