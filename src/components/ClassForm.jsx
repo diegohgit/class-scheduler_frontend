@@ -4,30 +4,43 @@ import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
 import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import LoadingMessage from "./LoadingMessage";
 
 export default function ClassForm() {
 
-  const { time, classLength, classModal, selStudent,
-          selDay, setModal, fetchClasses } = useSchool();
+  const { time, classLength, classModal, 
+          selStudent, selDay, setModal } = useSchool();
 
   const { request } = useApi();
+  const queryClient = useQueryClient();
 
   //Async function to send requests to schedule or modify a class.
-  const handleSubmit = async(e) => {
-    e.preventDefault();
+  const handleClassData = async() => {
 
     const classId = classModal?.id ?? null;
     const method  = classId ? "PUT" : "POST"; 
     const url     = classId ? `/api/student_classes/${classId}` 
                             : "/api/student_classes";
+
+    //Validate that all data is included
+    if(!selStudent?.id ||
+        !selDay?.id    ||
+        !time?.starts  ||
+        !time?.ends
+    ){  
+        toast.error("Missing required fields.");
+        return;
+    }
+
     //Use the states to set the data 
-    //wich is going to be sent in the post request.
-    const classData = { id         : classId,
-                        student_id : selStudent.id,
+    //which is going to be sent in the request.
+    const classData = { student_id : selStudent.id,
                         day_id     : selDay.id,
                         starts     : time.starts,
                         ends       : time.ends, 
                       };
+
     const message   = classId ? "Class modified."
                               : "Class scheduled.";
 
@@ -35,15 +48,32 @@ export default function ClassForm() {
                                        url,
                                        classData,
                                        message );
-
-    if(success){
-      setModal(false);
-      fetchClasses();
-    }
+    return success;
   }
+
+
+  const classMutation = useMutation({
+    mutationFn: handleClassData,
+
+    //Get success returned from handleClassData()
+    onSuccess:(success) => {
+      if(success){
+        queryClient.invalidateQueries({queryKey:["classes"]});
+        setModal(false);
+      }
+    },
+  })
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    classMutation.mutate();
+  }
+
 
   return (
     <>
+    
       <form className="w-90 h-60 mx-auto"
             onSubmit={handleSubmit}>
         <div className="w-85 mx-auto" >
@@ -87,9 +117,11 @@ export default function ClassForm() {
           </button>
           <button 
             type="submit"
-            className="button-base bg-indigo-500 hover:bg-indigo-600"
+            className={`button-base bg-indigo-500 
+                      ${classMutation.isPending ? 'bg-indigo-300 hover:cursor-not-allowed' : 'hover:bg-indigo-600'}`}
+            disabled={classMutation.isPending}
           >
-            Ok
+            {classMutation.isPending ? "Saving Class..." : "Save"}
           </button>
         </div>
       </form>
