@@ -2,39 +2,37 @@ import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
+import { useQuery } from "@tanstack/react-query";
+import { useStudents } from "../hooks/useStudents";
+
 
 export default function StudentList() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { getStudents, loading } = useSchool();
-  const [records, setRecords] = useState([]);
-  //Create a state to manage the searches 
+  const { filterStudents } = useSchool();
+  //State to manage the searches 
   const [ filter, setFilter ] =useState([]);
-  
+
+
+  //Get students using useStudents()
+  const { data:records = [],
+          isLoading,
+          isSuccess,
+        } = useStudents();
+
   useEffect(() => {
-    const fetchStudents = async () => {
-      const response = await getStudents();
-
-      setRecords(response);
-      setFilter(response)
-    }
-    
-    fetchStudents();
-  }, [])
+    if(isSuccess) setFilter(records)
+  }, [isSuccess]);
 
 
-  const handleChange = (e) => {
-    const inpValue = e.target.value.toLowerCase();
+  const handleSearch = (inpValue) => {
 
-    const filteredRecords = records.filter(student => {
-      return  student.name.toLowerCase().includes(inpValue) ||
-              student.level.toLowerCase().includes(inpValue);
-    })
-
-    //Modify "filter" state to not alter the original "students" state
-    setFilter(filteredRecords)
+    //If user erases all letters, show full list again.
+    if(!inpValue.length) setFilter(records);
+    else setFilter(filterStudents(records, inpValue));
   }
+
 
   //Columns for the DataTable component
   const columns = [
@@ -69,7 +67,7 @@ export default function StudentList() {
           type="text"
           className="input-base my-2 text-sm"
           placeholder="Search for student..."
-          onChange={handleChange}
+          onChange={(e) => handleSearch(e.target.value)}
         />
 
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -79,7 +77,7 @@ export default function StudentList() {
         </div>
       </div>
       <DataTable 
-        progressPending = {loading}
+        progressPending = {isLoading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
         data    = {filter}
