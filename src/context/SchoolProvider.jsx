@@ -161,6 +161,21 @@ const SchoolProvider = ({children}) => {
   }
 
 
+  //Function to filter by students name or level
+  const filterStudents = (records, inpValue) => {
+
+    if(inpValue.length > 1){ 
+      const studentsName = inpValue.toLowerCase();
+
+      const filteredRecords = records.filter(student => { 
+        return student.name.toLowerCase().includes(studentsName) ||
+               student.level.toLowerCase().includes(studentsName);
+      })
+      return filteredRecords;
+    }
+  }
+
+
   const [ classes, setClasses ] = useState([]);
 
   const fetchClasses = async () => {
@@ -172,7 +187,7 @@ const SchoolProvider = ({children}) => {
   }
 
   const fetchClassesReactQuery = async () => {
-    const url = 'api/tudent_classes/';
+    const url = 'api/student_classes/';
 
     const { success, response } = await request("GET", url, null, "Classes loaded.");
 
@@ -241,6 +256,7 @@ const SchoolProvider = ({children}) => {
         today,
         useChangesProtection,
         getStudents,
+        filterStudents,
         loading,
         modalChapter, setModalChapter,
         handleModalChapter,

@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from "react"
 import useSchool from "../hooks/useSchool";
+import { useStudents } from "../hooks/useStudents";
 
 //This component is used to display and modify data.
 //When its displaying data the user can click on it
 //and it will switch to an input usefull to search students
 export default function DivInput({info, style = ""}) {
 
+  const { selStudent, filterStudents, setSelStudent } = useSchool()
+
+
   //editInfo state is used to show the search input 
   //and show the <p> element which displays the student's name.
   const [ editInfo, setEditInfo ] = useState(0)
   const inputRef = useRef(null);
+
 
   //Manage search input's behavior and hide search results list
   useEffect(() => {
@@ -20,30 +25,45 @@ export default function DivInput({info, style = ""}) {
 
   }, [editInfo, info]);
 
-  const { getStudents, loading, selStudent, setSelStudent } = useSchool()
-  /*States to:
+
+
+  /*States useful for:
     - Store search results.
     - Show/hide div which shows search results.
   */
-  const [results, setResults] = useState([]);
-  const [showResults, setShowResults] = useState(0);
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     setSelStudent(info);
   }, [])
 
-  //Send request to search for students 
-  const handleSearch = (value) => {
-    const fetchResults = async () => {
-      const response = await getStudents(null, value);
-      setResults(response);
+
+  //Get students using useStudents()
+  const { data:records = [],
+          isLoading,
+        } = useStudents();
+
+
+  const [results, setResults] = useState([]);
+
+  //Function to handle student search
+  const handleSearch = (inpValue) => {
+
+    //If user erases all letters
+    //- Empty results state
+    //- Hide results div
+    if(!inpValue.length){ 
+      setResults([]);
+      setShowResults(false);
+      return;
     }
 
-    if(value.length) setShowResults(1);
-    else setResults([]);
-
-    if(value.length > 2) fetchResults();
+    //Call filterStudents() to search for students,
+    //pass "records" which contains all of the students.
+    setResults(filterStudents(records, inpValue))
+    setShowResults(true);
   }
+
 
   //Handle div where the search results are displayed
   const divResultsRef = useRef(null);
@@ -61,8 +81,8 @@ export default function DivInput({info, style = ""}) {
             in case the user had written something.
           - Deactivate editInfo state.
         */
-        setShowResults(0);
-        inputRef.current.value = selStudent.name;
+        setShowResults(false);
+        inputRef.current.value = selStudent?.name || null;
         setEditInfo(0);
       }
     }
@@ -105,42 +125,42 @@ export default function DivInput({info, style = ""}) {
             onChange={(e) => handleSearch(e.target.value)}
             />
         {/* List of results */}
-        <ul className={`${showResults ? '' : 'hidden'}
-                        w-9/10 bg-white absolute 
-                        rounded-b-lg border border-sky-300`}
-        >
-          <li className={`${!results.length && showResults && !loading ? '':'hidden'} 
-                          h-8 text-center`}>
-            No matches found.
-          </li>
-          <li className={`${loading && showResults ? '':'hidden'} h-8 text-center`}>
-            Searching...
-          </li>
+ 
+        
+      { showResults 
+        && <ul className="w-9/10 bg-white absolute 
+                          rounded-b-lg border border-sky-300">
+        
+          { showResults && !results?.length 
+            && <li className="h-8 text-center">No matches found.</li>}
 
-          {results.map((result) => {
-            return <li  key={result.id}
-                        className={`${loading ? 'hidden' : ''}
-                                  h-8 hover:bg-gray-200 hover:cursor-pointer
-                                  pl-2`}
+          { isLoading && showResults 
+            && <li className="h-8 text-center">Searching...</li>}
+
+          { results?.map((result) => {
+              return <li  key={result.id}
+                        className={`${isLoading ? 'hidden' : ''}
+                                    h-8 hover:bg-gray-200 hover:cursor-pointer
+                                    pl-2`}
                         onClick={() => {
-                  {/* If user clicks a result
-                      - Set selStudent state to the selected student.	
-                      - Set editInfo state to 0 to hide search input.
-                      - Set showResults state to 0 to hide list of results.
-                      - Set search input's value to the selected student
-                        in case the user wanted to make another search.
-                  */}
+                        /* If user clicks a result
+                            - Set selStudent state to the selected student.	
+                            - Set editInfo state to 0 to hide search input.
+                            - Set showResults state to 0 to hide list of results.
+                            - Set search input's value to the selected student
+                              in case the user wanted to make another search.
+                        */
                           setSelStudent(result);
                           setEditInfo(0);
-                          setShowResults(0);
+                          setShowResults(false);
                           inputRef.current.value = result.name;
                         }}
-                    >
-                      {result.name}
-                    </li>
+                      >
+                        {result?.name}
+                      </li>
              })
           }
-        </ul>
+        </ul>}
       </div>
     </>
   )
