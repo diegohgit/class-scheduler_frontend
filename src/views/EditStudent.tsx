@@ -5,37 +5,39 @@ import useSchool from "../hooks/useSchool";
 import { useEffect, useState } from "react";
 import { UpdateStudentDTO, Student } from "../types/Student";
 import { useApi } from "../hooks/useApi";
+import { useStudent } from "../hooks/useStudents";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function EditStudent() {
 
   //Access to the id included on the URL with useParams()
   const { id } = useParams();
-  const { getStudents } = useSchool();
+  
+  const { data: student,
+          isError,
+          error
+        } = useStudent(id);
 
-  const [ student, setStudent ] = useState<Student | undefined>(undefined);
+
   const navigate = useNavigate();
 
-  //Fetch student when the component is mounted.
+  //Redirect if user tries to get an student who doesn't exist.
   useEffect(() => {
-    const fetchStudent = async () => {
-      //Run getStudents with the student id.
-      //When the response is received, store it in the state
-      const response = await getStudents(id);
-      setStudent(response)
 
-      //If theres no response
-      //redirect to the student list and show an error msg
-      if(!response){
-        navigate("/students", {
-          replace: true,
-          state: { error: "Student not found"}
+      if(isError
+         && axios.isAxiosError(error)
+         && error.response?.status === 404
+        ){
+          toast.error("Student not found");
+
+          navigate("/students", {
+            //replace: true is used to prevent saving 
+            //this invalid entry in the browser history.
+            replace: true,
           });
-        return
       }
-    };
-
-    fetchStudent();
-  }, []);
+  }, [isError, error, navigate]);
 
 
   const { request } = useApi();

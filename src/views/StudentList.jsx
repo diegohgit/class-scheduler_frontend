@@ -1,6 +1,6 @@
 import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useQuery } from "@tanstack/react-query";
 import { useStudents } from "../hooks/useStudents";
@@ -9,9 +9,8 @@ import { useStudents } from "../hooks/useStudents";
 export default function StudentList() {
 
   const navigate = useNavigate();
-  const location = useLocation();
   const { filterStudents } = useSchool();
-  //State to manage the searches 
+  //State to manage the searches
   const [ filter, setFilter ] =useState([]);
 
 
@@ -51,14 +50,6 @@ export default function StudentList() {
 
   return (
   <>
-    {location.state?.error && (
-      <div className="w-6/12 mx-auto my-2 p-2
-              bg-red-200 text-red-800 font-bold
-              border border-red-800 rounded">
-        {location.state.error}
-      </div>
-    )}
-
     <h1 className="title-base">Students</h1>
 
     <div className="w-6/12 h-90 mx-auto my-3">

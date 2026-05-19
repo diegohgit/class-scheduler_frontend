@@ -132,33 +132,8 @@ const SchoolProvider = ({children}) => {
     }, [isDirty]);
   }
 
+
   const { request } = useApi();
-
-  const [loading, setLoading] = useState(false);
-
-  /*  Function to get students from DB
-      If it receives an id, it will return only that student
-      otherwise, it will return all the students.
-      Also, this function is usefull to search students.
-  */
-  const getStudents = async (id = null, search = null) => {
-    setLoading(true);
-
-    try{
-      const studentUrl = id ? `/api/students/${id}` : '/api/students/';
-      const searchUrl  = search ? `/api/students/?search=${search}` : null;
-      const url = searchUrl ? searchUrl : studentUrl;
-
-      const { data } = await axiosClient(url);
-
-      return data.data;
-    }catch(error){
-      console.log("OCURRIO UN ERROR");
-      console.log(error);
-    }finally{
-      setLoading(false);
-    }
-  }
 
 
   //Function to filter by students name or level
@@ -255,9 +230,7 @@ const SchoolProvider = ({children}) => {
         classModal,
         today,
         useChangesProtection,
-        getStudents,
         filterStudents,
-        loading,
         modalChapter, setModalChapter,
         handleModalChapter,
         selChapter, setSelChapter,
