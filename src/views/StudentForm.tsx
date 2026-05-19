@@ -3,10 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useSchool from "../hooks/useSchool";
 import { Student } from "../types/Student";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useApi } from "../hooks/useApi";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   initialValues?: Student | undefined;
@@ -69,23 +70,32 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     reset(normalizeFromBackend(initialValues));
   }, [initialValues]);
 
-  const { useChangesProtection, loading } = useSchool();
 
+  const { useChangesProtection } = useSchool();
   //Handle form changes
   useChangesProtection(isDirty);
 
+
   const { request } = useApi();
-  const [ colors, setColors ] = useState<Array<{id: number, name: string}>>([]);
 
-  //Fetch colors.
-  useEffect(() => {
-    const fetchColors = async () =>{
-      const { success, response } = await request('GET', 'api/colors/');
+  const fetchColors = async () => {
+    const { success, response } = await request("GET", "api/colors/",);
 
-      if(success) setColors(response?.data);
-    }
-    fetchColors();
-  }, []);
+    if(!success) throw new Error("Failed to fetch colors.");
+    return response.data;
+  }
+
+  const { data:colors = [],
+          isLoading,
+          isError,
+        } = useQuery({
+          queryKey: ["colors"],
+          queryFn: fetchColors,
+          staleTime: Infinity,
+          gcTime:    1000 * 60 * 90,//1hr 30min
+          retry: false,
+        })
+
 
   const [age, setAge]                     = useState<number>(0);
   const [tempBirthdate, setTempBirthdate] = useState<string>("");
@@ -273,7 +283,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
                 />
                 <p className={`${ageMessage !== "" ? '' : 'hidden' } text-md text-red-500` }>{`${ageMessage}`}</p>
               </div>
-              <p className={`${age > 0 ? 'ml-4' : 'hidden' }`}>({`${age}`} years old)</p>              
+              { age > 0 && <p className ='m-2'>({age} years old)</p> }
             </div>
           </div>
 
@@ -303,13 +313,16 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           ></textarea>
         </div>
 
-        
-        <p className={`${colors.length ? "font-bold mb-1" : "hidden"}`}>
-          Schedule Color:
-        </p>
+
+        { colors.length > 0 
+          && (<p className="font-bold mb-1">Schedule Color:</p>)}
+
+        { isError && (<p>Couldn't fetch colors.</p>) }
+
         <div className="flex gap-3 mb-4">
-          <p className={`${loading ? "" : "hidden"}`}>Loading colors...</p>
-          {colors.map((color)=>{
+          { isLoading && (<p>Loading colors...</p>) }
+
+          {colors.map((color:any)=>{
               return <label
                       key={color.id}
                       htmlFor={color.id.toString()}
