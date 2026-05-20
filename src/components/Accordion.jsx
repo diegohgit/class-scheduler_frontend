@@ -13,19 +13,22 @@ export default function Accordion({mode, chapter, sections}) {
   const { request } = useApi();
 
   const { id } = useParams();
+
+
   const handleCheck = async (e) => {
 
-    const section_id = e.target.id;
+    if(mode === "student"){
+      const section_id = e.target.id;
 
-    if(id && section_id){
-      const url = "api/students/"+id+"/progress";
-      const data = { "student_id" : id, "section_id" : section_id};
+      if(id && section_id){
+        const url  = `api/students/${id}/progress`;
+        const data = { "student_id" : id, "section_id" : section_id};
 
-      const { success } = await request("POST",
-                                        url,
-                                        data,
-                                        "Section marked as seen.");
-
+        const { success } = await request("POST",
+                                          url,
+                                          data,
+                                          "Section marked as seen.");
+      }
     }
   }
 
@@ -43,17 +46,17 @@ export default function Accordion({mode, chapter, sections}) {
 
       {/* Edit & Delete options */}
         <div className="flex items-center gap-2">
-          <div className={`${mode === "manage" ? 'group-hover:block' : 'hidden'}
-                          hidden text-base font-medium 
-                          
-                          *:ml-2 *:hover:underline`}>
+          {mode === "manage" 
+            && (<div className='group-hover:block hidden text-base 
+                                font-medium 
+                                *:ml-2 *:hover:underline'>
 
-            <span onClick={() => {setSelChapter(chapter);
-                                  handleModalChapter();}}
-                 >Edit</span>
+                  <span onClick={() => {setSelChapter(chapter);
+                                        handleModalChapter();}}
+                      >Edit</span>
 
-            <span>Delete</span>
-          </div>
+                  <span>Delete</span>
+                </div>)}
           {isOpen ? <span>-</span> : <span>+</span>}
         </div>
       </div>
@@ -68,43 +71,44 @@ export default function Accordion({mode, chapter, sections}) {
           <div className="flex overflow-hidden">
             <label
               htmlFor={section.id}
-              className="group w-12/12 items-center  flex border border-amber-200
-                         hover:cursor-pointer hover:bg-gray-300">
+              className="group w-12/12 items-center 
+                         flex hover:cursor-pointer hover:bg-gray-300">
 
             {/* Checkbox */}
-              <input
-                type="checkbox"
-                id={section.id}
-                className={`${mode === "manage" ? 'hidden' : '' } 1/12 hover:cursor-pointer`}
-                defaultChecked={Boolean(section.seenAt)}
-                onChange={handleCheck }
-              />
+             
+              {mode === "student"
+               && (<input
+                    type="checkbox"
+                    id={section.id}
+                    className="1/12 hover:cursor-pointer"
+                    checked={!!section.seenDate}
+                    onChange={ handleCheck }
+                  />)}
 
             {/* Section's name */}
-              <span className={`${section.seenAt ? 'w-8/12' : 'w-10/12'}
-                                  ml-2
-                                  border border-r-amber-600`
+              <span className={`${section.seenDate ? 'w-8/12' : 'w-10/12'}
+                                  ml-2`
                                 }>
                 {section.name}
               </span>
 
             {/* Edit & Delete options */}
-              <div className={`${mode === "manage" ? '' : 'hidden'}
-                                 items-center gap-2 flex
-                                *:hidden *:group-hover:block *:text-base
-                                *:hover:underline *:font-medium`}>
-                <span onClick={() => {setSelSection(section);
-                                      handleModalSection();
-                                    }}
-                     >Edit</span>
-                <span>Delete</span>
-              </div>
-
+              { mode === "manage"
+                && (<div className="items-center gap-2 flex
+                                    *:hidden *:group-hover:block *:text-base
+                                    *:hover:underline *:font-medium">
+                      <span onClick={() => {setSelSection(section);
+                                            handleModalSection();
+                                          }}
+                          >Edit</span>
+                      <span>Delete</span>
+                    </div>)}
             {/* Seen at */}
-              <span className={`${!section.seenAt ? 'hidden' : '' } 
-                               col-span-4 text-right text-sm text-gray-600 ml-4`}>
-                Seen at {section.seenAt}
-              </span>
+              {section?.seenDate ? (
+                  <span className="col-span-4 text-right text-sm 
+                                 text-gray-600 ml-4">
+                    Seen on {section?.seenDate}
+                  </span>) : null}
             </label>
           </div>
         </div>

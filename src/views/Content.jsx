@@ -1,39 +1,42 @@
 import Accordion from "../components/Accordion";
-//import { topics } from "../data/topics";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import ModalChapter from "../components/ModalChapter";
 import ModalSection from "../components/ModalSection";
 import { useEffect, useState } from "react";
+import { useContent } from "../hooks/useContent";
+
 
 export default function Content() {
 
   const { handleModalChapter, modalChapter, setModalChapter,
-          fetchChapters, chapters, setChapters, 
-          loadingChapters, modalSection, setModalSection,
-          handleModalSection, setSelSection} = useSchool();
+          modalSection, setModalSection, handleModalSection,
+          setSelSection } = useSchool();
 
-  useEffect(() =>  {
 
-    fetchChapters();
-  }, [])
+  const { data: chapters = [],
+          isLoading,
+        } = useContent();
+
 
   return (
 	<>
     <h1 className="title-base">Content</h1>
 
     <div className="w-8/12 p-4 mb-10 mx-auto bg-gray-200 rounded-lg">
-      {chapters && chapters.length ? (
+      {chapters?.length ? (
         chapters.map( (chapter) => (
           <Accordion 
             key={chapter.id} 
             mode="manage"
             chapter={chapter}
             sections={chapter.section}/>
-        ))
-      ) : ( loadingChapters ? <span>Fetching chapters...</span> 
-                            : <span>No chapters available.</span> )}
+          ))
+        ) : isLoading ? (<span>Fetching chapters...</span>) 
+                      : (<span>No chapters available.</span>)}
     </div>
+
+
     <div className={`w-full  fixed bottom-0 left-0 
                       bg-white `}>
       <div className="flex items-center justify-center">
@@ -42,7 +45,7 @@ export default function Content() {
         onClick={() => {handleModalChapter();
                         setSelChapter([]);}}
         className="button-base flex items-center 
-                    justify-center bg-indigo-500 hover:bg-indigo-600"
+                   justify-center bg-indigo-500 hover:bg-indigo-600"
         >
         {/* "Plus" icon  */}
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="size-4 mr-1">
@@ -55,7 +58,7 @@ export default function Content() {
         onClick={() => {handleModalSection();
                         setSelSection([]);}}
         className="button-base flex items-center 
-                    justify-center bg-indigo-500 hover:bg-indigo-600"
+                   justify-center bg-indigo-500 hover:bg-indigo-600"
         >
         {/* "Plus" icon  */}
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="size-4 mr-1">

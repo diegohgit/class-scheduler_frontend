@@ -97,6 +97,7 @@ const SchoolProvider = ({children}) => {
           weekday: 'long'
         });
 
+
   //Custom hook to warn user of unsaved changes 
   //when trying to navigate to a different route.
   const useChangesProtection = (isDirty) => {
@@ -179,20 +180,6 @@ const SchoolProvider = ({children}) => {
   }
 
 
-  //States and function to fetch chapters.
-  const [ chapters, setChapters ] = useState([]);
-  const [ loadingChapters, setLoadingChapters ] = useState(0);
-
-  const fetchChapters = async () => {
-    setLoadingChapters(1);
-    const url = 'api/chapters/';
-    const { success, response } = await request("GET", url, null, "Content loaded.");
-
-    if(success && response?.data) setChapters(response.data);
-    setLoadingChapters(0);
-  }
-
-
   //states to handle section's modal.
   const [modalSection, setModalSection] = useState(0);
   const [ selSection, setSelSection ]   = useState([]);
@@ -235,9 +222,6 @@ const SchoolProvider = ({children}) => {
         handleModalChapter,
         selChapter, setSelChapter,
         validString,
-        fetchChapters,
-        chapters, setChapters,
-        loadingChapters,
         modalSection, setModalSection,
         handleModalSection,
         selSection, setSelSection,

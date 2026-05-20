@@ -4,8 +4,8 @@ import { useApi } from "../hooks/useApi";
 
 export default function ModalChapter() {
 
-  const { handleModalChapter, validString, fetchChapters,
-          selChapter, setSelChapter } = useSchool();
+  const { handleModalChapter, validString, selChapter,
+          setSelChapter } = useSchool();
 
   const inputRef = useRef(null);
 
@@ -49,7 +49,6 @@ export default function ModalChapter() {
       //- Clean state selChapter.
       if(success) {
         handleModalChapter();
-        fetchChapters();
         setSelChapter([]);
       }
     }else setValidName(0)
@@ -90,7 +89,8 @@ export default function ModalChapter() {
                   maxLength={150}
                   onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
           />
-          <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Name is required</p>
+          { !validName && 
+            <p className="text-md text-red-500">Name is required</p> }
         </div>
         <div className=" flex mt-2">
           <button

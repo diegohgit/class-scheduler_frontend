@@ -1,13 +1,19 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
+import { useContent } from "../hooks/useContent"; 
 
 export default function ModalSection() {
 
-  const { handleModalSection, validString, fetchChapters,
-          selSection, setSelSection, chapters } = useSchool();
+  const { validString, selSection, setSelSection,
+          handleModalSection, } = useSchool();
 
   const inputRef = useRef(null);
+
+  const { data:chapters = [],
+          isLoading,
+          isError,
+        } = useContent();
 
   //Manage Name input's behavior.
   useEffect(() => {
@@ -17,8 +23,10 @@ export default function ModalSection() {
     inputRef.current?.select();
   }, []);
 
+
   const [ validName, setValidName ] = useState(1);
   const { request } = useApi();
+
 
   //Async function to send requests to create/update a section.
   const handleSubmit = async(e) => {
@@ -49,7 +57,6 @@ export default function ModalSection() {
         - Clean state selChapter.*/
       if(success) {
         handleModalSection();
-        fetchChapters();
         setSelSection([]);
       }
     }else setValidName(0)
@@ -86,11 +93,10 @@ export default function ModalSection() {
         <select className="input-base focus:border-2!"
                 name="chapter_id"
                 id="chapter_id"
-                defaultValue={selSection?.chapter_id}
-        >
-            {chapters.map((chapter) =>
-              <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
-            )}
+                defaultValue={selSection?.chapter_id}>
+          {chapters?.map((chapter) =>
+            <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
+          )}
         </select>
       </div>
 
@@ -104,7 +110,8 @@ export default function ModalSection() {
                maxLength={150}
                onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
         />
-        <p className={`${validName ? 'hidden' : '' } text-md text-red-500` }>Section field is required.</p>
+        { !validName &&
+          <p className="text-md text-red-500">Section field is required.</p>}
       </div>
 
       <div className=" flex ">
