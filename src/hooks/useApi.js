@@ -18,11 +18,13 @@ export const useApi = () => {
         if(response?.data?.success) success = true;
       }
       else if(method === "GET"){
-        //Validate if data structure is correct
+        //Validate if data structure is correct.
         //Data may come in either of these two structures:
         const data = response?.data?.data ?? response?.data;
 
-        if(Array.isArray(data)) success = true;
+        //Object type validation is useful
+        //when trying to fetch a single register.
+        if(Array.isArray(data) || typeof data === "object") success = true;
       }
 
     } catch (error){
