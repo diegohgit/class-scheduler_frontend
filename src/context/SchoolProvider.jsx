@@ -199,6 +199,13 @@ const SchoolProvider = ({children}) => {
   }
 
 
+
+  //State to define if its allowed to navigate
+  //after creating or updating a student.
+  const [shouldNavigate, setShouldNavigate] = useState(false)
+
+
+
   return (
     <SchoolContext.Provider 
       value = {{
@@ -225,6 +232,7 @@ const SchoolProvider = ({children}) => {
         modalSection, setModalSection,
         handleModalSection,
         selSection, setSelSection,
+        shouldNavigate, setShouldNavigate,
       }}
 
     >{children}

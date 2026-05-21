@@ -20,7 +20,8 @@ export const useStudents = () => {
   return useQuery({ queryKey: ["students"],
                     queryFn: () => getStudents(),
                     staleTime: Infinity,
-                    gcTime: 1000 * 60 * 90//1hr 30min
+                    gcTime: 1000 * 60 * 90,//1hr 30min
+                    retry: false,
                   });
 }
 
@@ -31,7 +32,7 @@ export const useStudent = (id) => {
   return useQuery({ queryKey: ["student", id],
                     queryFn: () => getStudents(id),
                     staleTime: Infinity,
-                    gcTime: 1000 * 60 * 90,//1hr 30min
+                    //gcTime: default time is 5min.
                     retry: false,
                   });
 }

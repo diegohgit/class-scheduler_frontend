@@ -23,6 +23,9 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   //get the id that comes in the url
   const { id } = useParams();
+  const navigate = useNavigate();
+
+
 
   //give a default color if creating a new student
   const defaultColor = Math.floor(Math.random() * 9) + 1;
@@ -48,6 +51,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   })
 
 
+
   /*Some data comes from Backend as null, but forms handle this as "".
     With this we create a copy of the data that comes from backend
     and switch every null to "" in order to make a comparission 
@@ -62,6 +66,8 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     color_id:     data?.color_id != null ? String(data.color_id) : "",
   })
 
+
+
   //When initialValues is loaded, normalize it and pass it to reset().
   //reset() will load the information into the form.
   useEffect(() =>{
@@ -71,9 +77,11 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   }, [initialValues]);
 
 
-  const { useChangesProtection } = useSchool();
+
+  const { useChangesProtection, setShouldNavigate } = useSchool();
   //Handle form changes
   useChangesProtection(isDirty);
+
 
 
   const { request } = useApi();
@@ -95,6 +103,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           gcTime:    1000 * 60 * 90,//1hr 30min
           retry: false,
         })
+
 
 
   const [age, setAge]                     = useState<number>(0);
@@ -126,7 +135,9 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
   const handleBirthDate = (value:string) => {
     setTempBirthdate(formatBirthdate(value));
   }
-  
+
+
+
   const [markInput, setMarkInput]   = useState<boolean>(false)
   const [ageMessage, setAgeMessage] = useState<String>("");
 
@@ -168,27 +179,28 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     setMarkInput(false);
   };
 
-  //Calculate age when the mode is "edit",
+
+
+  //Calculate age in "edit" mode.
   useEffect(() => {
 
-    //If there are no initial values yet, or we aren't in edit mode, return.
-    //This is helpful because the initialValues are fetched asynchronously, 
-    // so at the beginning they are undefined but eventually they will be loaded.
+    //initialValues are fetched asynchronously, 
+    //if they aren't loaded yet, return and check again
     if (!initialValues || mode !== "edit") return;
 
-    //When initialValues are loaded, check if there is a birthdate
-    //so we can calculate the age and show it in the form.
+    //When initialValues are loaded, calculate age and show it in the form.
     if(initialValues.birthdate){
       const parsedDate = dayjs(initialValues.birthdate, "MM/DD/YYYY", true);
       const age = dayjs().diff(parsedDate, "year");
       setAge(age);
       setValidDate(true);
 
-      //Set the birthdate when initialValues is loaded so the user 
-      // can see a value in the birthdate input when the user is in edit mode.
+      //Set the birthdate so it can be seen in the birthdate input
       setTempBirthdate(initialValues.birthdate.toString());
     }
   }, [initialValues, mode])
+
+
 
   //Validate form data (name and birthdate in this case).
   const validation = (): boolean => {
@@ -204,15 +216,6 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     }else return true;
   }
 
-  const navigate = useNavigate();
-  const [shouldNavigate, setShouldNavigate] = useState<boolean>(false)
-
-  //Run navigation in a useEffect because it takes a little time 
-  //until isDirty gets updated.
-  useEffect(() => {
-
-    if(shouldNavigate && !isDirty) navigate("/students");
-  }, [shouldNavigate, isDirty]);
 
 
   //Submit handler
@@ -239,6 +242,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       }
     }
   }
+
 
 
   return (
