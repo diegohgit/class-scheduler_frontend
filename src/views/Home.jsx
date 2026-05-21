@@ -12,7 +12,11 @@ Modal.setAppElement('#root')
 export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
-          handleClassModal, fetchClassesReactQuery, /*classes*/ } = useSchool();
+          handleClassModal, fetchClassesReactQuery, } = useSchool();
+
+  const [ searchStudent, setSearchStudent ] = useState(0);
+
+
 
   const { data:classes = [],
           isLoading,
@@ -24,17 +28,17 @@ export default function Home() {
         queryFn:   fetchClassesReactQuery,
         staleTime: Infinity,
         gcTime:    1000 * 60 * 90,//1hr 30min
+        retry: false,
       });
-
 
   useEffect(() => {
 
-    if(isError){
-      toast.error(error?.message || "Something went wrong.");
+    if(isSuccess && classes?.length === 0){
+      toast.warning("You have no classes scheduled.");
     }
-  }, [isError, error]);
-                  
-  const [ searchStudent, setSearchStudent ] = useState(0);
+  }, [isSuccess, classes]);
+
+
 
   //function to calculate the space before each class
   const spaceBeforeClass = (startMinute) => {
@@ -64,7 +68,9 @@ export default function Home() {
     return classHeightAC;
   }
 
-  const hours = [7, 8, 9, 10, 11];
+
+
+  const hours = [7, 8, 9, 10, 11, 12];
   const blocksPerHr = 12;
 
   let print = 0;
@@ -72,11 +78,14 @@ export default function Home() {
   let matchEnds    = 0;
   let nextClassMin = '';
 
+
   return (
     <>
-      {isLoading && <LoadingMessage text="Classes"/>}
+      {isLoading && <LoadingMessage text="Loading Classes..."/>}
+      {isError   && <p className="text-center mt-40">Couldn't fetch classes.</p>}
 
-      <div className="mt-15 grid grid-cols-8 gap-2">
+      {isSuccess && Array.isArray(classes) &&
+      (<div className="mt-15 grid grid-cols-8 gap-2">
         {/* Fixed time column */}
         <div className="w-20">
           <div className="text-center font-semibold bg-gray-300 
@@ -174,7 +183,7 @@ export default function Home() {
                   //and compare if it matches with the current hour
                   //Example: if we are in the 08:10 block, we look for a class in the 
                   // same hour range, like 08:30
-                  const nextClass = classes.filter(cls => cls.starts.split(':')[0] == hour
+                  const nextClass = classes?.filter(cls => cls.starts.split(':')[0] == hour
                                                           && cls.day_id === day.id);
 
                   if(nextClass[0]){
@@ -212,7 +221,7 @@ export default function Home() {
             ))}
           </div>
         ))}
-      </div>
+      </div>)}
 
       <Modal isOpen={modal}  className="modal-base w-95 h-80">
           <ModalClass />
