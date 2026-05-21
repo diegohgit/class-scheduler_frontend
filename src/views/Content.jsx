@@ -11,7 +11,7 @@ export default function Content() {
 
   const { handleModalChapter, modalChapter, setModalChapter,
           modalSection, setModalSection, handleModalSection,
-          setSelSection } = useSchool();
+          setSelSection, setSelChapter } = useSchool();
 
 
   const { data: chapters = [],

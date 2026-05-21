@@ -1,11 +1,15 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ModalChapter() {
 
   const { handleModalChapter, validString, selChapter,
           setSelChapter } = useSchool();
+
+
 
   const inputRef = useRef(null);
 
@@ -17,41 +21,58 @@ export default function ModalChapter() {
     inputRef.current?.select();
   }, []);
 
+
+
   //State useful to mark Name input in red if name is missing.
   const [ validName, setValidName ] = useState(1);
   const { request } = useApi();
 
   //Async function to send requests to create/update a chapter.
-  const handleSubmit = async(e) => {
+  const handleRequest = async(name) => {
+
+    const id = selChapter?.id ?? null;
+
+    const method   = id ? "PUT" : "POST";
+    const url      = id ? "/api/chapters/"+id : "/api/chapters";
+    const dataName = { "name" : name };
+    const message  = id ? "Chapter updated." : "Chapter created.";
+
+    console.log("name", name)
+    const { success } = await request( method,
+                                        url,
+                                        dataName,
+                                        message );
+    return success;
+  }
+
+
+
+  const queryClient = useQueryClient();
+
+  const chapterMutation = useMutation({
+    mutationFn: (name) => handleRequest(name),
+    onSuccess: async (success) => {
+      if(success){
+        await queryClient.refetchQueries({queryKey:["chapters"]})
+        handleModalChapter();
+        setSelChapter([]);
+      }
+    }
+  });
+
+
+
+  //Validate data and run mutation.
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
     const name     = formData.get('name');
 
     if(validString(name)) {
-      setValidName(1)
-
-      const id = selChapter?.id ?? null;
-
-      const method   = id ? "PUT" : "POST";
-      const url      = id ? "/api/chapters/"+id : "/api/chapters";
-      const dataName = { "name" : name };
-      const message  = id ? "Chapter updated." : "Chapter created.";
-
-      const { success } = await request( method,
-                                         url,
-                                         dataName,
-                                         message );
-
-      //If request is succeded:
-      //- Close modal.
-      //- Update list of chapters.
-      //- Clean state selChapter.
-      if(success) {
-        handleModalChapter();
-        setSelChapter([]);
-      }
-    }else setValidName(0)
+      setValidName(1);
+      chapterMutation.mutate(name);
+    }else setValidName(0);
   }
 
   return (
@@ -76,7 +97,8 @@ export default function ModalChapter() {
       </div>
 
 
-      <form onSubmit={handleSubmit}
+
+      <form onSubmit={(e) => handleSubmit(e)}
             className="w-11/12 mx-auto"
       >
         <div className="h-22">
@@ -104,7 +126,7 @@ export default function ModalChapter() {
             type="submit"
             className="button-base bg-indigo-500 hover:bg-indigo-600"
           >
-            Save
+            {chapterMutation.isPending ? "Saving Chapter..." : "Save"}
           </button>
         </div>
       </form>
