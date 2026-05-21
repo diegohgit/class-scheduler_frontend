@@ -8,16 +8,27 @@ export const useApi = () => {
     let success  = false;
     let message  = "An error has occurred.";
     let response = null;
-    let notification = null;
 
     try{
       response = await axiosClient({method, url, data});
-      success = true;
+
+      if(method === "POST" || method === "PUT" ){
+
+        //Laravel APIs are configured to send success=true.
+        if(response?.data?.success) success = true;
+      }
+      else if(method === "GET"){
+        //Validate if data structure is correct
+        //Data may come in either of these two structures:
+        const data = response?.data?.data ?? response?.data;
+
+        if(Array.isArray(data)) success = true;
+      }
 
     } catch (error){
       console.log(error)
 
-      message = error.response?.status === 422 ? error.response.data.message 
+      message = error.response?.status === 422 ? error.response.data.message
                                                : "Something went wrong.";
       throw error;
 
@@ -29,6 +40,5 @@ export const useApi = () => {
 
     return { success, message, response };
   }
-
   return { request };
 } 
