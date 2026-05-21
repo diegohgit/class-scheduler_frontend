@@ -2,6 +2,7 @@ import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useContent } from "../hooks/useContent"; 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function ModalSection() {
 
@@ -10,10 +11,12 @@ export default function ModalSection() {
 
   const inputRef = useRef(null);
 
+  //load list of chapters
   const { data:chapters = [],
           isLoading,
-          isError,
         } = useContent();
+
+
 
   //Manage Name input's behavior.
   useEffect(() => {
@@ -24,43 +27,61 @@ export default function ModalSection() {
   }, []);
 
 
-  const [ validName, setValidName ] = useState(1);
+
   const { request } = useApi();
-
-
+  
   //Async function to send requests to create/update a section.
-  const handleSubmit = async(e) => {
-    e.preventDefault();
+  const handleRequest = async(sectionData) => {
 
-    const formData = new FormData(e.currentTarget);
-    const chapter_id = formData.get('chapter_id');
-    const section    = formData.get('name');
+    const id = selSection?.id ?? null;
 
-    if(validString(section)) {
-      setValidName(1)
+    const method  = id ? "PUT" : "POST";
+    const url     = id ? "/api/sections/"+id : "/api/sections";
+    const message = id ? "Section updated." : "Section created.";
 
-      const id = selSection?.id ?? null;
+    const { success } = await request( method,
+                                        url,
+                                        sectionData,
+                                        message );
+    return success
+  }
 
-      const method      = id ? "PUT" : "POST";
-      const url         = id ? "/api/sections/"+id : "/api/sections";
-      const dataSection = { "chapter_id" : chapter_id, "name" : section };
-      const message     = id ? "Section updated." : "Section created.";
 
-      const { success } = await request( method,
-                                         url,
-                                         dataSection,
-                                         message );
 
-      /*If request is succeded:
-        - Close modal.
-        - Update list of chapters.
-        - Clean state selChapter.*/
-      if(success) {
+  const queryClient = useQueryClient();
+
+  const sectionMutation = useMutation({
+    mutationFn: (sectionData) => handleRequest(sectionData),
+    onSuccess: async (success) =>{
+      if(success){
+        await queryClient.refetchQueries({queryKey:["chapters"]})
         handleModalSection();
         setSelSection([]);
       }
-    }else setValidName(0)
+    }
+  });
+
+
+
+  const [ validName, setValidName ] = useState(1);
+
+  //Validate data and run mutation.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData   = new FormData(e.currentTarget);
+    const chapter_id = formData.get('chapter_id');
+    const section    = formData.get('name');
+
+    if(validString(section)){
+      setValidName(1);
+
+      const sectionData = { "chapter_id" : chapter_id, "name" : section };
+      sectionMutation.mutate(sectionData);
+    }
+    else setValidName(0);
   }
+
 
 
   return (
@@ -86,50 +107,50 @@ export default function ModalSection() {
       </div>
 
 
-    <form onSubmit={handleSubmit}
-          className="w-11/12 mx-auto">
-      <div className="block mb-2">
-        <b>Chapter:</b>
-        <select className="input-base focus:border-2!"
-                name="chapter_id"
-                id="chapter_id"
-                defaultValue={selSection?.chapter_id}>
-          {chapters?.map((chapter) =>
-            <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
-          )}
-        </select>
-      </div>
+      <form onSubmit={handleSubmit}
+            className="w-11/12 mx-auto">
+        <div className="block mb-2">
+          <b>Chapter:</b>
+          <select className="input-base focus:border-2!"
+                  name="chapter_id"
+                  id="chapter_id"
+                  defaultValue={selSection?.chapter_id}>
+            {chapters?.map((chapter) =>
+              <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
+            )}
+          </select>
+        </div>
 
-      <div className="h-22">
-        <b>Section name:</b>
-        <input ref={inputRef}
-               name="name"
-               id="name"
-               defaultValue={selSection?.name ?? null}
-               className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-               maxLength={150}
-               onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
-        />
-        { !validName &&
-          <p className="text-md text-red-500">Section field is required.</p>}
-      </div>
+        <div className="h-22">
+          <b>Section name:</b>
+          <input ref={inputRef}
+                name="name"
+                id="name"
+                defaultValue={selSection?.name ?? null}
+                className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
+                maxLength={150}
+                onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
+          />
+          { !validName &&
+            <p className="text-md text-red-500">Section field is required.</p>}
+        </div>
 
-      <div className=" flex ">
-        <button
-          type="button"
-          onClick={() => console.log("Cancel")}
-          className="button-base bg-red-500 hover:bg-red-600"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit"
-          className="button-base bg-indigo-500 hover:bg-indigo-600"
-        >
-          Save
-        </button>
-      </div>
-    </form>
-  </>
+        <div className=" flex ">
+          <button
+            type="button"
+            onClick={() => console.log("Cancel")}
+            className="button-base bg-red-500 hover:bg-red-600"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            className="button-base bg-indigo-500 hover:bg-indigo-600"
+          >
+            {sectionMutation.isPending ? "Saving Section..." : "Save"}
+          </button>
+        </div>
+      </form>
+    </>
   )
 }
