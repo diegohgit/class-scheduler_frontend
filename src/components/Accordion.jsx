@@ -2,35 +2,62 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Accordion({mode, chapter, sections}) {
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(mode === "student" ? true:false);
 
   const { handleModalChapter, setSelChapter, setSelSection,
           handleModalSection } = useSchool();
 
-  const { request } = useApi();
-
   const { id } = useParams();
 
 
-  const handleCheck = async (e) => {
+
+  const { request } = useApi();
+
+  //Async function to send requests to mark a section as seen.
+  const handleRequest = async (markData) => {
+
+    const url = `api/students/${id}/progress`;
+    const { success } = await request("POST",
+                                      url,
+                                      markData,
+                                      "Section marked as seen.");
+    return success;
+  }
+
+
+
+  const queryClient = useQueryClient();
+
+  const markMutation = useMutation({
+    mutationFn: (markData) => handleRequest(markData),
+    onSuccess: async (success) => {
+      console.log("mutatuon", success)
+      if(success){
+        await queryClient.refetchQueries({queryKey:["studentProgress", id]});
+      }
+    }
+  })
+
+
+  //Validate data and run mutation.
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     if(mode === "student"){
       const section_id = e.target.id;
 
       if(id && section_id){
-        const url  = `api/students/${id}/progress`;
-        const data = { "student_id" : id, "section_id" : section_id};
-
-        const { success } = await request("POST",
-                                          url,
-                                          data,
-                                          "Section marked as seen.");
+        const markData = { "student_id" : Number(id), "section_id" : Number(section_id)};
+        markMutation.mutate(markData);
       }
     }
   }
+
+
 
   return (
     <>
@@ -40,7 +67,6 @@ export default function Accordion({mode, chapter, sections}) {
                       bg-gray-200 hover:bg-gray-300"
            onClick={() => setIsOpen(!isOpen)}
         >
-
       {/* Chapter's name */}
         <span className="text-lg font-bold">{chapter.name}</span>
 
@@ -80,9 +106,9 @@ export default function Accordion({mode, chapter, sections}) {
                && (<input
                     type="checkbox"
                     id={section.id}
-                    className="1/12 hover:cursor-pointer"
+                    className="w-1/12 hover:cursor-pointer"
                     checked={!!section.seenDate}
-                    onChange={ handleCheck }
+                    onChange={ handleSubmit }
                   />)}
 
             {/* Section's name */}
