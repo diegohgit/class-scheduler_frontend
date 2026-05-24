@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import ConfirmModal from "./ConfirmModal";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -43,20 +44,39 @@ export default function Accordion({mode, chapter, sections}) {
   })
 
 
+
   //Validate data and run mutation.
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (section_id) => {
 
-    if(mode === "student"){
-      const section_id = e.target.id;
+    if(mode === "student" && id && section_id){
 
-      if(id && section_id){
-        const markData = { "student_id" : Number(id), "section_id" : Number(section_id)};
-        markMutation.mutate(markData);
-      }
+      const markData = { "student_id" : Number(id), "section_id" : Number(section_id)};
+      markMutation.mutate(markData);
     }
   }
 
+
+
+  const [activeSection, setActiveSection] = useState(null);
+  const bubbleRef = useRef(null);
+  //Hide bubble dialog when user clicks outside of it.
+  useEffect(() => {
+    function handleClickOutside(event){
+      
+      if(bubbleRef.current && !bubbleRef.current.contains(event.target)){
+        setActiveSection(null);
+      }
+    }
+
+    //add the "mousedown" event listener to the document
+    //if user does a mousedown on any part of document, run handleClickOutside()
+    if(activeSection){
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    //Cleanup function
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeSection]);
 
 
   return (
@@ -66,76 +86,98 @@ export default function Accordion({mode, chapter, sections}) {
                       font-bold justify-between 
                       bg-gray-200 hover:bg-gray-300"
            onClick={() => setIsOpen(!isOpen)}
-        >
-      {/* Chapter's name */}
+      >
+        {/* Chapter's name */}
         <span className="text-lg font-bold">{chapter.name}</span>
 
-      {/* Edit & Delete options */}
+        {/* Edit & Delete options */} 
         <div className="flex items-center gap-2">
           {mode === "manage" 
             && (<div className='group-hover:block hidden text-base 
                                 font-medium 
-                                *:ml-2 *:hover:underline'>
-
+                                *:ml-2 *:hover:underline'
+                >
                   <span onClick={() => {setSelChapter(chapter);
-                                        handleModalChapter();}}
-                      >Edit</span>
-
+                                        handleModalChapter();
+                                      }}
+                  >Edit</span>
                   <span>Delete</span>
                 </div>)}
           {isOpen ? <span>-</span> : <span>+</span>}
         </div>
       </div>
 
-      {sections?.map( (section) => (
-        <div
-          key={section.id}
-          className={`${isOpen ? 'grid-rows-[1fr] opacity-100'
-                               : 'grid-rows-[0fr] opacity-0' }
-                      grid overflow-hidden transition-all
-                      duration-300 ease-in-out`}>
-          <div className="flex overflow-hidden">
-            <label
-              htmlFor={section.id}
-              className="group w-12/12 items-center 
-                         flex hover:cursor-pointer hover:bg-gray-300">
+      {sections?.map((section, index) => (
+        <div key={section.id}
+             className={`${ isOpen ? "grid-rows-[1fr] opacity-100"
+                                   : "grid-rows-[0fr] opacity-0"} 
+                        grid overflow-visible transition-all
+                        duration-300 ease-in-out`}
+        >
+          <div className="relative flex overflow-visible">
 
-            {/* Checkbox */}
-             
-              {mode === "student"
-               && (<input
-                    type="checkbox"
-                    id={section.id}
-                    className="w-1/12 hover:cursor-pointer"
-                    checked={!!section.seenDate}
-                    onChange={ handleSubmit }
-                  />)}
+            {/* CLICKABLE AREA */}
+            <div className="group w-full items-center 
+                            flex hover:cursor-pointer hover:bg-gray-300"
+                onClick={() => setActiveSection( activeSection === section.id ? null : section.id )}
+            >
 
-            {/* Section's name */}
-              <span className={`${section.seenDate ? 'w-8/12' : 'w-10/12'}
-                                  ml-2`
-                                }>
+
+              {mode === "student" && (
+                //Temporarily remove check input beacuse it had some conflict
+                //with the bubble click.
+                <p>[Icon]</p>
+              )}
+
+
+              <span className={`${section.seenDate ? "w-8/12" : "w-10/12"} 
+                                ml-2 hover:cursor-pointer`}
+              >
                 {section.name}
               </span>
+            </div>
 
-            {/* Edit & Delete options */}
-              { mode === "manage"
-                && (<div className="items-center gap-2 flex
-                                    *:hidden *:group-hover:block *:text-base
-                                    *:hover:underline *:font-medium">
-                      <span onClick={() => {setSelSection(section);
-                                            handleModalSection();
-                                          }}
-                          >Edit</span>
-                      <span>Delete</span>
-                    </div>)}
-            {/* Seen at */}
-              {section?.seenDate ? (
-                  <span className="col-span-4 text-right text-sm 
-                                 text-gray-600 ml-4">
-                    Seen on {section?.seenDate}
-                  </span>) : null}
-            </label>
+            {/* Speech bubble */}
+            {activeSection === section.id && (
+              <div ref={bubbleRef}
+                   className="group absolute left-4/12 
+                             -translate-y-11/12 p-2 ml-3 
+                             bg-white rounded-lg z-50
+                             border border-gray-300 shadow-lg
+                             hover:cursor-pointer hover:bg-slate-100"
+              >
+                {/* Arrow */}
+                <div className="absolute left-1/2 top-full
+                                -translate-x-1/2 w-0 h-0
+                                border-l-8 
+                                border-l-transparent 
+                                border-r-8
+                                border-r-transparent 
+                                border-t-8 
+                                border-t-white
+                                group-hover:border-t-slate-100"
+                />
+
+                {/* Options */}
+                {mode === "student" &&
+                  (<div className="flex justify-center items-center"
+                        onClick={() => handleSubmit(section.id)}>
+                    <span className="text-sm hover:underline">
+                      Click here to mark as seen.
+                    </span>
+                  </div>)
+                }
+                {mode === "manage" &&
+                  (<div className="flex justify-center items-center 
+                                   *:px-2 *:py-1 *:hover:underline
+                                   *:text-sm"
+                    >
+                    <span>Edit</span>
+                    <span>Delete</span>
+                  </div>)
+                }
+              </div>
+            )}
           </div>
         </div>
       ))}
