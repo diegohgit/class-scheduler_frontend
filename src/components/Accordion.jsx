@@ -3,11 +3,12 @@ import { useParams } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ConfirmModal from "./ConfirmModal";
 
 export default function Accordion({mode, chapter, sections}) {
 
   const [isOpen, setIsOpen] = useState(mode === "student" ? true:false);
+
+  const [ confirmDelete, setConfirmDelete ] = useState(false);
 
   const { handleModalChapter, setSelChapter, setSelSection,
           handleModalSection } = useSchool();
@@ -65,6 +66,7 @@ export default function Accordion({mode, chapter, sections}) {
       
       if(bubbleRef.current && !bubbleRef.current.contains(event.target)){
         setActiveSection(null);
+        setConfirmDelete(false);
       }
     }
 
@@ -137,6 +139,7 @@ export default function Accordion({mode, chapter, sections}) {
               </span>
             </div>
 
+
             {/* Speech bubble */}
             {activeSection === section.id && (
               <div ref={bubbleRef}
@@ -144,7 +147,7 @@ export default function Accordion({mode, chapter, sections}) {
                              -translate-y-11/12 p-2 ml-3 
                              bg-white rounded-lg z-50
                              border border-gray-300 shadow-lg
-                             hover:cursor-pointer hover:bg-slate-100"
+                             hover:bg-slate-100"
               >
                 {/* Arrow */}
                 <div className="absolute left-1/2 top-full
@@ -167,14 +170,38 @@ export default function Accordion({mode, chapter, sections}) {
                     </span>
                   </div>)
                 }
-                {mode === "manage" &&
+
+                {mode === "manage" && confirmDelete === false &&
                   (<div className="flex justify-center items-center 
                                    *:px-2 *:py-1 *:hover:underline
-                                   *:text-sm"
+                                   *:text-sm *:hover:cursor-pointer"
                     >
-                    <span>Edit</span>
-                    <span>Delete</span>
+                    <span onClick={()=>{handleModalSection();
+                                        setActiveSection(null);
+                                        setSelSection(section);
+                     }}>
+                      Edit
+                    </span>
+                    <span onClick={() => setConfirmDelete(true)}>Delete</span>
                   </div>)
+                }
+
+                {mode === "manage" && confirmDelete === true &&
+                  ( <div className="flex">
+                      <span>Delete section?</span>
+
+                      <div className="*:m-1 *:font-bold *:hover:underline
+                                      *:hover:cursor-pointer"
+                      >
+                        <span onClick={() => {setConfirmDelete(false);
+                                              setActiveSection(null);}}
+                        >No</span>
+                        <span>
+                          Yes
+                        </span>
+                      </div>
+                    </div>
+                  )
                 }
               </div>
             )}
