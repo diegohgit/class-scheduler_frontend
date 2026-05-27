@@ -88,11 +88,13 @@ export default function Accordion({mode, chapter, sections}) {
 
       {/* CHAPTER HEADER */}
       <div
-        className="w-full flex cursor-pointer
+        className="w-full relative z-0 flex cursor-pointer
                    py-2 px-2 font-bold text-lg
                    bg-gray-200 hover:bg-gray-300"
         onClick={() => setIsOpen(!isOpen)}
       >
+
+        {/* CHAPTER NAME */}
         <span className="text-lg font-bold">{chapter.name}</span>
 
 
@@ -119,17 +121,18 @@ export default function Accordion({mode, chapter, sections}) {
 
 
       {/* ACCORDION CONTENT */}
-      <div className={`${isOpen ? "max-h-[1000px]" : "max-h-0"}
-                     transition-all duration-300 overflow-hidden`}
+      <div className={`${isOpen ? "max-h-[1000px] overflow-visible"
+                                : "max-h-0 overflow-hidden"}
+                     transition-all duration-300 `}
       >
         {sections?.map((section) => (
           <div  key={section.id}
                 onClick={() => setActiveSection(
                                  activeSection === section.id ? null : section.id)}
-                className="h-10"
+                className="relative"
           >
             {/* SECTION ROW */}
-            <div className={`${activeSection === section.id ? "bg-blue-200" 
+            <div className={`${activeSection === section.id ? "bg-blue-200 " 
                                                             : "bg-gray-200 hover:bg-gray-300" }
                             items-center flex w-full
                             cursor-pointer px-2 py-2`}
@@ -163,11 +166,10 @@ export default function Accordion({mode, chapter, sections}) {
             {activeSection === section.id &&
               ( <div ref={bubbleRef}
                      onClick={(e) => e.stopPropagation()}
-                     className="group relative z-50 
-                                -right-8 -translate-y-2/12 w-fit 
-                                bg-white rounded-lg shadow-lg
-                                border border-gray-300 
-                                hover:bg-slate-100 hover:cursor-pointer"
+                     className="group absolute top-7
+                                left-8 z-50 mt-2 
+                                bg-white rounded-lg shadow-lg 
+                                hover:bg-slate-100"
                 >
                   {/* Arrow */}
                   <div className="absolute bottom-8 translate-x-11/12
@@ -184,7 +186,7 @@ export default function Accordion({mode, chapter, sections}) {
                   {/* MARK AS SEEN OPTION*/}
                   {mode === "student" &&
                     ( <div className="flex justify-center items-center
-                                      p-2"
+                                      p-2 hover:cursor-pointer"
                           onClick={() => {handleSubmit(section.id)
                                           setActiveSection(null);}
                                   }
