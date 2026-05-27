@@ -37,7 +37,7 @@ export default function Accordion({mode, chapter, sections}) {
   const markMutation = useMutation({
     mutationFn: (markData) => handleRequest(markData),
     onSuccess: async (success) => {
-      console.log("mutatuon", success)
+
       if(success){
         await queryClient.refetchQueries({queryKey:["studentProgress", id]});
       }
@@ -70,7 +70,7 @@ export default function Accordion({mode, chapter, sections}) {
       }
     }
 
-    //add the "mousedown" event listener to the document
+    //Add the "mousedown" event listener to the document
     //if user does a mousedown on any part of document, run handleClickOutside()
     if(activeSection){
       document.addEventListener("mousedown", handleClickOutside);
@@ -78,136 +78,158 @@ export default function Accordion({mode, chapter, sections}) {
 
     //Cleanup function
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [activeSection]);
+  }, [activeSection, bubbleRef]);
 
 
   return (
     <>
-      <div className="group w-full flex
-                      p-2 hover:cursor-pointer text-lg 
-                      font-bold justify-between 
-                      bg-gray-200 hover:bg-gray-300"
-           onClick={() => setIsOpen(!isOpen)}
+      {/* CHAPTER HEADER */}
+      <div
+        className="w-full flex cursor-pointer
+                   py-2 px-2 font-bold text-lg
+                   bg-gray-200 hover:bg-gray-300"
+        onClick={() => setIsOpen(!isOpen)}
       >
-        {/* Chapter's name */}
         <span className="text-lg font-bold">{chapter.name}</span>
 
-        {/* Edit & Delete options */} 
-        <div className="flex items-center gap-2">
-          {mode === "manage" 
-            && (<div className='group-hover:block hidden text-base 
-                                font-medium 
-                                *:ml-2 *:hover:underline'
-                >
-                  <span onClick={() => {setSelChapter(chapter);
-                                        handleModalChapter();
-                                      }}
-                  >Edit</span>
-                  <span>Delete</span>
-                </div>)}
-          {isOpen ? <span>-</span> : <span>+</span>}
+
+        {/* Edit & Delete options */}
+        <div className="flex ml-auto gap-2">
+          {mode === "manage" &&
+            ( <div className='group-hover:block text-base 
+                              font-medium 
+                              *:ml-2 *:hover:underline'
+              >
+                <span onClick={() => {setSelChapter(chapter);
+                                      handleModalChapter();
+                                    }}
+                >Edit</span>
+                <span>Delete</span>
+              </div>)
+          }
+          <div className="w-2">
+            {isOpen ? <span>-</span> : <span>+</span>}
+          </div>
         </div>
       </div>
 
-      {sections?.map((section, index) => (
-        <div key={section.id}
-             className={`${ isOpen ? "grid-rows-[1fr] opacity-100"
-                                   : "grid-rows-[0fr] opacity-0"} 
-                        grid overflow-visible transition-all
-                        duration-300 ease-in-out`}
-        >
-          <div className="relative flex overflow-visible">
 
-            {/* CLICKABLE AREA */}
-            <div className="group w-full items-center 
-                            flex hover:cursor-pointer hover:bg-gray-300"
-                onClick={() => setActiveSection( activeSection === section.id ? null : section.id )}
+
+      {/* ACCORDION CONTENT */}
+      <div className={`${isOpen ? "max-h-[1000px]" : "max-h-0"}
+                     transition-all duration-300 overflow-hidden`}
+      >
+        {sections?.map((section) => (
+          <div  key={section.id}
+                onClick={() => setActiveSection(
+                                 activeSection === section.id ? null : section.id)}
+                className="h-10"
+          >
+            {/* SECTION ROW */}
+            <div className={`${activeSection === section.id ? "bg-blue-200" 
+                                                            : "bg-gray-200 hover:bg-gray-300" }
+                            items-center flex w-full
+                            cursor-pointer px-2 py-2`}
             >
-
-
+              {/* CHECKED ICON */}
               {mode === "student" && (
-                //Temporarily remove check input beacuse it had some conflict
-                //with the bubble click.
-                <p>[Icon]</p>
-              )}
+                section.seenDate !== null ? (
 
+                  <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" 
+                        className="ml-2 size-5.5 rounded-full bg-green-400 ">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                ) : ( <div className="ml-2 h-5.5 w-5.5 rounded-full border border-gray-500 "></div>))
+              }
 
-              <span className={`${section.seenDate ? "w-8/12" : "w-10/12"} 
-                                ml-2 hover:cursor-pointer`}
-              >
-                {section.name}
-              </span>
+              {/* SECTION NAME */}
+              <span className="px-2">{section.name}</span>
+
+              {/* SEEN DATE */}
+              {mode === "student" && section.seenDate !== null && (
+                <span className="ml-auto text-sm italic
+                                 text-gray-600"
+                >Seen on {section.seenDate}</span>
+                )
+              }
             </div>
 
 
-            {/* Speech bubble */}
-            {activeSection === section.id && (
-              <div ref={bubbleRef}
-                   className="group absolute left-4/12 
-                             -translate-y-11/12 p-2 ml-3 
-                             bg-white rounded-lg z-50
-                             border border-gray-300 shadow-lg
-                             hover:bg-slate-100"
-              >
-                {/* Arrow */}
-                <div className="absolute left-1/2 top-full
-                                -translate-x-1/2 w-0 h-0
-                                border-l-8 
-                                border-l-transparent 
-                                border-r-8
-                                border-r-transparent 
-                                border-t-8 
-                                border-t-white
-                                group-hover:border-t-slate-100"
-                />
 
-                {/* Options */}
-                {mode === "student" &&
-                  (<div className="flex justify-center items-center"
-                        onClick={() => handleSubmit(section.id)}>
-                    <span className="text-sm hover:underline">
-                      Click here to mark as seen.
-                    </span>
-                  </div>)
-                }
+            {/* BUBBLE */}
+            {activeSection === section.id &&
+              ( <div ref={bubbleRef}
+                     onClick={(e) => e.stopPropagation()}
+                     className="group relative z-50 
+                                -right-8 -translate-y-2/12 w-fit 
+                                bg-white rounded-lg shadow-lg
+                                border border-gray-300 
+                                hover:bg-slate-100 hover:cursor-pointer"
+                >
+                  {/* Arrow */}
+                  <div className="absolute bottom-8 translate-x-11/12
+                                  w-0 h-0
+                                  border-l-8
+                                  border-l-transparent 
+                                  border-r-8
+                                  border-r-transparent
+                                  border-b-10
+                                  border-b-white
+                                  group-hover:border-b-slate-100"
+                  />
 
-                {mode === "manage" && confirmDelete === false &&
-                  (<div className="flex justify-center items-center 
-                                   *:px-2 *:py-1 *:hover:underline
-                                   *:text-sm *:hover:cursor-pointer"
-                    >
-                    <span onClick={()=>{handleModalSection();
-                                        setActiveSection(null);
-                                        setSelSection(section);
-                     }}>
-                      Edit
-                    </span>
-                    <span onClick={() => setConfirmDelete(true)}>Delete</span>
-                  </div>)
-                }
+                  {/* MARK AS SEEN OPTION*/}
+                  {mode === "student" &&
+                    (<div className=" flex justify-center items-center
+                                      p-2"
+                          onClick={() => handleSubmit(section.id)}>
+                      <span className="text-sm hover:underline">
+                        Click here to mark it as seen.
+                      </span>
+                    </div>)
+                  }
 
-                {mode === "manage" && confirmDelete === true &&
-                  ( <div className="flex">
-                      <span>Delete section?</span>
-
-                      <div className="*:m-1 *:font-bold *:hover:underline
-                                      *:hover:cursor-pointer"
+                  {/* MANAGE OPTIONS */}
+                  {mode === "manage" && (
+                    confirmDelete === false ? (
+                      <div className="flex
+                                      *:p-2 *:hover:underline
+                                      *:text-sm *:hover:cursor-pointer"
                       >
-                        <span onClick={() => {setConfirmDelete(false);
-                                              setActiveSection(null);}}
-                        >No</span>
-                        <span>
-                          Yes
-                        </span>
+                        <span onClick={() => {handleModalSection();
+                                              setActiveSection(null);
+                                              setSelSection(section);
+                                            }}
+                        >Edit</span>
+
+                        <span onClick={() => setConfirmDelete(true)}
+                        >Delete</span>
                       </div>
-                    </div>
-                  )
-                }
-              </div>
-            )}
+                    ) : (
+
+                      /*{ CONFIRM DELETE }*/
+                      <div className="flex p-2 text-sm">
+                        <span>Delete section?</span>
+
+                        <div className="*:m-1 *:font-bold *:hover:underline
+                                        *:hover:cursor-pointer"
+                        >
+                          <span onClick={() => {setConfirmDelete(false);
+                                                setActiveSection(null);}}
+                          >No</span>
+
+                          <span>Yes</span>
+                        </div>
+                      </div>
+                      )
+                    )
+                  }{/* MANAGE OPTIONS */}
+                </div>
+              )
+            }{/* BUBBLE */}
           </div>
-        </div>
-      ))}
+        ))}{/* SECTIONS MAP() */}
+      </div>
     </>
   )
 }
