@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import LoadingMessage from "./LoadingMessage";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -83,6 +84,8 @@ export default function Accordion({mode, chapter, sections}) {
 
   return (
     <>
+      {markMutation.isPending && <LoadingMessage text="Marking as seen..."/>}
+
       {/* CHAPTER HEADER */}
       <div
         className="w-full flex cursor-pointer
@@ -180,13 +183,17 @@ export default function Accordion({mode, chapter, sections}) {
 
                   {/* MARK AS SEEN OPTION*/}
                   {mode === "student" &&
-                    (<div className=" flex justify-center items-center
+                    ( <div className="flex justify-center items-center
                                       p-2"
-                          onClick={() => handleSubmit(section.id)}>
-                      <span className="text-sm hover:underline">
-                        Click here to mark it as seen.
-                      </span>
-                    </div>)
+                          onClick={() => {handleSubmit(section.id)
+                                          setActiveSection(null);}
+                                  }
+                      >
+                        <span className="text-sm hover:underline">
+                          Click here to mark it as seen.
+                        </span>
+                      </div>
+                    )
                   }
 
                   {/* MANAGE OPTIONS */}
