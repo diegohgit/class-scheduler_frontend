@@ -10,6 +10,7 @@ export default function Accordion({mode, chapter, sections}) {
   const [isOpen, setIsOpen] = useState(mode === "student" ? true:false);
 
   const [ confirmDelete, setConfirmDelete ] = useState(false);
+  const [ loadingMsg, setLoadingMsg ] = useState("");
 
   const { handleModalChapter, setSelChapter, setSelSection,
           handleModalSection } = useSchool();
@@ -21,13 +22,17 @@ export default function Accordion({mode, chapter, sections}) {
   const { request } = useApi();
 
   //Async function to send requests to mark a section as seen.
-  const handleRequest = async (markData) => {
+  const handleRequest = async ({markData, method}) => {
 
-    const url = `api/students/${id}/progress`;
-    const { success } = await request("POST",
+    const url = method ? `api/students/${id}/progress`
+                          : `api/students/${id}/progress/${markData.section_id}`;
+    const method_send  = method ? "POST" : "DELETE";
+    const message      = method ? "Section marked as seen." : "Section marked as not seen.";
+
+    const { success } = await request(method_send,
                                       url,
                                       markData,
-                                      "Section marked as seen.");
+                                      message);
     return success;
   }
 
@@ -36,7 +41,7 @@ export default function Accordion({mode, chapter, sections}) {
   const queryClient = useQueryClient();
 
   const markMutation = useMutation({
-    mutationFn: (markData) => handleRequest(markData),
+    mutationFn: ({markData, method}) => handleRequest({markData, method}),
     onSuccess: async (success) => {
 
       if(success){
@@ -48,12 +53,12 @@ export default function Accordion({mode, chapter, sections}) {
 
 
   //Validate data and run mutation.
-  const handleSubmit = (section_id) => {
+  const handleSubmit = (section_id, method) => {
 
     if(mode === "student" && id && section_id){
 
       const markData = { "student_id" : Number(id), "section_id" : Number(section_id)};
-      markMutation.mutate(markData);
+      markMutation.mutate({markData, method});
     }
   }
 
@@ -84,7 +89,7 @@ export default function Accordion({mode, chapter, sections}) {
 
   return (
     <>
-      {markMutation.isPending && <LoadingMessage text="Marking as seen..."/>}
+      {markMutation.isPending && <LoadingMessage text={loadingMsg}/>}
 
       {/* CHAPTER HEADER */}
       <div
@@ -152,7 +157,7 @@ export default function Accordion({mode, chapter, sections}) {
               <span className="px-2">{section.name}</span>
 
               {/* SEEN DATE */}
-              {mode === "student" && section.seenDate !== null && (
+              {mode === "student" && section.seenDate && (
                 <span className="ml-auto text-sm italic
                                  text-gray-600"
                 >Seen on {section.seenDate}</span>
@@ -184,18 +189,38 @@ export default function Accordion({mode, chapter, sections}) {
                   />
 
                   {/* MARK AS SEEN OPTION*/}
-                  {mode === "student" &&
+                  {mode === "student" && section.seenDate === null ?
                     ( <div className="flex justify-center items-center
                                       p-2 hover:cursor-pointer"
-                          onClick={() => {handleSubmit(section.id)
-                                          setActiveSection(null);}
+                           onClick={() => {handleSubmit(section.id, true)
+                                           setActiveSection(null);
+                                           setLoadingMsg("Marking as seen...")}
                                   }
                       >
                         <span className="text-sm hover:underline">
                           Click here to mark it as seen.
                         </span>
                       </div>
-                    )
+                    ) : ( 
+                      <div className="flex justify-center items-center
+                                      p-1 hover:cursor-pointer"
+                      >
+                        <span className="text-sm hover:underline">
+                          Mark it as not seen?
+                        </span>
+                        <div className="*:m-1 *:font-bold *:text-sm
+                                        *:hover:underline *:hover:cursor-pointer"
+                        >
+                          <span onClick={() => {setActiveSection(null);}}
+                          >No</span>
+
+                          <span onClick={() => {handleSubmit(section.id, false);
+                                                setActiveSection(null);
+                                                setLoadingMsg("Marking as not seen...")
+                                                }}
+                          >Yes</span>
+                        </div>
+                      </div>)
                   }
 
                   {/* MANAGE OPTIONS */}

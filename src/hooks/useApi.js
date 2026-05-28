@@ -12,7 +12,9 @@ export const useApi = () => {
     try{
       response = await axiosClient({method, url, data});
 
-      if(method === "POST" || method === "PUT" ){
+      if(   method === "POST"
+         || method === "PUT"
+         || method === "DELETE" ){
 
         //Laravel APIs are configured to send success=true.
         if(response?.data?.success) success = true;
