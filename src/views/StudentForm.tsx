@@ -381,7 +381,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           </div>
         </div>
 
-        <div>
+        <div className="mb-10">
           <div className="flex">
             <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
             <button 
@@ -403,34 +403,29 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           ></textarea>
         </div>
 
-        <div className={`w-full  fixed bottom-0 left-0 
-                         bg-white `}>
-          <div className="flex items-center justify-center">
-          <button 
-            type="button"
-            className="button-base mx-auto bg-amber-300 hover:bg-amber-400"
-            onClick={() => {
-              navigate("/students");
-            }}>
+
+
+        <div className="bottom-bar">
+          <button type="button"
+                  className="button-base bg-blue-500 hover:bg-blue-600"
+                  onClick={() => navigate("/students")}
+          >
             Back to list
           </button>
 
-          <button 
-            type="submit"
-            className={`${isDirty ? "" : "hidden"}
-                        button-base mx-auto bg-green-500
-                        hover:bg-green-600`}
+          <button type="submit"
+                  className={`${isDirty ? "" : "hidden"}
+                            button-base bg-green-500 hover:bg-green-600`}
           >
-            {mode === "create" ? "Create Student" : "Save Changes"}
+            {mode === "create" ? "Create student" : "Save changes"}
           </button>
 
-          <button 
-            type="button"
-            className={`${mode === "edit" ? "block" : "hidden"}
-                       button-base mx-auto bg-red-500 hover:bg-red-600`}>
-            Delete Student
+          <button type="button"
+                  className={`${mode === "edit" ? "block" : "hidden"}
+                           button-base bg-red-500 hover:bg-red-600`}
+          >
+            Delete student
           </button>
-        </div>
         </div>
       </form>
     </div>

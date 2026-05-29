@@ -2,7 +2,6 @@ import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
-import { useQuery } from "@tanstack/react-query";
 import { useStudents } from "../hooks/useStudents";
 
 
@@ -79,13 +78,17 @@ export default function StudentList() {
         }}
       />
 
-      <div className="flex justify-center">
-        <button className="w-40 h-8 my-4 rounded 
-                  bg-blue-500 text-white font-bold
-                  hover:cursor-pointer hover:bg-blue-600"
+      <div className="bottom-bar">
+        <button className="button-base flex items-center 
+                           justify-center bg-indigo-500 hover:bg-indigo-600"
                 onClick={() => navigate('/students/create_student')}
-                  >
-          Add Student
+        >
+        {/* "Plus" icon  */}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="size-4 mr-1">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+
+        <span>Add student</span>
         </button>
       </div>
     </div>

@@ -1,13 +1,14 @@
 import Accordion from "../components/Accordion";
 import useSchool from "../hooks/useSchool";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import dayjs from "dayjs";
-import { useContent, useStudentProgress } from "../hooks/useContent"; 
+import { useContent, useStudentProgress } from "../hooks/useContent";
 
 export default function StudentProgress() {
 
   const {id} = useParams();
+  const navigate = useNavigate();
 
   //Fetch all chapters.
   const { data:chapters = [],
@@ -18,7 +19,7 @@ export default function StudentProgress() {
   //Fetch only chapters seen by a single student.
   const { data:studentProgress = [],
           isLoading: isLoadingProgress,
-          isError: isErrorProgress,
+          isError:   isErrorProgress,
         } = useStudentProgress(id);
 
 
@@ -44,7 +45,8 @@ export default function StudentProgress() {
   <>
     <h1 className="title-base">Content</h1>
 
-    <div className="w-8/12 p-4 mx-auto bg-gray-200 rounded-lg">
+    <div className="w-8/12 p-4 mb-10
+                    mx-auto bg-gray-200 rounded-lg">
       { isLoadingProgress || isLoadingChapters 
         ? (<span>Fetching progress...</span>) : null}
 
@@ -60,6 +62,22 @@ export default function StudentProgress() {
               ))
           )
       }
+    </div>
+
+    <div className="bottom-bar">
+      <button type="button"
+              className="button-base bg-blue-500 hover:bg-blue-600"
+              onClick={() => {navigate("/students");}}
+      >
+        Back to list
+      </button>
+
+      <button type="button"
+              className="button-base bg-blue-500 hover:bg-blue-600"
+              onClick={() => navigate("/students/"+id)}
+      >
+        Back to student
+      </button>
     </div>
   </>
   )
