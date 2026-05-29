@@ -189,7 +189,7 @@ export default function Accordion({mode, chapter, sections}) {
                   />
 
                   {/* MARK AS SEEN OPTION*/}
-                  {mode === "student" && section.seenDate === null ?
+                  {mode === "student" && (section.seenDate === null ?
                     ( <div className="flex justify-center items-center
                                       p-2 hover:cursor-pointer"
                            onClick={() => {handleSubmit(section.id, true)
@@ -220,7 +220,7 @@ export default function Accordion({mode, chapter, sections}) {
                                                 }}
                           >Yes</span>
                         </div>
-                      </div>)
+                      </div>))
                   }
 
                   {/* MANAGE OPTIONS */}
