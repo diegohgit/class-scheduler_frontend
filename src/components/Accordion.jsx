@@ -4,6 +4,7 @@ import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
+import { useSectionMutation } from "../hooks/useContent";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -87,9 +88,24 @@ export default function Accordion({mode, chapter, sections}) {
   }, [activeSection, bubbleRef]);
 
 
+
+  //Mutation to delete sections.
+  const sectionMutation = useSectionMutation();
+
+  const setMutation = (section_id) => {
+
+    const sectionData = { "section_id" : section_id, };
+    const method = "DELETE";
+  
+    sectionMutation.mutate({sectionData, method});
+  }
+
+
+
   return (
     <>
       {markMutation.isPending && <LoadingMessage text={loadingMsg}/>}
+      {sectionMutation.isPending && <LoadingMessage text="Deleting section..."/>}
 
       {/* CHAPTER HEADER */}
       <div
@@ -252,7 +268,11 @@ export default function Accordion({mode, chapter, sections}) {
                                                 setActiveSection(null);}}
                           >No</span>
 
-                          <span>Yes</span>
+                          <span onClick={() => {setConfirmDelete(false);
+                                                setActiveSection(null);
+                                                setMutation(section.id);
+                                              }}
+                          >Yes</span>
                         </div>
                       </div>
                       )

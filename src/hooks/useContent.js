@@ -13,6 +13,7 @@ const fetchChapters = async (id) => {
 }
 
 
+
 //Fetch all chapters.
 export const useContent = () => {
   return useQuery({ queryKey:  ["chapters"],
@@ -22,6 +23,7 @@ export const useContent = () => {
                     retry: false,
                   });
 }
+
 
 
 //Fetch only chapters seen by a single student.
@@ -40,32 +42,42 @@ export const useStudentProgress = (id) => {
 
 
 
-//Async function to send requests to create/update/delete a section.
+//Async function to send useSectionMutation requests.
 const handleRequest = async({sectionData, method}) => {
 
-  const id = sectionData?.section_id ?? null;
+  const id   = sectionData?.section_id ?? null;
+  const url  = id ? `api/sections/${id}` : "/api/sections";
+  let action = "";
 
-  const url     = id ? `api/sections/${id}` : "/api/sections";
-  const message = id ? "Section updated." : "Section created.";
+       if(method === "POST")   action = "created";
+  else if(method === "PUT")    action = "updated";
+  else if(method === "DELETE") action = "deleted";
 
   const { success } = await request(method,
                                     url,
                                     sectionData,
-                                    message );
-  return success
+                                    `Section ${action}.`);
+  return success;
 }
 
 
-//Mutation to create/update sections.
-const queryClient = useQueryClient();
 
-export const useSectionMutation = useMutation({
-  mutationFn: handleRequest,
-  onSuccess: async (success) =>{
-    if(success){
-      await queryClient.refetchQueries({queryKey:["chapters"]})
+//Mutation to create/update/delete sections.
+export const useSectionMutation = (options = {}) => {
+
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: handleRequest,
+    onSuccess: async (success) =>{
+      if(success){
+        await queryClient.refetchQueries({queryKey:["chapters"]})
+      }
+
+      //options contains the callback defined when 
+      //useSectionMutation() is called in other components.
+      options.onSuccess();
     }
-  }
-});
-
+  });
+}
 

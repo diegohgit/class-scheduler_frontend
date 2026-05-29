@@ -32,7 +32,7 @@ export default function ModalSection() {
       handleModalSection();
       setSelSection([]);
     }
-  })
+  });
 
 
 
