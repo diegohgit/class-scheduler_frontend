@@ -114,6 +114,11 @@ export default function ModalSection() {
           <select className="input-base focus:border-2!"
                   name="chapter_id"
                   id="chapter_id"
+                  onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.currentTarget.form?.requestSubmit();
+                              }
+                            }}
                   defaultValue={selSection?.chapter_id}>
             {chapters?.map((chapter) =>
               <option key={chapter.id} value={chapter.id}>{chapter.name}</option>
@@ -128,8 +133,7 @@ export default function ModalSection() {
                 id="name"
                 defaultValue={selSection?.name ?? null}
                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-                maxLength={150}
-                onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
+                maxLength={150}                
           />
           { !validName &&
             <p className="text-md text-red-500">Section field is required.</p>}
