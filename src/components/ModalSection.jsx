@@ -1,8 +1,6 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
-import { useApi } from "../hooks/useApi";
-import { useContent } from "../hooks/useContent"; 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContent, useSectionMutation } from "../hooks/useContent";
 
 export default function ModalSection() {
 
@@ -26,40 +24,15 @@ export default function ModalSection() {
     inputRef.current?.select();
   }, []);
 
-
-
-  const { request } = useApi();
   
-  //Async function to send requests to create/update a section.
-  const handleRequest = async(sectionData) => {
 
-    const id = selSection?.id ?? null;
-
-    const method  = id ? "PUT" : "POST";
-    const url     = id ? "/api/sections/"+id : "/api/sections";
-    const message = id ? "Section updated." : "Section created.";
-
-    const { success } = await request( method,
-                                        url,
-                                        sectionData,
-                                        message );
-    return success
-  }
-
-
-
-  const queryClient = useQueryClient();
-
-  const sectionMutation = useMutation({
-    mutationFn: (sectionData) => handleRequest(sectionData),
-    onSuccess: async (success) =>{
-      if(success){
-        await queryClient.refetchQueries({queryKey:["chapters"]})
-        handleModalSection();
-        setSelSection([]);
-      }
+  //Mutation to create/update sections.
+  const sectionMutation = useSectionMutation({
+    onSuccess: () => {
+      handleModalSection();
+      setSelSection([]);
     }
-  });
+  })
 
 
 
@@ -71,13 +44,19 @@ export default function ModalSection() {
 
     const formData   = new FormData(e.currentTarget);
     const chapter_id = formData.get('chapter_id');
-    const section    = formData.get('name');
+    const name       = formData.get('name');
 
-    if(validString(section)){
+    if(validString(name)){
       setValidName(1);
 
-      const sectionData = { "chapter_id" : chapter_id, "name" : section };
-      sectionMutation.mutate(sectionData);
+      const section_id = selSection?.id ?? null;
+      const method     = section_id ? "PUT" : "POST";
+
+      const sectionData = { "chapter_id" : chapter_id, 
+                            "section_id" : section_id,
+                            "name"       : name,};
+
+      sectionMutation.mutate({sectionData, method});
     }
     else setValidName(0);
   }

@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "../hooks/useApi";
-
+import useSchool from "./useSchool";
 
 const { request } = useApi();
 //Send get request.
@@ -33,3 +33,39 @@ export const useStudentProgress = (id) => {
                     retry: false,
                   });
 }
+
+
+
+//MUTATION
+
+
+
+//Async function to send requests to create/update/delete a section.
+const handleRequest = async({sectionData, method}) => {
+
+  const id = sectionData?.section_id ?? null;
+
+  const url     = id ? `api/sections/${id}` : "/api/sections";
+  const message = id ? "Section updated." : "Section created.";
+
+  const { success } = await request(method,
+                                    url,
+                                    sectionData,
+                                    message );
+  return success
+}
+
+
+//Mutation to create/update sections.
+const queryClient = useQueryClient();
+
+export const useSectionMutation = useMutation({
+  mutationFn: handleRequest,
+  onSuccess: async (success) =>{
+    if(success){
+      await queryClient.refetchQueries({queryKey:["chapters"]})
+    }
+  }
+});
+
+
