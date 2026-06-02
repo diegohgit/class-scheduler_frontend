@@ -16,8 +16,7 @@ export const useApi = () => {
          || method === "PUT"
          || method === "DELETE" ){
 
-        //Laravel APIs are configured to send success=true.
-        if(response?.data?.success) success = true;
+        if(response?.data?.id) success = true;
       }
       else if(method === "GET"){
         //Validate if data structure is correct.
