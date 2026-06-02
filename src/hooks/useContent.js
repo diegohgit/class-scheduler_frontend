@@ -77,7 +77,7 @@ export const useSectionMutation = (options = {}) => {
         const resSection = response?.response?.data;
 
         queryClient.setQueryData(["chapters"], (old) => {
-          //Prevent errors when the cache doesn't contain any data yet
+          //Prevent errors when the cache doesn't contain any data yet.
           if(!old) return old;
 
           return old.map((chapter) => {
@@ -116,7 +116,7 @@ export const useSectionMutation = (options = {}) => {
                   const exists = chapter.section.some(sec => sec.id === resSection.section.id);
 
                   //If section exists in current chapter, run a .map() to all sections
-                  //when it match the updated section, return it.
+                  //when it matches the updated section, return it.
                   //If section doesn't exist, just concatenate it to the list of sections.
                   return {...chapter,
                           section: exists ? chapter.section.map(sec => 
