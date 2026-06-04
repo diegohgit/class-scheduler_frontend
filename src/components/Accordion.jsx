@@ -4,13 +4,11 @@ import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
-import { useSectionMutation } from "../hooks/useContent";
+import { useChapterMutation, useSectionMutation } from "../hooks/useContent";
 
 export default function Accordion({mode, chapter, sections}) {
 
   const [isOpen, setIsOpen] = useState(mode === "student" ? true:false);
-
-  const [ confirmDelete, setConfirmDelete ] = useState(false);
   const [ loadingMsg, setLoadingMsg ] = useState("");
 
   const { handleModalChapter, setSelChapter, setSelSection,
@@ -65,15 +63,17 @@ export default function Accordion({mode, chapter, sections}) {
 
 
 
+  const [ confirmSectionDelete, setConfirmSectionDelete ] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
   const bubbleRef = useRef(null);
+
   //Hide bubble dialog when user clicks outside of it.
   useEffect(() => {
     function handleClickOutside(event){
       
       if(bubbleRef.current && !bubbleRef.current.contains(event.target)){
         setActiveSection(null);
-        setConfirmDelete(false);
+        setConfirmSectionDelete(false);
       }
     }
 
@@ -89,14 +89,54 @@ export default function Accordion({mode, chapter, sections}) {
 
 
 
+  const [ confirmChapterDelete, setConfirmChapterDelete ] = useState(false);
+  const [ activeChapter, setActiveChapter ] = useState(null); 
+  const confDeleteChapterRef = useRef(null);
+  //Hide confirm delete options when user clicks outside of it.
+  useEffect(() => {
+    function handleClickOutside(event){
+      
+      if(confDeleteChapterRef.current && !confDeleteChapterRef.current.contains(event.target)){
+        setIsOpen(false);
+        setActiveChapter(null)
+        setConfirmChapterDelete(false);
+      }
+    }
+
+    //Add the "mousedown" event listener to the document
+    //if user does a mousedown on any part of document, run handleClickOutside()
+    if(confirmChapterDelete === true  ){
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    //Cleanup function
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [//activeConfDelChapter, 
+      confirmChapterDelete]);
+
+
+
+  //Mutation to delete chapters.
+  const chapterMutation = useChapterMutation();
+
+  const setChapterMutation = (chapter_id) => {
+
+    const chapterData = { "chapter_id" : chapter_id, };
+    const method      = "DELETE";
+
+    chapterMutation.mutate({chapterData, method});
+  }
+
+
+
   //Mutation to delete sections.
   const sectionMutation = useSectionMutation();
 
-  const setMutation = (section_id) => {
+  const setSectionMutation = (section_id) => {
 
     const sectionData = { "section_id" : section_id, };
     const method = "DELETE";
-  
+
     sectionMutation.mutate({sectionData, method});
   }
 
@@ -104,35 +144,64 @@ export default function Accordion({mode, chapter, sections}) {
 
   return (
     <>
-      {markMutation.isPending && <LoadingMessage text={loadingMsg}/>}
+      {markMutation.isPending    && <LoadingMessage text={loadingMsg}/>}
       {sectionMutation.isPending && <LoadingMessage text="Deleting section..."/>}
+      {chapterMutation.isPending && <LoadingMessage text="Deleting chapter..."/>}
 
       {/* CHAPTER HEADER */}
       <div
-        className="w-full relative z-0 flex cursor-pointer
-                   py-2 px-2 font-bold text-lg
-                   bg-gray-200 hover:bg-gray-300"
-        onClick={() => setIsOpen(!isOpen)}
+        className="w-full relative flex
+                   py-2 px-2 font-bold 
+                   text-lg bg-gray-200"
       >
 
         {/* CHAPTER NAME */}
-        <span className="text-lg font-bold">{chapter.name}</span>
+        <span className={`${activeChapter === chapter.id ? "bg-blue-200 " 
+                                                         : "bg-gray-200 hover:bg-gray-300" }
+                          w-9/12 text-lg font-bold
+                          p-2 cursor-pointer hover:bg-gray-300`}
+              onClick={() => setIsOpen(!isOpen)}
+        >{chapter.name}</span>
 
 
-        {/* Edit & Delete options */}
-        <div className="flex ml-auto gap-2">
-          {mode === "manage" &&
+        {/* EDIT AND DELETE CHAPTER OPTIONS */}
+        <div className="flex ml-auto gap-2"
+             ref={confDeleteChapterRef}>
+
+          {mode === "manage" && (
+            confirmChapterDelete === false ?
             ( <div className='group-hover:block text-base 
-                              font-medium 
-                              *:ml-2 *:hover:underline'
+                              font-medium my-auto
+                              *:ml-2 *:hover:underline *:cursor-pointer'
               >
                 <span onClick={() => {setSelChapter(chapter);
-                                      handleModalChapter();
-                                    }}
+                                      handleModalChapter();}}
                 >Edit</span>
-                <span>Delete</span>
-              </div>)
+
+                <span onClick={() => {setConfirmChapterDelete(true);
+                                      setActiveChapter(chapter.id)
+                                      setIsOpen(true);}}
+                >Delete</span>
+              </div>
+
+          ) : (<div className='text-base text-center font-medium'>
+              {/* CONFIRM DELETE CHAPTER */}
+                <span className="text-sm">Delete chapter and<br></br>its sections?</span>
+
+                <div className="text-center *:px-2 *:font-bold 
+                                *:hover:underline *:cursor-pointer">
+                  <span onClick={() => {setConfirmChapterDelete(false);
+                                        setIsOpen(false);
+                                        setActiveChapter(null);}}
+                  >No</span>
+
+                  <span onClick={() => {setConfirmChapterDelete(false);
+                                        setChapterMutation(chapter.id);}}
+                  >Yes</span>
+                </div>
+              </div>))
           }
+
           <div className="w-2">
             {isOpen ? <span>-</span> : <span>+</span>}
           </div>
@@ -241,7 +310,7 @@ export default function Accordion({mode, chapter, sections}) {
 
                   {/* MANAGE OPTIONS */}
                   {mode === "manage" && (
-                    confirmDelete === false ? (
+                    confirmSectionDelete === false ? (
                       <div className="flex
                                       *:p-2 *:hover:underline
                                       *:text-sm *:hover:cursor-pointer"
@@ -252,7 +321,7 @@ export default function Accordion({mode, chapter, sections}) {
                                             }}
                         >Edit</span>
 
-                        <span onClick={() => setConfirmDelete(true)}
+                        <span onClick={() => setConfirmSectionDelete(true)}
                         >Delete</span>
                       </div>
                     ) : (
@@ -264,13 +333,13 @@ export default function Accordion({mode, chapter, sections}) {
                         <div className="*:m-1 *:font-bold *:hover:underline
                                         *:hover:cursor-pointer"
                         >
-                          <span onClick={() => {setConfirmDelete(false);
+                          <span onClick={() => {setConfirmSectionDelete(false);
                                                 setActiveSection(null);}}
                           >No</span>
 
-                          <span onClick={() => {setConfirmDelete(false);
+                          <span onClick={() => {setConfirmSectionDelete(false);
                                                 setActiveSection(null);
-                                                setMutation(section.id);
+                                                setSectionMutation(section.id);
                                               }}
                           >Yes</span>
                         </div>

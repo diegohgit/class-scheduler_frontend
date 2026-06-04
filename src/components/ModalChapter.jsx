@@ -1,8 +1,6 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
-import { useApi } from "../hooks/useApi";
-import { useMutation } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+import { useContent, useChapterMutation } from "../hooks/useContent";
 
 export default function ModalChapter() {
 
@@ -23,44 +21,17 @@ export default function ModalChapter() {
 
 
 
+  const chapterMutation = useChapterMutation({
+    onSuccess: () => {
+      handleModalChapter();
+      setSelChapter([]);
+    }
+  })
+
+
+
   //State useful to mark Name input in red if name is missing.
   const [ validName, setValidName ] = useState(1);
-  const { request } = useApi();
-
-  //Async function to send requests to create/update a chapter.
-  const handleRequest = async(name) => {
-
-    const id = selChapter?.id ?? null;
-
-    const method   = id ? "PUT" : "POST";
-    const url      = id ? "/api/chapters/"+id : "/api/chapters";
-    const dataName = { "name" : name };
-    const message  = id ? "Chapter updated." : "Chapter created.";
-
-    console.log("name", name)
-    const { success } = await request( method,
-                                        url,
-                                        dataName,
-                                        message );
-    return success;
-  }
-
-
-
-  const queryClient = useQueryClient();
-
-  const chapterMutation = useMutation({
-    mutationFn: (name) => handleRequest(name),
-    onSuccess: async (success) => {
-      if(success){
-        await queryClient.refetchQueries({queryKey:["chapters"]})
-        handleModalChapter();
-        setSelChapter([]);
-      }
-    }
-  });
-
-
 
   //Validate data and run mutation.
   const handleSubmit = (e) => {
@@ -71,7 +42,14 @@ export default function ModalChapter() {
 
     if(validString(name)) {
       setValidName(1);
-      chapterMutation.mutate(name);
+
+      const chapter_id = selChapter?.id ?? null;
+      const method     = chapter_id ? "PUT" : "POST";
+
+      const chapterData = {"chapter_id" : chapter_id,
+                           "name"       : name,};
+
+      chapterMutation.mutate({chapterData, method});
     }else setValidName(0);
   }
 
@@ -83,10 +61,9 @@ export default function ModalChapter() {
         </h2>
 
         <div className="flex justify-end">
-          <button
-            className="hover:cursor-pointer"
-            onClick={() => {handleModalChapter(); 
-                            setSelChapter([]);}}>
+          <button className="hover:cursor-pointer"
+                  onClick={() => {handleModalChapter(); 
+                                  setSelChapter([]);}}>
             {/* "Close" icon  */}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
               className="w-8 h-8">
@@ -100,31 +77,31 @@ export default function ModalChapter() {
 
       <form onSubmit={(e) => handleSubmit(e)}
             className="w-11/12 mx-auto"
+            onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(e); }}
       >
         <div className="h-22">
-          <b >Chapter name:</b>
-          <input  ref={inputRef}
-                  name="name"
-                  id="name"
-                  defaultValue={selChapter?.name ?? null}
-                  className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-                  maxLength={150}
-                  onKeyDown={(e) => { if(e.key === 'Enter') handleSubmit(); }}
+          <b>Chapter name:</b>
+          <input ref={inputRef}
+                 name="name"
+                 id="name"
+                 defaultValue={selChapter?.name ?? null}
+                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
+                 maxLength={150}
           />
           { !validName && 
             <p className="text-md text-red-500">Name is required</p> }
         </div>
+
         <div className=" flex mt-2">
-          <button
-            type="button"
-            onClick={() => console.log("Cancel")}
-            className="button-base bg-red-500 hover:bg-red-600"
+          <button type="button"
+                  onClick={() => console.log("Cancel")}
+                  className="button-base bg-red-500 hover:bg-red-600"
           >
             Cancel
           </button>
-          <button 
-            type="submit"
-            className="button-base bg-indigo-500 hover:bg-indigo-600"
+
+          <button type="submit"
+                  className="button-base bg-indigo-500 hover:bg-indigo-600"
           >
             {chapterMutation.isPending ? "Saving Chapter..." : "Save"}
           </button>

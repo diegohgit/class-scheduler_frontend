@@ -38,7 +38,82 @@ export const useStudentProgress = (id) => {
 
 
 
-//MUTATION
+//Async function to send useSectionMutation requests.
+const handleChapterRequest = async({chapterData, method}) => {
+
+  const id   = chapterData?.chapter_id ?? null;
+  const url  = id ? `api/chapters/${id}` : "/api/chapters";
+  let action = "";
+
+       if(method === "POST")   action = "created";
+  else if(method === "PUT")    action = "updated";
+  else if(method === "DELETE") action = "deleted";
+
+  const { success, response } = await request(method,
+                                    url,
+                                    chapterData,
+                                    `Chapter ${action}.`);
+  return {"success"  : success,
+          "response" : response,
+          "method"   : method};
+}
+
+
+
+//CHAPTER'S MUTATION
+
+
+
+//Mutation to create/update/delete sections.
+export const useChapterMutation = (options = {}) => {
+
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: handleChapterRequest,
+    onSuccess: (response) =>{
+
+      if(response?.success){
+        const resChapter = response?.response?.data;
+        //console.log("CHAPTER RESPONSE", resChapter);
+
+        queryClient.setQueryData(["chapters"], (old) => {          
+          //Prevent errors when the cache doesn't contain any data yet.
+          if(!old) return old;
+
+      //****** POST ******
+          if(response.method === "POST"){
+
+            //Add the section array so user can add new sections.
+            const formatChapter = {...resChapter, section: []};
+
+            return [...old, formatChapter].sort((a, b) => a.name.localeCompare(b.name, undefined, {
+                                                                        numeric: true,
+                                                                        sensitivity: "base"}
+                                                ));
+      //****** PUT ******
+          }else if(response.method === "PUT"){
+
+            return old.map((chapter) => chapter.id === resChapter.id 
+                                        ? {...chapter, name: resChapter.name}
+                                        : chapter);
+      //****** DELETE ******
+          }else if(response.method === "DELETE"){
+
+            return old.filter((chap) => chap.id !== resChapter.id);
+
+          }
+          return old;
+        });
+      }
+      options?.onSuccess(response?.success);
+    }
+  });
+}
+
+
+
+//SECTION'S MUTATION
 
 
 
@@ -94,11 +169,9 @@ export const useSectionMutation = (options = {}) => {
                           .sort((a, b) => a.name.localeCompare(b.name, undefined, {
                                                                     numeric: true,
                                                                     sensitivity: "base"
-                                                                  }
-                                              ))
-                  };
+                                                              }))
+                        };
                 }
-
           //****** PUT ******
               }else if(response.method === "PUT"){
 
@@ -149,7 +222,7 @@ export const useSectionMutation = (options = {}) => {
           })
         });
       }
-      options?.onSuccess(response.success);
+      options?.onSuccess(response?.success);
     }
   });
 }
