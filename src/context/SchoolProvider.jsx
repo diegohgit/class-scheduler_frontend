@@ -14,6 +14,8 @@ const SchoolProvider = ({children}) => {
   const [ selDay, setSelDay ] = useState([]);
   const [ time, setTime]      = useState([]);
 
+
+
   //State to show/hide the modal.
   const [ modal, setModal ] = useState(0);
 
@@ -21,7 +23,9 @@ const SchoolProvider = ({children}) => {
   const handleClickModal = () => {
     setModal(!modal)
   }
-  
+
+
+
   //State to store the class to be shown in the modal.
   const [ classModal, setClassModal ] = useState(0);
   //Function to set the class to be shown in the modal.
@@ -31,6 +35,8 @@ const SchoolProvider = ({children}) => {
     if(classModal)setSelStudent({id: classModal.student_id, name: classModal.student});
     else setSelStudent([]);
   }
+
+
 
   //Function to set the time parameters to be displayed on the modal.
   const handleSetTime = ({day, currTime, emptyClassEnd, match}) => {
@@ -60,6 +66,7 @@ const SchoolProvider = ({children}) => {
   }
 
 
+
   //State to show the duration of a class.
   const [classLength, setClassLength] = useState('');
 
@@ -73,7 +80,7 @@ const SchoolProvider = ({children}) => {
     let start = dayjs(`${baseDate} ${time.starts}`);
     let end   = dayjs(`${baseDate} ${time.ends}`);
 
-    //In case we were working with an start hour in one day
+    //In case we were working with a start hour in one day
     //and end hour in the next day.
     if(end.isBefore(start)){
       end = end.add(1, "day");
@@ -87,15 +94,26 @@ const SchoolProvider = ({children}) => {
     setClassLength(totalH+' '+totalM);
   }
 
-  //Get calculation of class duration
+
+
+  //Calculate class duration
   useEffect(() => {
     getDuration(time);
   }, [time])
+
+
 
   //Variable to show if the current day has been selected.
   const today = new Date().toLocaleDateString("en-US", {
           weekday: 'long'
         });
+
+
+
+  //State to define if its allowed to navigate
+  //after creating or updating a student.
+  const [shouldNavigate, setShouldNavigate] = useState(false)
+
 
 
   //Custom hook to warn user of unsaved changes 
@@ -134,8 +152,6 @@ const SchoolProvider = ({children}) => {
   }
 
 
-  const { request } = useApi();
-
 
   //Function to filter by students name or level
   const filterStudents = (records, inpValue) => {
@@ -152,24 +168,6 @@ const SchoolProvider = ({children}) => {
   }
 
 
-  const [ classes, setClasses ] = useState([]);
-
-  const fetchClasses = async () => {
-
-    const url = 'api/student_classes/';
-    const { success, response } = await request("GET", url, null, "Classes loaded.");
-
-    if(success && response?.data) setClasses(response.data);
-  }
-
-  const fetchClassesReactQuery = async () => {
-    const url = 'api/student_classes/';
-
-    const { success, response } = await request("GET", url, null, "Classes loaded.");
-
-    if(!success) throw new Error("Failed to fetch clases");
-    return response.data;
-  }
 
   //States and handler to show/hide modal chapter.
   const [modalChapter, setModalChapter] = useState(0);
@@ -180,6 +178,7 @@ const SchoolProvider = ({children}) => {
   }
 
 
+
   //states to handle section's modal.
   const [modalSection, setModalSection] = useState(0);
   const [ selSection, setSelSection ]   = useState([]);
@@ -187,6 +186,7 @@ const SchoolProvider = ({children}) => {
   const handleModalSection = () => {
     setModalSection(!modalSection);
   }
+
 
 
   //Validate strings
@@ -200,20 +200,11 @@ const SchoolProvider = ({children}) => {
 
 
 
-  //State to define if its allowed to navigate
-  //after creating or updating a student.
-  const [shouldNavigate, setShouldNavigate] = useState(false)
-
-
-
   return (
     <SchoolContext.Provider 
       value = {{
         handleClickModal,
         modal, setModal,
-        classes, setClasses,
-        fetchClasses,
-        fetchClassesReactQuery,
         selStudent, setSelStudent,
         selDay, setSelDay,
         handleSetTime,

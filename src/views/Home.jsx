@@ -7,17 +7,31 @@ import { days } from "../data/days";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import LoadingMessage from "../components/LoadingMessage";
+import { useApi } from "../hooks/useApi";
 
 Modal.setAppElement('#root')
 export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
-          handleClassModal, fetchClassesReactQuery, } = useSchool();
+          handleClassModal, } = useSchool();
 
   const [ searchStudent, setSearchStudent ] = useState(0);
 
 
 
+  const { request } = useApi();
+  //Fucntion to fetch classes
+  const fetchClasses = async () => {
+
+    const { success, response } = await request("GET", 
+                                                "api/student_classes/",);
+
+    if(!success) throw new Error("Failed to fetch clases");
+    return response.data;
+  }
+
+
+  //useQuery configuration to fetch classes
   const { data:classes = [],
           isLoading,
           isSuccess,
@@ -25,7 +39,7 @@ export default function Home() {
           error,
   } = useQuery({ 
         queryKey:  ["classes"],
-        queryFn:   fetchClassesReactQuery,
+        queryFn:   fetchClasses,
         staleTime: Infinity,
         gcTime:    1000 * 60 * 90,//1hr 30min
         retry: false,
