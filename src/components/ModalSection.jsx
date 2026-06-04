@@ -52,11 +52,11 @@ export default function ModalSection() {
       const section_id = selSection?.id ?? null;
       const method     = section_id ? "PUT" : "POST";
 
-      const sectionData = { "chapter_id" : chapter_id, 
-                            "section_id" : section_id,
-                            "name"       : name,};
+      const data = {"id"         : section_id,
+                    "name"       : name,
+                    "chapter_id" : chapter_id,};
 
-      sectionMutation.mutate({sectionData, method});
+      sectionMutation.mutate({"table": "sections", data, method});
     }
     else setValidName(0);
   }

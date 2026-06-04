@@ -36,7 +36,7 @@ export default function Accordion({mode, chapter, sections}) {
   }
 
 
-
+  //Mutation to mark/unmark a section as seen.
   const queryClient = useQueryClient();
 
   const markMutation = useMutation({
@@ -51,7 +51,7 @@ export default function Accordion({mode, chapter, sections}) {
 
 
 
-  //Validate data and run mutation.
+  //Validate data and run markMutation.
   const handleSubmit = (section_id, method) => {
 
     if(mode === "student" && id && section_id){
@@ -121,10 +121,11 @@ export default function Accordion({mode, chapter, sections}) {
 
   const setChapterMutation = (chapter_id) => {
 
-    const chapterData = { "chapter_id" : chapter_id, };
-    const method      = "DELETE";
+    const data = { "id" : chapter_id, };
 
-    chapterMutation.mutate({chapterData, method});
+    chapterMutation.mutate({"table" : "chapters",
+                            data,
+                            "method" : "DELETE",});
   }
 
 
@@ -134,10 +135,11 @@ export default function Accordion({mode, chapter, sections}) {
 
   const setSectionMutation = (section_id) => {
 
-    const sectionData = { "section_id" : section_id, };
-    const method = "DELETE";
+    const data = { "id" : section_id, };
 
-    sectionMutation.mutate({sectionData, method});
+    sectionMutation.mutate({"table" : "sections",
+                            data,
+                            "method" : "DELETE",});
   }
 
 

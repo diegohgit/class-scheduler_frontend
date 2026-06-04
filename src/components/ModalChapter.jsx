@@ -46,10 +46,10 @@ export default function ModalChapter() {
       const chapter_id = selChapter?.id ?? null;
       const method     = chapter_id ? "PUT" : "POST";
 
-      const chapterData = {"chapter_id" : chapter_id,
-                           "name"       : name,};
+      const data = {"id"   : chapter_id,
+                    "name" : name,};
 
-      chapterMutation.mutate({chapterData, method});
+      chapterMutation.mutate({"table": "chapters", data, method});
     }else setValidName(0);
   }
 

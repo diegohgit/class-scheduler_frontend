@@ -38,24 +38,26 @@ export const useStudentProgress = (id) => {
 
 
 
-//Async function to send useSectionMutation requests.
-const handleChapterRequest = async({chapterData, method}) => {
+//Async function to send chapter/section mutation requests.
+const handleRequest = async({table, data, method}) => {
 
-  const id   = chapterData?.chapter_id ?? null;
-  const url  = id ? `api/chapters/${id}` : "/api/chapters";
+  const id   = data?.id ?? null;
+  const url  = id ? `api/${table}/${id}` : `/api/${table}`;
   let action = "";
 
        if(method === "POST")   action = "created";
   else if(method === "PUT")    action = "updated";
   else if(method === "DELETE") action = "deleted";
 
+  const message = table === "chapters" ? "Chapter" : "Section";
+
   const { success, response } = await request(method,
-                                    url,
-                                    chapterData,
-                                    `Chapter ${action}.`);
-  return {"success"  : success,
-          "response" : response,
-          "method"   : method};
+                                              url,
+                                              data,
+                                              `${message} ${action}.`);
+  return {success,
+          response,
+          method};
 }
 
 
@@ -64,18 +66,17 @@ const handleChapterRequest = async({chapterData, method}) => {
 
 
 
-//Mutation to create/update/delete sections.
+//Mutation to create/update/delete CHAPTERS.
 export const useChapterMutation = (options = {}) => {
 
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: handleChapterRequest,
+    mutationFn: handleRequest,
     onSuccess: (response) =>{
 
       if(response?.success){
         const resChapter = response?.response?.data;
-        //console.log("CHAPTER RESPONSE", resChapter);
 
         queryClient.setQueryData(["chapters"], (old) => {          
           //Prevent errors when the cache doesn't contain any data yet.
@@ -114,28 +115,6 @@ export const useChapterMutation = (options = {}) => {
 
 
 //SECTION'S MUTATION
-
-
-
-//Async function to send useSectionMutation requests.
-const handleRequest = async({sectionData, method}) => {
-
-  const id   = sectionData?.section_id ?? null;
-  const url  = id ? `api/sections/${id}` : "/api/sections";
-  let action = "";
-
-       if(method === "POST")   action = "created";
-  else if(method === "PUT")    action = "updated";
-  else if(method === "DELETE") action = "deleted";
-
-  const { success, response } = await request(method,
-                                    url,
-                                    sectionData,
-                                    `Section ${action}.`);
-  return {"success"  : success,
-          "response" : response,
-          "method"   : method};
-}
 
 
 
