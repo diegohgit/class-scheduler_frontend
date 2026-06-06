@@ -1,20 +1,15 @@
 import { useNavigate, useParams } from "react-router";
 import StudentForm from "./StudentForm"
-import useSchool from "../hooks/useSchool";
 import { useEffect } from "react";
-import { UpdateStudentDTO, Student } from "../types/Student";
-import { useApi } from "../hooks/useApi";
-import { useStudent } from "../hooks/useStudents";
+import { useStudent, useStudentMutation } from "../hooks/useStudents";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function EditStudent() {
 
-  const { id } = useParams();
-  const { shouldNavigate, setShouldNavigate } = useSchool();
+  const { id }   = useParams();
   const navigate = useNavigate();
+
   const { data: student,
           isError,
           error
@@ -40,42 +35,11 @@ export default function EditStudent() {
 
 
 
-  const { request } = useApi();
-  //Send request to modify a student.
-  async function handleSubmitEditStudent(data: Student): Promise<boolean>{
-
-    const { success } = await request("PUT", 
-                                      "api/students/"+id,
-                                      data as UpdateStudentDTO,
-                                      "Student modified.");
-    return success;
-  }
-
-
-
-  const queryClient = useQueryClient();
-
-  const updateStudentMutation = useMutation({
-    mutationFn: handleSubmitEditStudent,
-    onSuccess: async (success: boolean) => {
-      if(success){
-        await queryClient.refetchQueries({queryKey:["students"]});
-        await queryClient.refetchQueries({queryKey:["student", id]});
-      }
+  const studentMutation = useStudentMutation({
+    onSuccess: (success: boolean) => {
+      if(success) navigate("/students");
     }
   });
-
-
-
-  //Navigate after shouldNavigate flag is set to true
-  //in StudentForm.tsx
-  useEffect(() => {
-
-    if(shouldNavigate){
-      setShouldNavigate(false);
-      navigate("/students");
-    }
-  }, [shouldNavigate, navigate,]);
 
 
 
@@ -84,7 +48,11 @@ export default function EditStudent() {
       <StudentForm 
         mode = "edit"
         initialValues = {student}
-        onSubmit={(data:Student) => updateStudentMutation.mutateAsync(data)}
+        onSubmit={(student) => studentMutation.mutateAsync({
+                                data: student,
+                                method: "PUT"
+                              })
+                  }
       />
     </>
   )

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "./useApi";
 
 const { request } = useApi();
@@ -36,3 +36,86 @@ export const useStudent = (id) => {
                     retry: false,
                   });
 }
+
+
+
+//Async function to send chapter/section mutation requests.
+const handleRequest = async({data, method}) => {
+
+  const id   = data?.id ?? null;
+  const url  = id ? `api/students/${id}` : `/api/students`;
+  let action = "";
+
+       if(method === "POST")   action = "created";
+  else if(method === "PUT")    action = "updated";
+  else if(method === "DELETE") action = "deleted";
+
+  const { success, response } = await request(method,
+                                              url,
+                                              data,
+                                              `Student ${action}.`);
+  return {success,
+          response,
+          method};
+}
+
+
+
+//STUDENT'S MUTATION
+
+
+
+//Mutation to create/update/delete students.
+export const useStudentMutation = (options = {}) => {
+
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: handleRequest,
+    onSuccess: (response) =>{
+
+      if(response?.success){
+        const resStudent = response?.response?.data;
+        const method     = response?.method;
+
+        queryClient.setQueryData(["students"], (old) => {          
+          //Prevent errors when the cache doesn't contain any data yet.
+          if(!old) return old;
+
+      //****** POST ******
+          if(method === "POST"){
+
+            return [...old, resStudent].sort();
+
+      //****** PUT ******
+          }else if(method === "PUT"){
+
+            //Update list
+            return [...old].map((stu) => stu.id === resStudent.id 
+                                    ? {...stu, 
+                                       id:    resStudent.id,
+                                       name:  resStudent.name,
+                                       level: resStudent.level.name,
+                                      }
+                                    : stu
+                            ).sort((a, b) => a.name.localeCompare(b.name));
+
+      //****** DELETE ******
+          }
+
+          return old;
+        });
+
+        if(method === "PUT"){
+
+          queryClient.setQueryData(["student", String(resStudent.id)], resStudent);
+        }
+
+
+
+      }
+      options?.onSuccess(response?.success);
+    }
+  });
+}
+

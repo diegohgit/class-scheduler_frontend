@@ -61,9 +61,10 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     birthdate: data?.birthdate ?? "",
     homework:  data?.homework  ?? "",
     progress:  data?.progress  ?? "",
-    //Color_id comes from Backend as integer so we must switch it to string
+    //Color_id and level_id come from Backend as integer so we must switch it to string
     //so it can be seen in the colors list.
-    color_id:     data?.color_id != null ? String(data.color_id) : "",
+    color_id:     data?.color?.id != null ? String(data.color?.id) : "",
+    level_id:     data?.level?.id != null ? String(data.level?.id) : "",
   })
 
 
