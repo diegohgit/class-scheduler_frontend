@@ -24,12 +24,14 @@ export default function StudentList() {
   }, [isSuccess]);
 
 
+
   const handleSearch = (inpValue) => {
 
     //If user erases all letters, show full list again.
     if(!inpValue.length) setFilter(records);
     else setFilter(filterStudents(records, inpValue));
   }
+
 
 
   //Columns for the DataTable component
@@ -70,7 +72,7 @@ export default function StudentList() {
         progressPending = {isLoading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
-        data    = {filter.sort((a, b) => a.name.localeCompare(b.name))}
+        data    = {filter?.sort((a, b) => a.name.localeCompare(b.name))}
         pagination
         paginationPerPage = {10}
         onRowClicked      = {(row, e) => {

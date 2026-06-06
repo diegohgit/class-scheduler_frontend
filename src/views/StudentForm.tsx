@@ -15,7 +15,7 @@ type Props = {
   //onSubmit is a function that receives a Student object 
   //and returns a Promise that resolves to nothing.
   //its a promise because our parent function is async
-  onSubmit: (data: Student) => Promise<any>;
+  onSubmit: (data: Student | any, method: String) => Promise<any>;
 }
 
 
@@ -144,6 +144,8 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
   dayjs.extend(customParseFormat);
 
+
+
   //Validate the birthdate typed by the user
   const handleDateValidation = (date:string) => {
     //Using dayjs to work with dates
@@ -219,31 +221,37 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
 
 
+  //Normalize data so it can be processed by backend.
+  const normalizeToBackend = (data: any) => ({
+    ...data,
+    birthdate: data?.birthdate ? data.birthdate: null,
+    homework:  data?.homework || null,
+    progress:  data?.progress || null,
+    level_id:  Number(data?.level_id),
+    color_id:  Number(data?.color_id),
+  });
+
+
+
   //Submit handler
-  const submit = async (data:Student) => {
+  const submit = async (data:Student | null, method: string) => {
 
-    if(validation()){
-      //Normalize data so it can be processed by backend.
-      const normalizeToBackend = {
-        ...data,
-        birthdate: data.birthdate ? data.birthdate: null,
-        homework:  data.homework || null,
-        progress:  data.progress || null,
-        level_id:  Number(data.level_id),
-        color_id:  Number(data.color_id),
-      };
+    if(!validation() && method !== "DELETE") return;
 
-      const success = await onSubmit(normalizeToBackend);
+    const success = await onSubmit(normalizeToBackend(data), method);
 
-      if(success){
-        //reset(data) will switch isDirty to "false" so we can navigate().
-        //navigate() can't be used here because isDirty isn't updated yet.
-        reset(data);
-        setShouldNavigate(true);
-      }
+    if(success){
+      //reset(data) will switch isDirty to "false" so we can navigate().
+      //navigate() can't be used here because isDirty isn't updated yet.
+      reset();
+      setShouldNavigate(true);
     }
+    
   }
 
+
+
+  const [ confirmDelete, setConfirmDelete ] = useState(false);
 
 
   return (
@@ -254,7 +262,8 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
     <div className="flex items-center justify-center">
       <form 
-        onSubmit={handleSubmit(submit)}
+        onSubmit={handleSubmit((data) => submit(data, 
+                                                mode === "create" ? "POST":"PUT"))}
         className="w-8/12"
       >
         <div className=" mb-4">
@@ -385,15 +394,15 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         <div className="mb-10">
           <div className="flex">
             <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
-            <button 
-              type="button"
-              onClick={() => {
-                navigate(`/students/${id}/progress`);
-              }}
-              className={`${mode === "edit" ? "" : "hidden"}
-                         button-base mx-auto bg-blue-500 hover:bg-blue-600`}>
-              See progress
-            </button>
+
+            {mode === "edit" &&
+              <button type="button"
+                      onClick={() => {
+                        navigate(`/students/${id}/progress`);
+                      }}
+                      className="button-base mx-auto bg-blue-500 hover:bg-blue-600">
+                See progress
+            </button>}
           </div>
           <textarea 
             {...register("progress")}
@@ -414,19 +423,40 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
             Back to list
           </button>
 
-          <button type="submit"
-                  className={`${isDirty ? "" : "hidden"}
-                            button-base bg-green-500 hover:bg-green-600`}
-          >
-            {mode === "create" ? "Create student" : "Save changes"}
-          </button>
+          {isDirty &&
+            <button type="submit"
+                    className="button-base bg-green-500 hover:bg-green-600"
+            >
+              {mode === "create" ? "Create student" : "Save changes"}
+            </button>
+          }
 
-          <button type="button"
-                  className={`${mode === "edit" ? "block" : "hidden"}
-                           button-base bg-red-500 hover:bg-red-600`}
-          >
-            Delete student
-          </button>
+          {mode === "edit" && (
+            confirmDelete === false ? 
+            (
+              <button type="button"
+                      className="button-base bg-red-500 hover:bg-red-600"
+                      onClick={() => setConfirmDelete(true)}
+              >
+                Delete student
+              </button>
+            ) : (
+              <div className="flex items-center">
+                <span>Delete student?</span>
+                <div className="*:m-1 *:font-bold *:hover:underline
+                                *:hover:cursor-pointer"
+                >
+                  <span onClick={() => setConfirmDelete(false)}
+                  >No</span>
+
+                  <span onClick={handleSubmit((data) => submit(data, "DELETE"))}
+                  >Yes</span>
+                </div>
+              </div>
+            )
+          )
+          }
+
         </div>
       </form>
     </div>

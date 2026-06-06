@@ -48,9 +48,9 @@ export default function EditStudent() {
       <StudentForm 
         mode = "edit"
         initialValues = {student}
-        onSubmit={(student) => studentMutation.mutateAsync({
+        onSubmit={(student, method) => studentMutation.mutateAsync({
                                 data: student,
-                                method: "PUT"
+                                method
                               })
                   }
       />

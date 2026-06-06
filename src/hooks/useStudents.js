@@ -82,17 +82,20 @@ export const useStudentMutation = (options = {}) => {
           //Prevent errors when the cache doesn't contain any data yet.
           if(!old) return old;
 
-      //****** POST ******
+          //****** POST ******
           if(method === "POST"){
 
             return [...old, resStudent].sort();
 
-      //****** PUT ******
+          //****** PUT ******
           }else if(method === "PUT"){
 
-            //Update list
+            //Modify student local cache data.
+            queryClient.setQueryData(["student", String(resStudent.id)], resStudent);
+
+            //Update list.
             return [...old].map((stu) => stu.id === resStudent.id 
-                                    ? {...stu, 
+                                    ? {...stu,
                                        id:    resStudent.id,
                                        name:  resStudent.name,
                                        level: resStudent.level.name,
@@ -100,19 +103,18 @@ export const useStudentMutation = (options = {}) => {
                                     : stu
                             ).sort((a, b) => a.name.localeCompare(b.name));
 
-      //****** DELETE ******
+          //****** DELETE ******
+          }else if(method === "DELETE"){
+
+            //Remove student local cache data .
+            queryClient.removeQueries({queryKey: ["student", String(resStudent.id)]});
+
+            //Remove student from local cache data list.
+            return old.filter((stud) => stud.id !== resStudent.id);
           }
 
           return old;
         });
-
-        if(method === "PUT"){
-
-          queryClient.setQueryData(["student", String(resStudent.id)], resStudent);
-        }
-
-
-
       }
       options?.onSuccess(response?.success);
     }
