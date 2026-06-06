@@ -51,7 +51,7 @@ export default function StudentList() {
   <>
     <h1 className="title-base">Students</h1>
 
-    <div className="w-6/12 h-90 mx-auto my-3">
+    <div className="w-6/12 h-fit mx-auto mt-3 mb-15">
       <div className="relative w-64 mx-auto">
         <input
           type="text"
@@ -66,11 +66,11 @@ export default function StudentList() {
           </svg>
         </div>
       </div>
-      <DataTable 
+      <DataTable
         progressPending = {isLoading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
-        data    = {filter}
+        data    = {filter.sort((a, b) => a.name.localeCompare(b.name))}
         pagination
         paginationPerPage = {10}
         onRowClicked      = {(row, e) => {
