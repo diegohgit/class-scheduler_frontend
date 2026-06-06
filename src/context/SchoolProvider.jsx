@@ -126,12 +126,19 @@ const SchoolProvider = ({children}) => {
     useEffect(() => {
       if(blocker.state !== "blocked") return;
 
-      const confirm = window.confirm(
-        "You have unsaved changes. Are you sure you want to leave this page?"
-      );
+      //Validate shouldNavigate so we don't have to wait until isDirty comes false.
+      if(shouldNavigate === false){
+        const confirm = window.confirm(  
+                          "You have unsaved changes. Are you sure you want to leave this page?");
 
-      confirm ? blocker.proceed() : blocker.reset();
-    }, [blocker]);
+        confirm ? blocker.proceed() : blocker.reset();
+
+      }else{
+        blocker.proceed();
+        setShouldNavigate(false);
+      }
+
+    }, [blocker, shouldNavigate]);
 
     // Warn user of unsaved changes when trying to close the tab or browser
     //it also works when trying to refresh the page
