@@ -110,6 +110,11 @@ const SchoolProvider = ({children}) => {
 
 
 
+  //State to handle birthdate validation
+  const [validDate, setValidDate] = useState(false)
+
+
+
   //State to define if its allowed to navigate
   //after creating or updating a student.
   const [shouldNavigate, setShouldNavigate] = useState(false)
@@ -230,6 +235,7 @@ const SchoolProvider = ({children}) => {
         modalSection, setModalSection,
         handleModalSection,
         selSection, setSelSection,
+        validDate, setValidDate,
         shouldNavigate, setShouldNavigate,
       }}
 

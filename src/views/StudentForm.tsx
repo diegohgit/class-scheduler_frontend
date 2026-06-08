@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import useSchool from "../hooks/useSchool";
 import { Student } from "../types/Student";
 import { toast } from "react-toastify";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useApi } from "../hooks/useApi";
 import { useQuery } from "@tanstack/react-query";
+import BirthdateInput from "../components/BirthdateInput";
 
 type Props = {
   initialValues?: Student | undefined;
@@ -21,13 +20,14 @@ type Props = {
 
 export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
-  //get the id that comes in the url
   const { id } = useParams();
   const navigate = useNavigate();
+  const [ confirmDelete, setConfirmDelete ] = useState(false);
 
 
 
-  //give a default color if creating a new student
+
+  //Give a default color if user is creating a new student.
   const defaultColor = Math.floor(Math.random() * 9) + 1;
 
   const {
@@ -36,11 +36,12 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     watch,
     handleSubmit,
     reset,
+    control,
     formState: { isDirty },
   } = useForm<Student>({
     defaultValues: {
       name:      "",
-      birthdate: "",
+      birthdate: initialValues?.birthdate ?? "",
       level_id:  "1",
       homework:  null,
       //Parse color to string because in the radio inputs this 
@@ -75,23 +76,25 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     if(!initialValues) return;
 
     reset(normalizeFromBackend(initialValues));
-  }, [initialValues]);
+  }, [initialValues, reset]);
 
 
 
-  const { useChangesProtection, setShouldNavigate } = useSchool();
+  const { useChangesProtection, setShouldNavigate, validDate } = useSchool();
+
   //Handle form changes
   useChangesProtection(isDirty);
 
 
 
+  //Fetch list of colors.
   const { request } = useApi();
 
   const fetchColors = async () => {
     const { success, response } = await request("GET", "api/colors/",);
 
     if(!success) throw new Error("Failed to fetch colors.");
-    return response.data;
+    return response?.data;
   }
 
   const { data:colors = [],
@@ -103,105 +106,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
           staleTime: Infinity,
           gcTime:    1000 * 60 * 90,//1hr 30min
           retry: false,
-        })
-
-
-
-  const [age, setAge]                     = useState<number>(0);
-  const [tempBirthdate, setTempBirthdate] = useState<string>("");
-  const [validDate, setValidDate]         = useState<boolean>(false)
-
-  //Format the birthdate typed by the user
-  const formatBirthdate = (value:string) => {
-    //set validDate to false every time the user starts to 
-    //type a new date.
-    setValidDate(false);
-
-    //Get only numbers and limit to 8 digits
-    const digits = value?.replace(/\D/g, "")?.slice(0, 8);
-
-    //Fragment date string to get day, month and year
-    const month = digits.slice(0, 2);
-    const day   = digits.slice(2, 4);
-    const year  = digits.slice(4, 8);
-
-    //Concatenating a "/" every two digits 
-    // to get the date format
-    if(digits.length <= 2) return month;
-    if(digits.length <= 4) return `${month}/${day}`;
-    return `${month}/${day}/${year}`;
-  }
-
-  //Include the date in the form values
-  const handleBirthDate = (value:string) => {
-    setTempBirthdate(formatBirthdate(value));
-  }
-
-
-
-  const [markInput, setMarkInput]   = useState<boolean>(false)
-  const [ageMessage, setAgeMessage] = useState<String>("");
-
-  dayjs.extend(customParseFormat);
-
-
-
-  //Validate the birthdate typed by the user
-  const handleDateValidation = (date:string) => {
-    //Using dayjs to work with dates
-    const parsedDate = dayjs(date, "MM/DD/YYYY", true);
-    const valid = parsedDate.isValid();
-    
-    if(date !== ""){
-
-      if(!valid){
-        setAgeMessage('Invalid date')
-        setMarkInput(true)
-        return;
-
-      }else{
-        //Validate that the birthdate is more than 
-        //2 years ago and less than 100 years ago.xz
-        const twoYearsAgo = dayjs().subtract(2, "year");
-        const aHundredYearsAgo = dayjs().subtract(100, "year");
-
-        if(parsedDate.isAfter(twoYearsAgo) || parsedDate.isBefore(aHundredYearsAgo)){
-          setAgeMessage("Invalid year");
-          setMarkInput(true);
-          return;
-
-        }else{
-          //If the birthdate is valid
-          //calculate age and store it in the state.
-          const age = dayjs().diff(parsedDate, "year");
-          setAge(age);
-          setValidDate(true);
-        }
-      }
-    }else{setValidDate(true);}
-    setMarkInput(false);
-  };
-
-
-
-  //Calculate age in "edit" mode.
-  useEffect(() => {
-
-    //initialValues are fetched asynchronously, 
-    //if they aren't loaded yet, return and check again
-    if (!initialValues || mode !== "edit") return;
-
-    //When initialValues are loaded, calculate age and show it in the form.
-    if(initialValues.birthdate){
-      const parsedDate = dayjs(initialValues.birthdate, "MM/DD/YYYY", true);
-      const age = dayjs().diff(parsedDate, "year");
-      setAge(age);
-      setValidDate(true);
-
-      //Set the birthdate so it can be seen in the birthdate input
-      setTempBirthdate(initialValues.birthdate.toString());
-    }
-  }, [initialValues, mode])
+        });
 
 
 
@@ -213,7 +118,9 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       return false;
     }
 
-    if(!validDate && tempBirthdate !== "" ){
+    const birthdateValidation = String(watch("birthdate"));
+
+    if(!validDate && birthdateValidation.length > 0){
       toast.error("You must enter a valid birthdate");
       return false;
     }else return true;
@@ -238,20 +145,16 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
 
     if(!validation() && method !== "DELETE") return;
 
-    const success = await onSubmit(normalizeToBackend(data), method);
+   const success = await onSubmit(normalizeToBackend(data), method);
 
-    if(success){
-      //reset(data) will switch isDirty to "false" so we can navigate().
-      //navigate() can't be used here because isDirty isn't updated yet.
-      reset();
-      setShouldNavigate(true);
-    }
-    
+   if(success){
+     //reset() will switch isDirty to "false" so we can navigate().
+     //navigate() can't be used here because isDirty isn't updated yet.
+     reset();
+     setShouldNavigate(true);
+   }    
   }
 
-
-
-  const [ confirmDelete, setConfirmDelete ] = useState(false);
 
 
   return (
@@ -268,7 +171,7 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
       >
         <div className=" mb-4">
           <p className="font-bold mb-1">Name:</p>
-          <input 
+          <input
             {...register("name")}
             className="input-base"
             placeholder="Student's name"
@@ -276,30 +179,23 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
         </div>
 
         <div className="flex">
-          <div className="w-6/12 mb-0 mr-3">
-            <p className="font-bold mb-1">Birthdate (MM/DD/YYYY):</p>
-            <div className="flex ">
-              <div>
-                <input
-                  {...register("birthdate",{
-                      onChange: (e) => {
-                        handleBirthDate(e.target.value);
-                        setAgeMessage("");
-                        setAge(0);
-                      },
-                      onBlur: (e) => handleDateValidation(e.target.value),
-                    }
-                  )}
-                  className={`input-base  ${markInput === true ? "focus:border-0! border-red-500! border-2!":"" } `}
-                  placeholder="(optional)"
-                  type="text"
-                  value={tempBirthdate}
-                />
-                <p className={`${ageMessage !== "" ? '' : 'hidden' } text-md text-red-500` }>{`${ageMessage}`}</p>
-              </div>
-              { age > 0 && <p className ='m-2'>({age} years old)</p> }
-            </div>
-          </div>
+
+        {/* Birthdate input 
+            Handle it with Controller so we can use isDirty 
+            with an external input.
+        */}
+          <Controller
+            //Shouldn´t use register() because Controller 
+            //needs name="" to use its own features
+            name="birthdate"
+            control={control}
+            render={({field}) =>(
+                <BirthdateInput
+                  initialBirthdate = {field.value ?? null }
+                  mode = {mode}
+                  onChange={field.onChange}
+                />)}
+          />
 
           <div className="w-6/12 mb-6">
             <p className="font-bold mb-1">English level:</p>
