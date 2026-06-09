@@ -16,10 +16,11 @@ type Props = {
   //and returns a Promise that resolves to nothing.
   //its a promise because our parent function is async
   onSubmit: (data: Student | any, method: String) => Promise<any>;
+  isPending: boolean
 }
 
 
-export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
+export default function StudentForm({ initialValues, mode, onSubmit, isPending }: Props) {
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -170,199 +171,210 @@ export default function StudentForm({ initialValues, mode, onSubmit }: Props) {
     </h1>
 
     {initialValues || mode === "create" ? (
-      <div className="flex items-center justify-center">
-        <form 
-          onSubmit={handleSubmit((data) => submit(data, 
-                                                  mode === "create" ? "POST":"PUT"))}
-          className="w-8/12"
-        >
-          <div className=" mb-4">
-            <p className="font-bold mb-1">Name:</p>
-            <input
-              {...register("name")}
-              className="input-base"
-              placeholder="Student's name"
-            />
-          </div>
+      <>
+        {/* Loading request message */}
+        {isPending &&
+        <LoadingMessage text={` ${mode === "edit"   ? "Saving changes..."
+                                : mode === "create" ? "Saving student..."
+                                                    : "Deleting student..."
+                                }`
+                              }
+        />}
 
-          <div className="flex">
-
-          {/* Birthdate input 
-              Handle it with Controller so we can use isDirty 
-              with an external input.
-          */}
-            <Controller
-              //Shouldn´t use register() because Controller 
-              //needs name="" to use its own features
-              name="birthdate"
-              control={control}
-              render={({field}) =>(
-                  <BirthdateInput
-                    initialBirthdate = {field.value ?? null }
-                    mode = {mode}
-                    onChange={field.onChange}
-                  />)}
-            />
-
-            <div className="w-6/12 mb-6">
-              <p className="font-bold mb-1">English level:</p>
-              <select 
-                {...register("level_id")}
+        <div className="flex items-center justify-center">
+          <form 
+            onSubmit={handleSubmit((data) => submit(data, 
+                                                    mode === "create" ? "POST":"PUT"))}
+            className="w-8/12"
+          >
+            <div className=" mb-4">
+              <p className="font-bold mb-1">Name:</p>
+              <input
+                {...register("name")}
                 className="input-base"
-              >
-                <option value="1">A1</option>
-                <option value="2">A2</option>
-                <option value="3">B1</option>
-                <option value="4">B2</option>
-                <option value="5">C1</option>
-                <option value="6">C2</option>
-              </select>
+                placeholder="Student's name"
+              />
             </div>
-          </div>
 
-          <div className={`${mode === "create" ? "hidden" : ""}`}>
-            <p className="font-bold">Homework:</p>
-            <textarea 
-              {...register("homework")}
-              className="textarea-base"
-              name="homework"
-              id="homework"
-            ></textarea>
-          </div>
-
-
-          { colors.length > 0 
-            && (<p className="font-bold mb-1">Schedule Color:</p>)}
-
-          { isError && (<p>Couldn't fetch colors.</p>) }
-
-          <div className="flex gap-3 mb-4">
-            { isLoading && (<p>Loading colors...</p>) }
-
-            {colors.map((color:any)=>{
-                return <label
-                        key={color.id}
-                        htmlFor={color.id.toString()}
-                        className="cursor-pointer">
-                          <input
-                            {...register("color_id")}
-                            id={color.id.toString()}
-                            className="peer"
-                            hidden
-                            type="radio"
-                            name="color_id"
-                            value={color.id.toString()}
-                          />
-                          <span className="block w-10 h-10
-                                          rounded-full transition duration-300 
-                                          peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-gray-300"
-                                style = {{backgroundColor: color.name}}
-                                      ></span>
-                      </label>
-              })
-            }
-          </div >
-
-          <div className={mode === "edit" ? "block" : "hidden"}>
-            <p className="font-bold mb-1">Student's classes:</p>
-            <div className="flex mb-4">
-              <div className="w-30 h-20 bg-gray-100 pt-1 mr-2 
-                      text-center rounded hover:cursor-pointer hover:bg-blue-200">
-                <p className="text-center font-bold text-transform: uppercase
-                  mt-4">
-                  TUE
-                </p>
-                <p>10:00</p>
-              </div>
-              <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
-                      text-center rounded hover:cursor-pointer hover:bg-blue-200">
-                <p className="text-center font-bold text-transform:uppercase
-                  mt-4">
-                  THU
-                </p>
-                <p>11:00</p>
-              </div>
-              <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
-                              text-center rounded hover:cursor-pointer 
-                            hover:bg-blue-200">
-                <p className="text-center font-bold text-transform:uppercase
-                  mt-4">
-                  FRI
-                </p>
-                <p>11:00</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-10">
             <div className="flex">
-              <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
 
-              {mode === "edit" &&
-                <button type="button"
-                        onClick={() => {
-                          navigate(`/students/${id}/progress`);
-                        }}
-                        className="button-base mx-auto bg-blue-500 hover:bg-blue-600">
-                  See progress
-              </button>}
-            </div>
-            <textarea 
-              {...register("progress")}
-              className="textarea-base" 
-              name="progress" 
-              id="progress"
-              placeholder="Write something about this student's level (optional)."
-            ></textarea>
-          </div>
+            {/* Birthdate input 
+                Handle it with Controller so we can use isDirty 
+                with an external input.
+            */}
+              <Controller
+                //Shouldn´t use register() because Controller 
+                //needs name="" to use its own features
+                name="birthdate"
+                control={control}
+                render={({field}) =>(
+                    <BirthdateInput
+                      initialBirthdate = {field.value ?? null }
+                      mode = {mode}
+                      onChange={field.onChange}
+                    />)}
+              />
 
-
-
-          <div className="bottom-bar">
-            <button type="button"
-                    className="button-base bg-blue-500 hover:bg-blue-600"
-                    onClick={() => navigate("/students")}
-            >
-              Back to list
-            </button>
-
-            {isDirty &&
-              <button type="submit"
-                      className="button-base bg-green-500 hover:bg-green-600"
-              >
-                {mode === "create" ? "Create student" : "Save changes"}
-              </button>
-            }
-
-            {mode === "edit" && (
-              confirmDelete === false ? 
-              (
-                <button type="button"
-                        className="button-base bg-red-500 hover:bg-red-600"
-                        onClick={() => setConfirmDelete(true)}
+              <div className="w-6/12 mb-6">
+                <p className="font-bold mb-1">English level:</p>
+                <select 
+                  {...register("level_id")}
+                  className="input-base"
                 >
-                  Delete student
-                </button>
-              ) : (
-                <div className="flex items-center">
-                  <span>Delete student?</span>
-                  <div className="*:m-1 *:font-bold *:hover:underline
-                                  *:hover:cursor-pointer"
-                  >
-                    <span onClick={() => setConfirmDelete(false)}
-                    >No</span>
+                  <option value="1">A1</option>
+                  <option value="2">A2</option>
+                  <option value="3">B1</option>
+                  <option value="4">B2</option>
+                  <option value="5">C1</option>
+                  <option value="6">C2</option>
+                </select>
+              </div>
+            </div>
 
-                    <span onClick={handleSubmit((data) => submit(data, "DELETE"))}
-                    >Yes</span>
-                  </div>
+            <div className={`${mode === "create" ? "hidden" : ""}`}>
+              <p className="font-bold">Homework:</p>
+              <textarea 
+                {...register("homework")}
+                className="textarea-base"
+                name="homework"
+                id="homework"
+              ></textarea>
+            </div>
+
+
+            { colors.length > 0 
+              && (<p className="font-bold mb-1">Schedule Color:</p>)}
+
+            { isError && (<p>Couldn't fetch colors.</p>) }
+
+            <div className="flex gap-3 mb-4">
+              { isLoading && (<p>Loading colors...</p>) }
+
+              {colors.map((color:any)=>{
+                  return <label
+                          key={color.id}
+                          htmlFor={color.id.toString()}
+                          className="cursor-pointer">
+                            <input
+                              {...register("color_id")}
+                              id={color.id.toString()}
+                              className="peer"
+                              hidden
+                              type="radio"
+                              name="color_id"
+                              value={color.id.toString()}
+                            />
+                            <span className="block w-10 h-10
+                                            rounded-full transition duration-300 
+                                            peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-gray-300"
+                                  style = {{backgroundColor: color.name}}
+                                        ></span>
+                        </label>
+                })
+              }
+            </div >
+
+            <div className={mode === "edit" ? "block" : "hidden"}>
+              <p className="font-bold mb-1">Student's classes:</p>
+              <div className="flex mb-4">
+                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2 
+                        text-center rounded hover:cursor-pointer hover:bg-blue-200">
+                  <p className="text-center font-bold text-transform: uppercase
+                    mt-4">
+                    TUE
+                  </p>
+                  <p>10:00</p>
                 </div>
-              )
-            )
-            }
+                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
+                        text-center rounded hover:cursor-pointer hover:bg-blue-200">
+                  <p className="text-center font-bold text-transform:uppercase
+                    mt-4">
+                    THU
+                  </p>
+                  <p>11:00</p>
+                </div>
+                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
+                                text-center rounded hover:cursor-pointer 
+                              hover:bg-blue-200">
+                  <p className="text-center font-bold text-transform:uppercase
+                    mt-4">
+                    FRI
+                  </p>
+                  <p>11:00</p>
+                </div>
+              </div>
+            </div>
 
-          </div>
-        </form>
-      </div>
+            <div className="mb-10">
+              <div className="flex">
+                <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
+
+                {mode === "edit" &&
+                  <button type="button"
+                          onClick={() => {
+                            navigate(`/students/${id}/progress`);
+                          }}
+                          className="button-base mx-auto bg-blue-500 hover:bg-blue-600">
+                    See progress
+                </button>}
+              </div>
+              <textarea 
+                {...register("progress")}
+                className="textarea-base" 
+                name="progress" 
+                id="progress"
+                placeholder="Write something about this student's level (optional)."
+              ></textarea>
+            </div>
+
+
+
+            <div className="bottom-bar">
+              <button type="button"
+                      className="button-base bg-blue-500 hover:bg-blue-600"
+                      onClick={() => navigate("/students")}
+              >
+                Back to list
+              </button>
+
+              {isDirty &&
+                <button type="submit"
+                        className="button-base bg-green-500 hover:bg-green-600"
+                >
+                  {mode === "create" ? "Create student" : "Save changes"}
+                </button>
+              }
+
+              {mode === "edit" && (
+                confirmDelete === false ? 
+                (
+                  <button type="button"
+                          className="button-base bg-red-500 hover:bg-red-600"
+                          onClick={() => setConfirmDelete(true)}
+                  >
+                    Delete student
+                  </button>
+                ) : (
+                  <div className="flex items-center">
+                    <span>Delete student?</span>
+                    <div className="*:m-1 *:font-bold *:hover:underline
+                                    *:hover:cursor-pointer"
+                    >
+                      <span onClick={() => setConfirmDelete(false)}
+                      >No</span>
+
+                      <span onClick={handleSubmit((data) => submit(data, "DELETE"))}
+                      >Yes</span>
+                    </div>
+                  </div>
+                )
+              )
+              }
+
+            </div>
+          </form>
+        </div>
+      </>
       ):(
       <LoadingMessage text="Loading student..."/>
     )

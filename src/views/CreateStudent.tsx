@@ -24,6 +24,7 @@ export default function CreateStudent() {
                                 method: "POST"
                               })
                   }
+        isPending = {studentMutation.isPending}
       />
     </>
   )

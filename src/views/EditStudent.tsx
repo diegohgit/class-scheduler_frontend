@@ -53,6 +53,7 @@ export default function EditStudent() {
                                 method
                               })
                   }
+        isPending = {studentMutation.isPending}
       />
     </>
   )
