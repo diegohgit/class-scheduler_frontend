@@ -141,19 +141,24 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
 
 
+  //State useful to define wich action is being requested.
+  const [ loadingAction , setLoadingAction ] = useState("");
+
+
+
   //Submit handler
   const submit = async (data:Student | null, method: string) => {
 
     if(!validation() && method !== "DELETE") return;
 
-   const success = await onSubmit(normalizeToBackend(data), method);
+    const success = await onSubmit(normalizeToBackend(data), method);
 
-   if(success){
-     //reset() will switch isDirty to "false" so we can navigate().
-     //navigate() can't be used here because isDirty isn't updated yet.
-     reset();
-     setShouldNavigate(true);
-   }    
+    if(success){
+      //reset() will switch isDirty to "false" so we can navigate().
+      //navigate() can't be used here because isDirty isn't updated yet.
+      reset();
+      setShouldNavigate(true);
+    }    
   }
 
 
@@ -173,18 +178,11 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     {initialValues || mode === "create" ? (
       <>
         {/* Loading request message */}
-        {isPending &&
-        <LoadingMessage text={` ${mode === "edit"   ? "Saving changes..."
-                                : mode === "create" ? "Saving student..."
-                                                    : "Deleting student..."
-                                }`
-                              }
-        />}
+        {isPending && <LoadingMessage text={loadingAction} />}
 
         <div className="flex items-center justify-center">
-          <form 
-            onSubmit={handleSubmit((data) => submit(data, 
-                                                    mode === "create" ? "POST":"PUT"))}
+          <form
+            onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PUT"))}
             className="w-8/12"
           >
             <div className=" mb-4">
@@ -340,6 +338,9 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               {isDirty &&
                 <button type="submit"
                         className="button-base bg-green-500 hover:bg-green-600"
+                        onClick={() => setLoadingAction(mode === "edit" 
+                                                          ? "Saving changes..." 
+                                                          : "Saving student...")}
                 >
                   {mode === "create" ? "Create student" : "Save changes"}
                 </button>
@@ -363,12 +364,12 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                       <span onClick={() => setConfirmDelete(false)}
                       >No</span>
 
-                      <span onClick={handleSubmit((data) => submit(data, "DELETE"))}
+                      <span onClick={handleSubmit((data) => {submit(data, "DELETE")
+                                                             setLoadingAction("Deleting student...")})}
                       >Yes</span>
                     </div>
                   </div>
-                )
-              )
+                ))
               }
 
             </div>
