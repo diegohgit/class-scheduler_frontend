@@ -109,6 +109,10 @@ export const useStudentMutation = (options = {}) => {
             //Remove student local cache data .
             queryClient.removeQueries({queryKey: ["student", String(resStudent.id)]});
 
+            //Remove classes that belong to the deleted student.
+            queryClient.setQueryData(["classes"], (oldClass) => {
+              return oldClass.filter((oc) => oc.student_id !== resStudent.id)});
+
             //Remove student from local cache data list.
             return old.filter((stud) => stud.id !== resStudent.id);
           }
