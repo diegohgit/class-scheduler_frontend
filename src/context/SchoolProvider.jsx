@@ -172,8 +172,8 @@ const SchoolProvider = ({children}) => {
       const studentsName = inpValue.toLowerCase();
 
       const filteredRecords = records.filter(student => { 
-        return student.name.toLowerCase().includes(studentsName) ||
-               student.level.toLowerCase().includes(studentsName);
+        return student?.name?.toLowerCase().includes(studentsName) ||
+               student?.level?.toLowerCase().includes(studentsName);
       })
       return filteredRecords;
     }

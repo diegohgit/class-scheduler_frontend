@@ -4,10 +4,11 @@ import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import { useState, useEffect } from "react";
 import { days } from "../data/days";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import LoadingMessage from "../components/LoadingMessage";
-import { useApi } from "../hooks/useApi";
+import { useClasses } from "../hooks/useClasses";
+
+
 
 Modal.setAppElement('#root')
 export default function Home() {
@@ -19,31 +20,13 @@ export default function Home() {
 
 
 
-  const { request } = useApi();
-  //Fucntion to fetch classes
-  const fetchClasses = async () => {
-
-    const { success, response } = await request("GET", 
-                                                "api/student_classes/",);
-
-    if(!success) throw new Error("Failed to fetch clases");
-    return response.data;
-  }
-
-
-  //useQuery configuration to fetch classes
+  //Get scheduled classes using useClasses()
   const { data:classes = [],
           isLoading,
           isSuccess,
           isError,
           error,
-  } = useQuery({ 
-        queryKey:  ["classes"],
-        queryFn:   fetchClasses,
-        staleTime: Infinity,
-        gcTime:    1000 * 60 * 90,//1hr 30min
-        retry: false,
-      });
+        } = useClasses();
 
   useEffect(() => {
 
@@ -91,6 +74,7 @@ export default function Home() {
   let matchActive  = 0;
   let matchEnds    = 0;
   let nextClassMin = '';
+
 
 
   return (

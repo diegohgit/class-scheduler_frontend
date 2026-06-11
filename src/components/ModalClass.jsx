@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
+import { useClassMutation } from "../hooks/useClasses";
 
 export default function ModalClass() {
 
@@ -13,66 +14,43 @@ export default function ModalClass() {
           selStudent, selDay, setModal,
           handleClickModal } = useSchool();
 
-  const { request } = useApi();
   const queryClient = useQueryClient();
 
 
+  
+  const classMutation = useClassMutation({
+    onSuccess:() => {
+        setModal(false);
+    },
+  })
 
-  //Async function to send requests to schedule or modify a class.
-  const handleClassData = async() => {
 
-    const classId = classModal?.id ?? null;
-    const method  = classId ? "PUT" : "POST"; 
-    const url     = classId ? `/api/student_classes/${classId}` 
-                            : "/api/student_classes";
+
+  //Validate data and run classMutation.
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     //Validate that all data is included
     if(!selStudent?.id ||
        !selDay?.id     ||
        !time?.starts   ||
        !time?.ends
-    ){
-        toast.error("Missing required fields.");
-        return;
-    }
+    ){  
+      toast.error("Missing required fields.");
+      return;}
+
+    const classId = classModal?.id ?? null;
+    const method  = classId ? "PUT" : "POST"; 
 
     //Use the states to set the data 
     //which is going to be sent in the request.
-    const classData = { student_id : selStudent.id,
-                        day_id     : selDay.id,
-                        starts     : time.starts,
-                        ends       : time.ends, 
-                      };
+    const data = {id         : classId, 
+                  student_id : selStudent.id,
+                  day_id     : selDay.id,
+                  starts     : time.starts,
+                  ends       : time.ends, };
 
-    const message   = classId ? "Class modified."
-                              : "Class scheduled.";
-
-    const { success } = await request( method,
-                                       url,
-                                       classData,
-                                       message );
-    return success;
-  }
-
-
-
-  const classMutation = useMutation({
-    mutationFn: handleClassData,
-
-    //Get success response returned from handleClassData()
-    onSuccess:(success) => {
-      if(success){
-        queryClient.invalidateQueries({queryKey:["classes"]});
-        setModal(false);
-      }
-    },
-  })
-
-
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    classMutation.mutate();
+    classMutation.mutate({data, method});
   }
 
 
