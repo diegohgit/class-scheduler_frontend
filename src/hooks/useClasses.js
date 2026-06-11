@@ -75,7 +75,13 @@ export const useClassMutation = (options = {}) => {
           }else if(method === "PUT"){
             
             return old.map((c) => c.id === resClass.id ? resClass : c);
+
+          //****** DELETE ******
+          }else if(method === "DELETE"){
+
+            return old.filter((c) => c.id !== resClass.id);
           }
+
         });
       }
       options?.onSuccess(response?.success);

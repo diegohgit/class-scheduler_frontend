@@ -3,10 +3,9 @@ import TimeSelector from "./TimeSelector";
 import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
 import { ToastContainer, toast } from "react-toastify";
-import { useApi } from "../hooks/useApi";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import LoadingMessage from "./LoadingMessage";
+import { useQueryClient } from "@tanstack/react-query";
 import { useClassMutation } from "../hooks/useClasses";
+import { useState } from "react";
 
 export default function ModalClass() {
 
@@ -14,10 +13,14 @@ export default function ModalClass() {
           selStudent, selDay, setModal,
           handleClickModal } = useSchool();
 
+  const [ showConfirm, setShowConfirm ] = useState(false);
+  //State usefull to show a loading message ONLY when a class is being deleted.
+  const [ isDeleting, setIsDeleting ] = useState(false);
+
   const queryClient = useQueryClient();
 
 
-  
+
   const classMutation = useClassMutation({
     onSuccess:() => {
         setModal(false);
@@ -105,21 +108,54 @@ export default function ModalClass() {
           </div>
         </div>
 
-        <div className="mt-5">
-          <button
-            type="button"
-            onClick={() => console.log(selStudent)}
-            className="button-base bg-red-500 hover:bg-red-600"
-          >
-            Cancel Class
-          </button>
+        <div className="mt-5 justify-center flex">
+          {/* DELETE CLASS BUTTON */}
+            {classModal?.id && (
+              <div className="w-6/12 flex justify-center items-center text-center">
+
+                {showConfirm === false ? (
+                  <button type="button"
+                          onClick={() => {setShowConfirm(true); 
+                                          setIsDeleting(true);}}
+                          className="button-base bg-red-500 hover:bg-red-600 "
+                  >
+                    Delete Class
+                  </button>
+
+                ) : (
+                  isDeleting === true && (
+                    classMutation.isPending ? 
+                    ( <span>Deleting class...</span>
+                    ):(
+                      <div>
+                        <span>Delete class?</span>
+
+                        <div className="*:m-1 *:font-bold *:hover:underline
+                                        *:hover:cursor-pointer"
+                        >
+                          <span onClick={() => setShowConfirm(false)}
+                          >No</span>
+
+                          <span onClick={() => {classMutation.mutate({data:{id: classModal.id}, 
+                                                                      method: "DELETE"});
+                                                }}
+                          >Yes</span>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
+              )
+            }
+
+          {/* SUBMIT BUTTON */}
           <button 
             type="submit"
             className={`button-base bg-indigo-500 
                       ${classMutation.isPending ? 'bg-indigo-300 hover:cursor-not-allowed' : 'hover:bg-indigo-600'}`}
             disabled={classMutation.isPending}
           >
-            {classMutation.isPending ? "Saving Class..." : "Save"}
+            {classMutation.isPending && !isDeleting ? "Saving Class..." : "Save"}
           </button>
         </div>
       </form>
