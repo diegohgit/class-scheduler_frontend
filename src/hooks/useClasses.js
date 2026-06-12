@@ -62,14 +62,14 @@ export const useClassMutation = (options = {}) => {
         const resClass = response?.response?.data;
         const method   = response?.method;
 
-        queryClient.setQueriesData(["classes"], (old) => {
+        queryClient.setQueryData(["classes"], (old) => {
           //Prevent errors when the cache doesn't contain any data yet.
           if(!old) return old;
 
           //****** POST ******
           if(method === "POST"){
 
-            return [...old, resClass].sort();
+            return [...old, resClass];
 
           //****** PUT ******
           }else if(method === "PUT"){
