@@ -3,22 +3,21 @@ import TimeSelector from "./TimeSelector";
 import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
 import { ToastContainer, toast } from "react-toastify";
-import { useQueryClient } from "@tanstack/react-query";
 import { useClassMutation } from "../hooks/useClasses";
 import { useState } from "react";
+import { days } from "../data/days";
 
 export default function ModalClass() {
 
   const { time, classLength, classModal, 
           selStudent, selDay, setModal,
-          handleClickModal } = useSchool();
+          handleClickModal, today } = useSchool();
 
   const [ showConfirm, setShowConfirm ] = useState(false);
   //State usefull to show a loading message ONLY when a class is being deleted.
   const [ isDeleting, setIsDeleting ] = useState(false);
 
-  const queryClient = useQueryClient();
-
+  const isToday = (modalDay) => (modalDay=== selDay.id);
 
 
   const classMutation = useClassMutation({
@@ -42,6 +41,10 @@ export default function ModalClass() {
       toast.error("Missing required fields.");
       return;}
 
+    
+    const formData     = new FormData(e.currentTarget);
+    const selectedDays = formData.getAll('checked_days');
+
     const classId = classModal?.id ?? null;
     const method  = classId ? "PUT" : "POST"; 
 
@@ -49,7 +52,7 @@ export default function ModalClass() {
     //which is going to be sent in the request.
     const data = {id         : classId, 
                   student_id : selStudent.id,
-                  day_id     : selDay.id,
+                  days_ids   : selectedDays,
                   starts     : time.starts,
                   ends       : time.ends, };
 
@@ -77,14 +80,33 @@ export default function ModalClass() {
 
       <form className="w-90 h-60 mx-auto"
             onSubmit={handleSubmit}>
-        <div className="w-85 mx-auto" >
+        <div className="w-85 mx-auto">
           <div className="h-15">
             <b>Student:</b>
-            <DivInput info = {selStudent} />
+            <DivInput info = {selStudent}/>
           </div>
-          <div className="flex mt-2">
-            <b className="mr-2">Day:</b>
-            <SelectDay />
+          <div className="mt-2">
+            <b className="mr-2">Days:</b>
+              <div className="flex gap-2.5">
+                {
+                  days.map((day) => (
+
+                    <div key={day.id}
+                         className="w-10 inline-block text-center
+                                    *:w-full *:block *:cursor-pointer"
+                    >
+                      <label htmlFor={day.id}>{day.label.slice(0, 3)}</label>
+
+                      <input id={day.id}
+                             type="checkbox"
+                             name = "checked_days"
+                             value = {day.id}
+                             defaultChecked = {isToday(day.id)}
+                             />
+                    </div>
+                  ))
+                }
+              </div>
           </div>
           <div className="h-10 mt-4 flex">
             <div className="w-5/12 flex">
