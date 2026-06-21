@@ -69,6 +69,7 @@ export default function Home() {
 
   const hours = [7, 8, 9, 10, 11, 12];
   const blocksPerHr = 12;
+  const endOfDay    = `${String(blocksPerHr).padStart(2, '0')}:55`;
 
   let print = 0;
   let matchActive  = 0;
@@ -103,6 +104,7 @@ export default function Home() {
 
         {/* Columns for days */}
         {days.map((day) => (
+
           <div key = {day.id}>
             <div className="text-center h-8 font-semibold
                    bg-gray-300 rounded">
@@ -111,6 +113,7 @@ export default function Home() {
 
             {/* Rows for time blocks */}
             {hours.map((hour) => (
+
               // Create an array
               // 12 blocks (representing each hour) of 5 minutes each one to divide the hour
               Array.from({ length: blocksPerHr }).map((value, i) => {
@@ -123,7 +126,7 @@ export default function Home() {
                 //VALIDATE IF THE CURRENT CYCLE IS THE START OF A CLASS
                 const match = classes?.find(cls => {
                         // Split the hour string of the class into hours and minutes
-                        const [h, m] = cls.starts.split(':').map(Number);
+                        const [h, m] = cls.starts?.split(':').map(Number) || [];
 
                         // With this instruction we define the block in which it starts
                         const blockStart = String(m).padStart(2, '0');
@@ -133,7 +136,7 @@ export default function Home() {
                         return (
                           h === hour && 
                           blockStart === minute && 
-                          cls.days.some((d) =>d.id === day.id)
+                          cls.days?.some((d) =>d.id === day.id)
                         );
                       });
 
@@ -173,7 +176,7 @@ export default function Home() {
                   
                   //If we reach the column limit, reset 
                   // print and matchActive values
-                  }else if(hour +':'+ minute == '11:55'){
+                  }else if(hour +':'+ minute === endOfDay){
                     print = 0;
                     matchActive = 0;
                   }
@@ -189,11 +192,11 @@ export default function Home() {
                   // same hour range, like 08:30
 
                   const nextClass = classes?.find(cls => {
-                                      const nextStartHr = Number(cls.starts.split(':')[0]);
+                                      const nextStartHr = Number(cls.starts?.split(':')[0]);
 
                                       return (
                                         nextStartHr === hour &&
-                                        cls.days.some((d) => d.id === day.id));
+                                        cls.days?.some((d) => d.id === day.id));
                                     })
 
                   if(nextClass){
