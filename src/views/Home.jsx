@@ -111,7 +111,8 @@ export default function Home() {
 
             {/* Rows for time blocks */}
             {hours.map((hour) => (
-              // Create an array (12 blocks of 5 minutes each one to divide the hour)
+              // Create an array
+              // 12 blocks (representing each hour) of 5 minutes each one to divide the hour
               Array.from({ length: blocksPerHr }).map((value, i) => {
 
                 // Calculate the minute for each block (0, 5, 10, ..., 55)
@@ -127,9 +128,14 @@ export default function Home() {
                         // With this instruction we define the block in which it starts
                         const blockStart = String(m).padStart(2, '0');
 
-                        // Validate if the current cycle (hour and minute) matches the start of a class
-                        return h === hour && blockStart === minute && cls.day_id === day.id;
-                      }) ?? null;
+                        // Validate if the current cycle (day, hour and minute) 
+                        // matches the start of a class.
+                        return (
+                          h === hour && 
+                          blockStart === minute && 
+                          cls.days.some((d) =>d.id === day.id)
+                        );
+                      });
 
                 //let classHeight = match ? match.height : 'h-20';
                 let classHeight = 'h-20';
@@ -181,11 +187,17 @@ export default function Home() {
                   //and compare if it matches with the current hour
                   //Example: if we are in the 08:10 block, we look for a class in the 
                   // same hour range, like 08:30
-                  const nextClass = classes?.filter(cls => cls.starts.split(':')[0] == hour
-                                                          && cls.day_id === day.id);
 
-                  if(nextClass[0]){
-                    const startMinute = nextClass[0].starts.split(':')[1];
+                  const nextClass = classes?.find(cls => {
+                                      const nextStartHr = Number(cls.starts.split(':')[0]);
+
+                                      return (
+                                        nextStartHr === hour &&
+                                        cls.days.some((d) => d.id === day.id));
+                                    })
+
+                  if(nextClass){
+                    const startMinute = nextClass?.starts?.split(':')[1];
 
                     classHeight = spaceBeforeClass(startMinute);
 
@@ -221,7 +233,7 @@ export default function Home() {
         ))}
       </div>)}
 
-      <Modal isOpen={modal}  className="modal-base w-95 h-80">
+      <Modal isOpen={modal}  className="modal-base w-95 h-88">
           <ModalClass />
       </Modal>
     </>
