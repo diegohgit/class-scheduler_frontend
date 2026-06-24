@@ -1,23 +1,67 @@
 import DivInput from "./DivInput";
 import TimeSelector from "./TimeSelector";
-import SelectDay from "./SelectDay";
 import useSchool from "../hooks/useSchool";
-import { ToastContainer, toast } from "react-toastify";
-import { useClassMutation } from "../hooks/useClasses";
-import { useState } from "react";
+import { toast } from "react-toastify";
+import { useClasses, useClassMutation } from "../hooks/useClasses";
+import { useEffect, useState } from "react";
 import { days } from "../data/days";
 
 export default function ModalClass() {
 
-  const { time, classLength, classModal, 
-          selStudent, selDay, setModal,
-          handleClickModal, today } = useSchool();
+  const { time, classLength, selStudent,
+          selDay, setModal, handleClickModal,
+          classModal, } = useSchool();
 
+  //State to define if the delete confirmation options will be shown.
   const [ showConfirm, setShowConfirm ] = useState(false);
   //State usefull to show a loading message ONLY when a class is being deleted.
   const [ isDeleting, setIsDeleting ] = useState(false);
 
-  const isToday = (modalDay) => (modalDay=== selDay.id);
+
+
+  //Get scheduled classes using useClasses()
+  const { data:classes = [], } = useClasses();
+
+
+
+  //Find in the same time range other class of the same student.
+  const matchSchedule = classes?.find(cls => {
+                return (
+                   cls.starts === time.starts &&
+                   cls.ends   === time.ends   &&
+                   cls.student_id === selStudent.id
+                );
+  });
+
+
+
+  const [selectedDays, setSelectedDays] = useState([]);
+
+  //Load all days of a class into selectedDays to show them in the checkboxes.
+  //If theres no class loaded in the current modal, check only the current day.
+  useEffect(() => {
+
+    if(classModal){
+      setSelectedDays(
+        matchSchedule?.days?.map(day => day.id) ?? []
+      );
+
+    }else{ setSelectedDays([selDay.id]) }
+
+  }, [matchSchedule, classModal]);
+
+
+
+  //Function used to update selectedDays state.
+  const handleDayChange = (e) => {
+    const dayId = Number(e.target.value);
+    const isChecked = e.target.checked;
+
+    setSelectedDays(prev => isChecked ? [...prev, dayId]
+                                      : prev.filter(id => id !== dayId)
+    );
+  };
+
 
 
   const classMutation = useClassMutation({
@@ -98,10 +142,11 @@ export default function ModalClass() {
                       <label htmlFor={day.id}>{day.label.slice(0, 3)}</label>
 
                       <input id={day.id}
-                             type="checkbox"
-                             name = "checked_days"
+                             type  = "checkbox"
+                             name  = "checked_days"
                              value = {day.id}
-                             defaultChecked = {isToday(day.id)}
+                             checked  = {selectedDays.includes(day.id)}
+                             onChange = {handleDayChange}
                              />
                     </div>
                   ))
