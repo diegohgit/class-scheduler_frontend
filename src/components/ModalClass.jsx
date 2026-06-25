@@ -41,14 +41,16 @@ export default function ModalClass() {
   //If theres no class loaded in the current modal, check only the current day.
   useEffect(() => {
 
-    if(classModal){
-      setSelectedDays(
-        matchSchedule?.days?.map(day => day.id) ?? []
-      );
+    if(matchSchedule){
+      //Store every day id from the match class scheduled into dayIds. 
+      const dayIds =  matchSchedule?.days?.map(day => day.id) ?? []
+
+      //new Set() is to avoid duplicated items.
+      setSelectedDays([...new Set([...dayIds, selDay.id])]);
 
     }else{ setSelectedDays([selDay.id]) }
 
-  }, [matchSchedule, classModal]);
+  }, [matchSchedule]);
 
 
 
@@ -76,18 +78,18 @@ export default function ModalClass() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const formData     = new FormData(e.currentTarget);
+    const selectedDays = formData.getAll('checked_days');
+
     //Validate that all data is included
     if(!selStudent?.id ||
        !selDay?.id     ||
        !time?.starts   ||
-       !time?.ends
+       !time?.ends     ||
+       !selectedDays.length
     ){  
       toast.error("Missing required fields.");
       return;}
-
-    
-    const formData     = new FormData(e.currentTarget);
-    const selectedDays = formData.getAll('checked_days');
 
     const classId = classModal?.id ?? null;
     const method  = classId ? "PUT" : "POST"; 
