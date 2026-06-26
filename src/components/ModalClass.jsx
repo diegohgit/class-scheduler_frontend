@@ -35,22 +35,31 @@ export default function ModalClass() {
 
 
 
+  //blockSearch is used to prevent the system of doing day searches (matchSchedule)
+  //every time the user changes time range or student.
+  const [blockSearch, setBlockSearch]   = useState(false);
   const [selectedDays, setSelectedDays] = useState([]);
 
-  //Load all days of a class into selectedDays to show them in the checkboxes.
   //If theres no class loaded in the current modal, check only the current day.
+  //Load all days of a class into selectedDays to show them in the checkboxes.
   useEffect(() => {
 
-    if(matchSchedule){
-      //Store every day id from the match class scheduled into dayIds. 
-      const dayIds =  matchSchedule?.days?.map(day => day.id) ?? []
+    if(!classModal){
+      setSelectedDays([selDay.id]);
+      return;
+    }
+
+    if(blockSearch === false){
+
+      //Store every day id from the match class scheduled into dayIds.0
+      const dayIds =  matchSchedule?.days?.map(day => day.id) ?? [];
 
       //new Set() is to avoid duplicated items.
       setSelectedDays([...new Set([...dayIds, selDay.id])]);
 
-    }else{ setSelectedDays([selDay.id]) }
-
-  }, [matchSchedule]);
+      if(classModal) setBlockSearch(true);
+    }
+  }, [matchSchedule, classModal, blockSearch]);
 
 
 
@@ -74,11 +83,9 @@ export default function ModalClass() {
 
 
 
-  //Validate data and run classMutation.
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  //Validate data and overlapses.
+  const validation = (formData) => {
 
-    const formData     = new FormData(e.currentTarget);
     const selectedDays = formData.getAll('checked_days');
 
     //Validate that all data is included
@@ -86,10 +93,32 @@ export default function ModalClass() {
        !selDay?.id     ||
        !time?.starts   ||
        !time?.ends     ||
-       !selectedDays.length
-    ){  
+       !selectedDays.length)
+    {
       toast.error("Missing required fields.");
-      return;}
+      return false;
+    }
+
+    //Avoid to schedule a class if the student already has a class in the selected time range.
+    if(matchSchedule?.student_id === selStudent?.id
+       && matchSchedule?.id !== classModal?.id)
+    {
+      toast.error("This student already has scheduled classes in this time range.");
+      return false;
+    }
+
+    return true;
+  }
+
+
+
+  //Validate data and run classMutation.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    if(!validation(formData)) return;
 
     const classId = classModal?.id ?? null;
     const method  = classId ? "PUT" : "POST"; 
