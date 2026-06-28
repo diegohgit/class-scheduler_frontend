@@ -97,13 +97,39 @@ export default function ModalClass() {
     {
       toast.error("Missing required fields.");
       return false;
-    }
+    }  
 
-    //Avoid to schedule a class if the student already has a class in the selected time range.
+    //Validate that student doesn't have a class in the selected time.
     if(matchSchedule?.student_id === selStudent?.id
        && matchSchedule?.id !== classModal?.id)
     {
       toast.error("This student already has scheduled classes in this time range.");
+      return false;
+    }
+
+    //Validate that the selected time range doesn't overlapse with another class.
+    const findOverlapse = classes?.some(cls => {
+      const checkTime    = cls.starts < time.ends && cls.ends > time.starts;
+      const checkStudent = cls.student_id !== selStudent.id;
+
+      if(checkTime && checkStudent){
+        //Validate days.
+        const checkDay = cls.days?.some(d =>{
+
+          return selectedDays?.some(selD =>{
+              return Number(d.id) === Number(selD)
+            }
+          )}
+        )
+
+        if(checkDay) return true;
+      }
+      return false;
+    });
+
+
+    if (findOverlapse) {
+      toast.error("This time range overlaps with an existing class.");
       return false;
     }
 
@@ -112,7 +138,7 @@ export default function ModalClass() {
 
 
 
-  //Validate data and run classMutation.
+  //Run classMutation.
   const handleSubmit = (e) => {
     e.preventDefault();
 
