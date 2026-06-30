@@ -14,7 +14,7 @@ Modal.setAppElement('#root')
 export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
-          handleClassModal, } = useSchool();
+          handleClassModal, expanded, setExpanded } = useSchool();
 
   const [ searchStudent, setSearchStudent ] = useState(0);
 
@@ -119,7 +119,7 @@ export default function Home() {
               Array.from({ length: blocksPerHr }).map((value, i) => {
 
                 // Calculate the minute for each block (0, 5, 10, ..., 55)
-                // String.padStart is used to ensure that the minute 
+                // String.padStart is used to ensure that the minute
                 // is always two digits (e.g., "00", "05"... "55")
                 const minute = String(i * 5).padStart(2, '0');
 
@@ -236,7 +236,10 @@ export default function Home() {
         ))}
       </div>)}
 
-      <Modal isOpen={modal}  className="modal-base w-95 h-88">
+      <Modal isOpen={modal}  className= {`modal-base w-95 transition-all
+                                          duration-300 ease-in-out
+                                          ${expanded ? "h-110" : "h-95"}
+                                        `}>
           <ModalClass />
       </Modal>
     </>

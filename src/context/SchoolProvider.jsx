@@ -38,6 +38,11 @@ const SchoolProvider = ({children}) => {
 
 
 
+  //Expand/hide class notes in ModalClass
+  const [expanded, setExpanded] = useState(false);
+
+
+
   //Function to set the time parameters to be displayed on the modal.
   const handleSetTime = ({day, currTime, emptyClassEnd, match}) => {
 
@@ -225,6 +230,7 @@ const SchoolProvider = ({children}) => {
         classLength,
         handleClassModal,
         classModal,
+        expanded, setExpanded,
         today,
         useChangesProtection,
         filterStudents,

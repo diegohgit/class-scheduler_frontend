@@ -10,7 +10,7 @@ export default function ModalClass() {
 
   const { time, classLength, selStudent,
           selDay, setModal, handleClickModal,
-          classModal, } = useSchool();
+          classModal, expanded, setExpanded} = useSchool();
 
   //State to define if the delete confirmation options will be shown.
   const [ showConfirm, setShowConfirm ] = useState(false);
@@ -24,7 +24,7 @@ export default function ModalClass() {
 
 
 
-  //Find in the same time range other class of the same student.
+  //Check if there's another class with same time range and same student.
   const matchSchedule = classes?.find(cls => {
                 return (
                    cls.starts === time.starts &&
@@ -169,7 +169,7 @@ export default function ModalClass() {
         <div className="flex justify-end">
           <button
             className="hover:cursor-pointer"
-            onClick={handleClickModal}>
+            onClick={() => {handleClickModal(), setExpanded(false)}}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
               viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
               className="w-8 h-8">
@@ -179,7 +179,7 @@ export default function ModalClass() {
         </div>
       </div>
 
-      <form className="w-90 h-60 mx-auto"
+      <form className="w-90 mx-auto"
             onSubmit={handleSubmit}>
         <div className="w-85 mx-auto">
           <div className="h-15">
@@ -230,9 +230,32 @@ export default function ModalClass() {
             <b className="mr-2">Duration: </b>
             <p className="mr-1">{classLength}</p>
           </div>
+
+          <div>
+            <div className="flex mt-4 cursor-pointer"
+                  onClick={() => setExpanded(!expanded)}>
+              <b className="mr-2">Class notes</b>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+                className={`size-6 transition-all duration-300 ${expanded ? "rotate-180" : "rotate-0"}`} >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </div>
+
+            <div className={`overflow-hidden
+                             transition-all
+                             duration-300
+                            ${expanded ? "max-h-96 opacity-100" : "max-h-0 opacity"}
+                             `}>
+              <textarea className=" textarea-base resize-none h-15!
+                                    mb-1! w-11/12! mx-auto 
+                                    block" />
+            </div>
+          </div>
         </div>
 
-        <div className="mt-5 justify-center flex">
+
+
+        <div className=" justify-center flex">
           {/* DELETE CLASS BUTTON */}
             {classModal?.id && (
               <div className="w-6/12 flex justify-center items-center text-center">
