@@ -30,10 +30,17 @@ const SchoolProvider = ({children}) => {
   const [ classModal, setClassModal ] = useState(0);
   //Function to set the class to be shown in the modal.
   const handleClassModal = (classModal) => {
+
+    if(!classModal){
+      setSelStudent([]);
+      return;
+    }
+
     setClassModal(classModal)
 
-    if(classModal)setSelStudent({id: classModal.student_id, name: classModal.student});
-    else setSelStudent([]);
+    setSelStudent({id: classModal.student_id,
+                   name: classModal.student,
+                   class_notes: classModal.class_notes,});
   }
 
 

@@ -110,9 +110,13 @@ export default function ModalClass() {
     //Validate that the selected time range doesn't overlapse with another class.
     const findOverlapse = classes?.some(cls => {
       const checkTime    = cls.starts < time.ends && cls.ends > time.starts;
+      //If the class has different student and different class_id
+      //it won't be possible to schedule the class 
+      //unless it is scheduled on a different day.
       const checkStudent = cls.student_id !== selStudent.id;
+      const checkClass   = cls.id !== classModal?.id;
 
-      if(checkTime && checkStudent){
+      if(checkTime && checkStudent && checkClass){
         //Validate days.
         const checkDay = cls.days?.some(d =>{
 
@@ -127,7 +131,6 @@ export default function ModalClass() {
       return false;
     });
 
-
     if (findOverlapse) {
       toast.error("This time range overlaps with an existing class.");
       return false;
@@ -135,6 +138,24 @@ export default function ModalClass() {
 
     return true;
   }
+
+
+
+  //Set initialClassNotes to validate if it should be send in the POST/PUT request.
+  const [initialClassNotes, setInitialClassNotes] = useState(undefined);
+  //State useful to handle class notes textarea value.
+  const [classNotes, setClassNotes] = useState("")
+
+  //If theres a student loaded in the modal, 
+  //load its class notes into the textarea and initialize initialClassNotes.
+  useEffect(() => {
+
+    if(selStudent){
+      setClassNotes(selStudent.class_notes);
+      setInitialClassNotes(selStudent.class_notes)
+    }
+
+  }, [ selStudent]);
 
 
 
@@ -147,15 +168,21 @@ export default function ModalClass() {
     if(!validation(formData)) return;
 
     const classId = classModal?.id ?? null;
-    const method  = classId ? "PUT" : "POST"; 
+    const method  = classId ? "PUT" : "POST";
 
-    //Use the states to set the data 
+    //If user didn't modified class_notes, send it as undefined.
+    const sendClassNotes = initialClassNotes !== formData.get("class_notes") 
+                           ? formData.get("class_notes") : undefined;
+
+    //Use the states to set the data
     //which is going to be sent in the request.
-    const data = {id         : classId, 
-                  student_id : selStudent.id,
-                  days_ids   : selectedDays,
-                  starts     : time.starts,
-                  ends       : time.ends, };
+    const data = {id          : classId,
+                  student_id  : selStudent.id,
+                  days_ids    : selectedDays,
+                  starts      : time.starts,
+                  ends        : time.ends,
+                  class_notes : sendClassNotes,
+                };
 
     classMutation.mutate({data, method});
   }
@@ -241,14 +268,14 @@ export default function ModalClass() {
               </svg>
             </div>
 
-            <div className={`overflow-hidden
-                             transition-all
-                             duration-300
-                            ${expanded ? "max-h-96 opacity-100" : "max-h-0 opacity"}
-                             `}>
+            <div className={`overflow-hidden transition-all duration-300
+                            ${expanded ? "max-h-96 opacity-100" : "max-h-0 opacity"}`}>
               <textarea className=" textarea-base resize-none h-15!
                                     mb-1! w-11/12! mx-auto 
-                                    block" />
+                                    block"
+                        name = "class_notes"
+                        value = {classNotes ?? undefined}
+                        onChange = {(e) => setClassNotes(e.target.value)}/>
             </div>
           </div>
         </div>
@@ -258,7 +285,8 @@ export default function ModalClass() {
         <div className=" justify-center flex">
           {/* DELETE CLASS BUTTON */}
             {classModal?.id && (
-              <div className="w-6/12 flex justify-center items-center text-center">
+              <div className="w-6/12 flex justify-center 
+                              items-center text-center">
 
                 {showConfirm === false ? (
                   <button type="button"
