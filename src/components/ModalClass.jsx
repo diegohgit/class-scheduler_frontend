@@ -259,7 +259,7 @@ export default function ModalClass() {
           </div>
 
           <div>
-            <div className="flex mt-4 cursor-pointer"
+            <div className="inline-flex mt-4 cursor-pointer"
                   onClick={() => setExpanded(!expanded)}>
               <b className="mr-2">Class notes</b>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"

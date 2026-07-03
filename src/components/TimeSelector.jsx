@@ -16,7 +16,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
   //State to show the selected time.
   const [selTime, setSelTime] = useState(selHr+':'+selMin);
 
-  const { setTime } = useSchool();
+  const { setTime, expanded, setExpanded } = useSchool();
 
   //Update 'time' state to calculate 'duration' state.
   useEffect(() => {
@@ -87,7 +87,9 @@ export default function TimeSelector({initialTime, auxiliar}) {
       <div  className={`${showHr ? 'opacity-0' : 'opacity-100'}
                        gap-1 flex hover:cursor-pointer
                        transition-opacity duration-300`}
-            onClick={() => setShowHr(1)}
+            onClick={() => {setShowHr(1);
+                            if(expanded) setExpanded(false);
+                            }}
       >
         <p className=" underline underline-offset-2">
           {selTime}
@@ -101,8 +103,9 @@ export default function TimeSelector({initialTime, auxiliar}) {
       <div  ref={divHrRef}
             className={`${showHr ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
                       border-2 border-sky-200 bg-white 
-                      shadow-xl rounded absolute 
-                      w-40 bottom-3 transition-opacity duration-300`}
+                      shadow-xl rounded w-40
+                      absolute z-50 bottom-3
+                      transition-opacity duration-300`}
       >
         {getTittle("Hour")}
         {/*Grid to show hours*/}
@@ -143,7 +146,7 @@ export default function TimeSelector({initialTime, auxiliar}) {
           { Array.from({ length: 12 }).map((value, i) => {
             const every5Min = i*5;
             const minute = every5Min.toString().padStart(2, '0');
-            return  <button 
+            return  <button
                       type="button"
                       key={minute}
                       className={`${ minute === selMin ? 'bg-sky-400' : '' }
