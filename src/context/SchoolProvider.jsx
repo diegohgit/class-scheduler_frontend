@@ -36,11 +36,12 @@ const SchoolProvider = ({children}) => {
       return;
     }
 
-    setClassModal(classModal)
+    setClassModal(classModal);
 
-    setSelStudent({id: classModal.student_id,
-                   name: classModal.student,
-                   class_notes: classModal.class_notes,});
+    setSelStudent({id   : classModal.student_id,
+                   name : classModal.student,
+                   class_notes      : classModal.class_notes,
+                   class_notes_date : classModal.class_notes_date,});
   }
 
 

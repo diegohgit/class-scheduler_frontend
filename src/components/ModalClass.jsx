@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useClasses, useClassMutation } from "../hooks/useClasses";
 import { useEffect, useState } from "react";
 import { days } from "../data/days";
+import dayjs from "dayjs";
 
 export default function ModalClass() {
 
@@ -78,6 +79,7 @@ export default function ModalClass() {
   const classMutation = useClassMutation({
     onSuccess:() => {
         setModal(false);
+        setExpanded(false);
     },
   })
 
@@ -144,18 +146,38 @@ export default function ModalClass() {
   //Set initialClassNotes to validate if it should be send in the POST/PUT request.
   const [initialClassNotes, setInitialClassNotes] = useState(undefined);
   //State useful to handle class notes textarea value.
-  const [classNotes, setClassNotes] = useState("")
+  const [classNotes, setClassNotes] = useState("");
+  //State used to store the result of getLastEntry().
+  const [classNotesDate, setClassNotesDate] = useState("");
 
   //If theres a student loaded in the modal, 
   //load its class notes into the textarea and initialize initialClassNotes.
   useEffect(() => {
 
-    if(selStudent){
+    if(selStudent.class_notes){
       setClassNotes(selStudent.class_notes);
       setInitialClassNotes(selStudent.class_notes)
+
+      setClassNotesDate(getLastEntry(selStudent.class_notes_date));
     }
 
-  }, [ selStudent]);
+  }, [selStudent]);
+
+
+
+  //Calculate when was the last class notes entry.
+  const getLastEntry = (date) => {
+
+    const entryDate = dayjs(date);
+    const today = dayjs();
+
+    //Calculate how many days have passed since the last entry date.
+    const days = today.startOf("day").diff(entryDate.startOf("day"), "day");
+
+    if(days === 0) return "Today";
+    if(days === 1) return "Yesterday";
+    if(days >= 2)  return dayjs(date).format("DD/MMM/YYYY");
+  }
 
 
 
@@ -259,19 +281,25 @@ export default function ModalClass() {
           </div>
 
           <div>
-            <div className="inline-flex mt-4 cursor-pointer"
+            <div className="inline-flex mt-4 cursor-pointer
+                             items-center"
                   onClick={() => setExpanded(!expanded)}>
               <b className="mr-2">Class notes</b>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
-                className={`size-6 transition-all duration-300 ${expanded ? "rotate-180" : "rotate-0"}`} >
+                className={`size-6 transition-all duration-300
+                            mt-1
+                            ${expanded ? "rotate-180" : "rotate-0"}`} >
                 <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </svg>
+              { classNotesDate &&
+                  <span className="italic ml-3 text-gray-600">Last entry: {classNotesDate}</span>
+              }
             </div>
 
             <div className={`overflow-hidden transition-all duration-300
                             ${expanded ? "max-h-96 opacity-100" : "max-h-0 opacity"}`}>
               <textarea className=" textarea-base resize-none h-15!
-                                    mb-1! w-11/12! mx-auto 
+                                    mb-1! w-11/12! mx-auto
                                     block"
                         name = "class_notes"
                         value = {classNotes ?? undefined}
