@@ -10,7 +10,7 @@ export default function StudentList() {
   const navigate = useNavigate();
   const { filterStudents } = useSchool();
   //State to manage the searches
-  const [ filter, setFilter ] =useState([]);
+  const [ filter, setFilter ] = useState([]);
 
 
   //Get students using useStudents()
@@ -72,7 +72,7 @@ export default function StudentList() {
         progressPending = {isLoading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
-        data    = {filter?.sort((a, b) => a.name.localeCompare(b.name))}
+        data    = {filter?.sort((a, b) => a.name?.localeCompare(b.name))}
         pagination
         paginationPerPage = {10}
         onRowClicked      = {(row, e) => {
