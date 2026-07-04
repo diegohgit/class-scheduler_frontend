@@ -5,6 +5,7 @@ import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
 import { useChapterMutation, useSectionMutation } from "../hooks/useContent";
+import dayjs from "dayjs";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -246,8 +247,8 @@ export default function Accordion({mode, chapter, sections}) {
               {/* SEEN DATE */}
               {mode === "student" && section.seenDate && (
                 <span className="ml-auto text-sm italic
-                                 text-gray-600"
-                >Seen on {section.seenDate}</span>
+                                text-gray-600"
+                >Seen on {dayjs(section.seenDate).format("DD/MMM/YYYY")}</span>
                 )
               }
             </div>

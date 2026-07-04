@@ -2,7 +2,6 @@ import Accordion from "../components/Accordion";
 import useSchool from "../hooks/useSchool";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import dayjs from "dayjs";
 import { useContent, useStudentProgress } from "../hooks/useContent";
 
 export default function StudentProgress() {
@@ -28,12 +27,12 @@ export default function StudentProgress() {
   const progress = chapters.map( (chapter) => ({
     ...chapter,
     section: chapter.section.map( (section) => {
+
       const sp = studentProgress.find(
         (sp) => sp.section_id === section.id
       );
 
-      //const seenAt = studentProgress[section.id] ?? null;
-      const seenDate = sp ? dayjs(sp.seen_date).format("DD/MMM/YYYY") : null;
+      const seenDate = sp?.seen_date ?? null;
 
       //Return a new section object that includes the "seenDate" property.
       return { ...section, seenDate, };
