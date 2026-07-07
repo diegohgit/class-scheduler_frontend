@@ -80,6 +80,7 @@ export default function ModalClass() {
     onSuccess:() => {
         setModal(false);
         setExpanded(false);
+        handleClickModal();
     },
   })
 

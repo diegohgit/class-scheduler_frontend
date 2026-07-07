@@ -17,7 +17,7 @@ const SchoolProvider = ({children}) => {
 
 
   //State to show/hide the modal.
-  const [ modal, setModal ] = useState(0);
+  const [ modal, setModal ] = useState(null);
 
   //Function to show/hide the modal.
   const handleClickModal = () => {
@@ -27,11 +27,12 @@ const SchoolProvider = ({children}) => {
 
 
   //State to store the class to be shown in the modal.
-  const [ classModal, setClassModal ] = useState(0);
+  const [ classModal, setClassModal ] = useState([]);
   //Function to set the class to be shown in the modal.
   const handleClassModal = (classModal) => {
 
     if(!classModal){
+      setClassModal([]);
       setSelStudent([]);
       return;
     }
