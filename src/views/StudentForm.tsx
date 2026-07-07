@@ -44,7 +44,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
       name:      "",
       birthdate: initialValues?.birthdate ?? "",
       level_id:  "1",
-      homework:  null,
+      class_notes:  null,
       //Parse color to string because in the radio inputs this 
       //field must be a string so the selection can be shown
       color_id:  defaultColor.toString(),
@@ -81,7 +81,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
 
 
-  const { useChangesProtection, setShouldNavigate, validDate } = useSchool();
+  const { useChangesProtection, setShouldNavigate, validDate,
+          getFormattedDate } = useSchool();
 
   //Handle form changes
   useChangesProtection(isDirty);
@@ -230,12 +231,23 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             </div>
 
             <div className={`${mode === "create" ? "hidden" : ""}`}>
-              <p className="font-bold">Homework:</p>
+
+              <div className="flex">
+                <span className="font-bold">Class notes:</span>
+
+                {initialValues?.class_notes_date && 
+                  <div>
+                    <span className="italic ml-4">(Last entry: </span>
+                    <span className="italic">{ getFormattedDate(initialValues?.class_notes_date)} )</span>
+                  </div>
+                }
+              </div>
+
               <textarea 
-                {...register("homework")}
-                className="textarea-base"
-                name="homework"
-                id="homework"
+                {...register("class_notes")}
+                className="textarea-base resize-none"
+                name="class_notes"
+                id="class_notes"
               ></textarea>
             </div>
 
@@ -318,7 +330,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               </div>
               <textarea 
                 {...register("progress")}
-                className="textarea-base" 
+                className="textarea-base resize-none"
                 name="progress" 
                 id="progress"
                 placeholder="Write something about this student's level (optional)."
