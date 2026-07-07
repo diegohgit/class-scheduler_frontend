@@ -226,6 +226,22 @@ const SchoolProvider = ({children}) => {
 
 
 
+  //Calculate when was the last class notes entry.
+  const getFormattedDate = (date) => {
+
+    const entryDate = dayjs(date);
+    const today = dayjs();
+
+    //Calculate how many days have passed since the last entry date.
+    const days = today.startOf("day").diff(entryDate.startOf("day"), "day");
+
+    if(days === 0) return "Today";
+    if(days === 1) return "Yesterday";
+    if(days >= 2)  return dayjs(date).format("DD/MMM/YYYY");
+  }
+
+
+
   return (
     <SchoolContext.Provider 
       value = {{
@@ -252,6 +268,7 @@ const SchoolProvider = ({children}) => {
         selSection, setSelSection,
         validDate, setValidDate,
         shouldNavigate, setShouldNavigate,
+        getFormattedDate,
       }}
 
     >{children}

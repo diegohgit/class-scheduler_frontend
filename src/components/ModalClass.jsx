@@ -5,13 +5,13 @@ import { toast } from "react-toastify";
 import { useClasses, useClassMutation } from "../hooks/useClasses";
 import { useEffect, useState } from "react";
 import { days } from "../data/days";
-import dayjs from "dayjs";
 
 export default function ModalClass() {
 
   const { time, classLength, selStudent,
           selDay, setModal, handleClickModal,
-          classModal, expanded, setExpanded} = useSchool();
+          classModal, expanded, setExpanded, 
+          getFormattedDate, } = useSchool();
 
   //State to define if the delete confirmation options will be shown.
   const [ showConfirm, setShowConfirm ] = useState(false);
@@ -159,26 +159,10 @@ export default function ModalClass() {
       setClassNotes(selStudent.class_notes);
       setInitialClassNotes(selStudent.class_notes)
 
-      setClassNotesDate(getLastEntry(selStudent.class_notes_date));
+      setClassNotesDate(getFormattedDate(selStudent.class_notes_date));
     }
 
   }, [selStudent]);
-
-
-
-  //Calculate when was the last class notes entry.
-  const getLastEntry = (date) => {
-
-    const entryDate = dayjs(date);
-    const today = dayjs();
-
-    //Calculate how many days have passed since the last entry date.
-    const days = today.startOf("day").diff(entryDate.startOf("day"), "day");
-
-    if(days === 0) return "Today";
-    if(days === 1) return "Yesterday";
-    if(days >= 2)  return dayjs(date).format("DD/MMM/YYYY");
-  }
 
 
 
