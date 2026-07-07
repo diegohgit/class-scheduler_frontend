@@ -66,22 +66,40 @@ export const useClassMutation = (options = {}) => {
           //Prevent errors when the cache doesn't contain any data yet.
           if(!old) return old;
 
-          //****** POST ******
-          if(method === "POST"){
+        //****** POST/PUT ******
+          if(method === "POST" || method === "PUT"){
 
-            return [...old, resClass];
+            //Modify class notes info in student's local cache data.
+            queryClient.setQueryData(["students"], (old) =>{
+              if(!old) return old;
 
-          //****** PUT ******
-          }else if(method === "PUT"){
-            
-            return old.map((c) => c.id === resClass.id ? resClass : c);
+              return [...old].map((stu) => stu.id === resClass.student_id
+                    ? { ...stu,
+                        class_notes      : resClass.class_notes,
+                        class_notes_date : resClass.class_notes_date,}
+                    : stu
+              );
+            });
 
-          //****** DELETE ******
-          }else if(method === "DELETE"){
+            //If method is POST, add class to list of classes.
+            //If method is PUT, replace the old class with the new one.
+            const newClasses = method === "POST" 
+                             ? [...old, resClass]
+                             : old.map((c) => c.id === resClass.id ? resClass : c);
+
+            //Replace old class notes data with the new information
+            //in everey class of the selected student.
+            return newClasses?.map((c) => c.student_id === resClass.student_id 
+                                  ? {...c, class_notes      : resClass.class_notes,
+                                           class_notes_date : resClass.class_notes_date}
+                                  : c);
+          }
+
+        //****** DELETE ******
+          if(method === "DELETE"){
 
             return old.filter((c) => c.id !== resClass.id);
           }
-
         });
       }
       options?.onSuccess(response?.success);
