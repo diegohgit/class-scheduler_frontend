@@ -5,7 +5,6 @@ import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
 import { useChapterMutation, useSectionMutation } from "../hooks/useContent";
-import dayjs from "dayjs";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -13,7 +12,7 @@ export default function Accordion({mode, chapter, sections}) {
   const [ loadingMsg, setLoadingMsg ] = useState("");
 
   const { handleModalChapter, setSelChapter, setSelSection,
-          handleModalSection } = useSchool();
+          handleModalSection, getFormattedDate, } = useSchool();
 
   const { id } = useParams();
 
@@ -145,6 +144,18 @@ export default function Accordion({mode, chapter, sections}) {
 
 
 
+  //Get seen label with the formatted date.
+  const getSeenLabel = (date) => {
+    const formattedDate = getFormattedDate(date);
+
+    const label = formattedDate.includes("/") ? `Seen on ${formattedDate}` 
+                                              : `Seen ${formattedDate}`;
+
+    return label;
+  }
+
+
+
   return (
     <>
       {markMutation.isPending    && <LoadingMessage text={loadingMsg}/>}
@@ -248,7 +259,7 @@ export default function Accordion({mode, chapter, sections}) {
               {mode === "student" && section.seenDate && (
                 <span className="ml-auto text-sm italic
                                 text-gray-600"
-                >Seen on {dayjs(section.seenDate).format("DD/MMM/YYYY")}</span>
+                >{getSeenLabel(section.seenDate)}</span>
                 )
               }
             </div>
