@@ -69,7 +69,7 @@ export const useClassMutation = (options = {}) => {
         //****** POST/PUT ******
           if(method === "POST" || method === "PUT"){
 
-            //Modify class notes info in student's local cache data.
+            //Modify class notes info in student list local cache data.
             queryClient.setQueryData(["students"], (old) =>{
               if(!old) return old;
 
@@ -80,6 +80,16 @@ export const useClassMutation = (options = {}) => {
                     : stu
               );
             });
+
+            //Modify class notes info in local cache data of selected student.
+            queryClient.setQueryData(["student", String(resClass.student_id)], (old) => {
+              //In case the student doesn't exist in the cache, in won't do anything.
+              if(!old) return old;
+
+              return {...old, class_notes      : resClass.class_notes,
+                              class_notes_date : resClass.class_notes_date,}
+              }
+            );
 
             //If method is POST, add class to list of classes.
             //If method is PUT, replace the old class with the new one.
