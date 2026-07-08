@@ -14,6 +14,7 @@ const getStudents = async (id) => {
 }
 
 
+
 //Use query function to fetch students.
 export const useStudents = () => {
 
@@ -24,6 +25,7 @@ export const useStudents = () => {
                     retry: false,
                   });
 }
+
 
 
 //Use query function to fetch a single student.
@@ -39,7 +41,7 @@ export const useStudent = (id) => {
 
 
 
-//Async function to send chapter/section mutation requests.
+//Async function to send student mutation requests.
 const handleRequest = async({data, method}) => {
 
   const id   = data?.id ?? null;
@@ -91,14 +93,33 @@ export const useStudentMutation = (options = {}) => {
           }else if(method === "PUT"){
 
             //Modify student local cache data.
-            queryClient.setQueryData(["student", String(resStudent.id)], resStudent);
+            queryClient.setQueryData(["student", String(resStudent.id)], (old) => {
+              if(!old) return old;
+
+              return resStudent;
+            });
+
+            //Modify student's info on its classes.
+            queryClient.setQueryData(["classes"], (old) => {
+              if(!old) return old;
+
+               return old?.map((c) => c.student_id === resStudent.id
+                                  ? {...c,  student_id : resStudent.id,
+                                            student    : resStudent.name,
+                                            color      : resStudent.color.name,
+                                            class_notes      : resStudent.class_notes,
+                                            class_notes_date : resStudent.class_notes_date}
+                                  : c);
+            });
 
             //Update list.
             return [...old].map((stu) => stu.id === resStudent.id 
                                     ? {...stu,
-                                       id:    resStudent.id,
-                                       name:  resStudent.name,
-                                       level: resStudent.level.name,
+                                       id    : resStudent.id,
+                                       name  : resStudent.name,
+                                       level : resStudent.level.name,
+                                       class_notes      : resStudent.class_notes,
+                                       class_notes_date : resStudent.class_notes_date,
                                       }
                                     : stu
                             ).sort((a, b) => a.name.localeCompare(b.name));
@@ -124,4 +145,3 @@ export const useStudentMutation = (options = {}) => {
     }
   });
 }
-
