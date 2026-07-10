@@ -314,37 +314,6 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               }
             </div >
 
-            <div className={mode === "edit" ? "block" : "hidden"}>
-              <p className="font-bold mb-1">Student's classes:</p>
-              <div className="flex mb-4">
-                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2 
-                        text-center rounded hover:cursor-pointer hover:bg-blue-200">
-                  <p className="text-center font-bold text-transform: uppercase
-                    mt-4">
-                    TUE
-                  </p>
-                  <p>10:00</p>
-                </div>
-                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
-                        text-center rounded hover:cursor-pointer hover:bg-blue-200">
-                  <p className="text-center font-bold text-transform:uppercase
-                    mt-4">
-                    THU
-                  </p>
-                  <p>11:00</p>
-                </div>
-                <div className="w-30 h-20 bg-gray-100 pt-1 mr-2
-                                text-center rounded hover:cursor-pointer 
-                              hover:bg-blue-200">
-                  <p className="text-center font-bold text-transform:uppercase
-                    mt-4">
-                    FRI
-                  </p>
-                  <p>11:00</p>
-                </div>
-              </div>
-            </div>
-
             <div className="mb-10">
               <div className="flex">
                 <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
