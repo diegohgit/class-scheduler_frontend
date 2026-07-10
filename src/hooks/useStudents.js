@@ -10,7 +10,7 @@ const getStudents = async (id) => {
   const { success, response,  } = await request("GET", url);
 
   if(!success) throw new Error("Failed to fetch students");
-  return response.data.data;
+  return response.data;
 }
 
 

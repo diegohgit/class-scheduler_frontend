@@ -11,12 +11,12 @@ import LoadingMessage from "../components/LoadingMessage";
 
 type Props = {
   initialValues?: Student | undefined;
-  mode: "create" | "edit";
+  mode : "create" | "edit";
   //onSubmit is a function that receives a Student object 
   //and returns a Promise that resolves to nothing.
   //its a promise because our parent function is async
-  onSubmit: (data: Student | any, method: String) => Promise<any>;
-  isPending: boolean
+  onSubmit  : (data: Student | any, method: String) => Promise<any>;
+  isPending : boolean
 }
 
 
@@ -41,14 +41,14 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     formState: { isDirty },
   } = useForm<Student>({
     defaultValues: {
-      name:      "",
-      birthdate: initialValues?.birthdate ?? "",
-      level_id:  "1",
-      class_notes:  null,
+      name        : "",
+      birthdate   : initialValues?.birthdate ?? "",
+      level_id    : "1",
+      class_notes : null,
       //Parse color to string because in the radio inputs this 
       //field must be a string so the selection can be shown
-      color_id:  defaultColor.toString(),
-      progress:  null
+      color_id : defaultColor.toString(),
+      progress : null
     }
   })
 
@@ -61,12 +61,12 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   const normalizeFromBackend = (data: any) => ({
     ...data,
     birthdate: data?.birthdate ?? "",
-    homework:  data?.homework  ?? "",
+    email:     data?.email ?? "",
     progress:  data?.progress  ?? "",
     //Color_id and level_id come from Backend as integer so we must switch it to string
     //so it can be seen in the colors list.
-    color_id:     data?.color?.id != null ? String(data.color?.id) : "",
-    level_id:     data?.level?.id != null ? String(data.level?.id) : "",
+    color_id: data?.color?.id != null ? String(data.color?.id) : "",
+    level_id: data?.level?.id != null ? String(data.level?.id) : "",
   })
 
 
@@ -103,11 +103,11 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
           isLoading,
           isError,
         } = useQuery({
-          queryKey: ["colors"],
-          queryFn: fetchColors,
-          staleTime: Infinity,
-          gcTime:    1000 * 60 * 90,//1hr 30min
-          retry: false,
+          queryKey  : ["colors"],
+          queryFn   : fetchColors,
+          staleTime : Infinity,
+          gcTime    : 1000 * 60 * 90,//1hr 30min
+          retry     : false,
         });
 
 
@@ -117,6 +117,17 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
     if(watch("name") === ""){
       toast.error("Name is required");
+      return false;
+    }
+
+    //Regex to validate that the e-mail contains an identifier, 
+    //an @ symbol, a domain name, a dot (.), 
+    //and a domain extension, with no spaces anywhere.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const watchEmail = watch('email') ?? "";
+
+    if(watchEmail && !emailRegex.test(watchEmail)){
+      toast.error("The email field must be a valid email address.");
       return false;
     }
 
@@ -133,11 +144,11 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   //Normalize data so it can be processed by backend.
   const normalizeToBackend = (data: any) => ({
     ...data,
-    birthdate: data?.birthdate ? data.birthdate: null,
-    homework:  data?.homework || null,
-    progress:  data?.progress || null,
-    level_id:  Number(data?.level_id),
-    color_id:  Number(data?.color_id),
+    birthdate : data?.birthdate ? data.birthdate: null,
+    email     : data?.email || null,
+    progress  : data?.progress || null,
+    level_id  : Number(data?.level_id),
+    color_id  : Number(data?.color_id),
   });
 
 
@@ -159,7 +170,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
       //navigate() can't be used here because isDirty isn't updated yet.
       reset();
       setShouldNavigate(true);
-    }    
+    }
   }
 
 
@@ -186,13 +197,32 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PUT"))}
             className="w-8/12"
           >
-            <div className=" mb-4">
+            <div className="mb-4">
               <p className="font-bold mb-1">Name:</p>
               <input
                 {...register("name")}
                 className="input-base"
                 placeholder="Student's name"
               />
+            </div>
+
+            <div className="flex mb-4">
+              <div className="w-1/2 mb-6">
+                <p className="font-bold mb-1">Phone:</p>
+                <input
+                  {...register("phone")}
+                  className="input-base w-10/12!"
+                  placeholder="Phone number (optional)"
+                />
+              </div>
+              <div className="w-1/2 mb-6">
+                <p className="font-bold mb-1">E-mail:</p>
+                <input
+                  {...register("email")}
+                  className="input-base w-10/12!"
+                  placeholder="(Optional)"
+                />
+              </div>
             </div>
 
             <div className="flex">
