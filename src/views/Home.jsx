@@ -14,7 +14,8 @@ Modal.setAppElement('#root')
 export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
-          handleClassModal, expanded, setExpanded } = useSchool();
+          handleClassModal, expanded, setExpanded,
+          getDuration } = useSchool();
 
   const [ searchStudent, setSearchStudent ] = useState(0);
 
@@ -37,32 +38,14 @@ export default function Home() {
 
 
 
-  //function to calculate the space before each class
-  const spaceBeforeClass = (startMinute) => {
-    const classHeightBC = startMinute <= 5  ? 'h-2' :
-                          startMinute <= 10 ? 'h-4' :
-                          startMinute <= 20 ? 'h-8' :
-                          startMinute <= 30 ? 'h-10' :
-                          startMinute <= 40 ? 'h-12' :
-                          startMinute <= 50 ? 'h-16' :
-                          startMinute <= 55 ? 'h-18' :
-                          '';
+  //Calculate height for a class or empty space.
+  const getHeight = (durationMins, currentMinute) => {
 
-    return classHeightBC;
-  }
+    const spaceMinutes = currentMinute ? durationMins - currentMinute : durationMins;
 
-  //function to calculate tlhe space after each class
-  const spaceAfterClass = (endingMinute) => {
-    const classHeightAC = endingMinute <= 5  ? 'h-18' :
-                          endingMinute <= 10 ? 'h-16' :
-                          endingMinute <= 20 ? 'h-12' :
-                          endingMinute <= 30 ? 'h-10' :
-                          endingMinute <= 40 ? 'h-8' :
-                          endingMinute <= 50 ? 'h-4' :
-                          endingMinute <= 55 ? 'h-2' :
-                          '';
+    const classHeight = (Number(spaceMinutes)/60) * 100; 
 
-    return classHeightAC;
+    return classHeight.toFixed(2);
   }
 
 
@@ -140,40 +123,45 @@ export default function Home() {
                         );
                       });
 
-                //let classHeight = match ? match.height : 'h-20';
-                let classHeight = 'h-20';
-
-                const isHighLighted = match && searchStudent == match.student_id ? 1 : 0;
+                let classHeight = 100;
 
                 // If we have a match, we activate matchActive
                 // and get the matchEnds from the class.
                 if(match){
                   matchActive = 1;
-                  matchEnds	= match.ends;
+                  matchEnds	  = match.ends;
+
+                  const classDuration = getDuration({starts: match.starts, ends: match.ends});
+                  const totalClassMinutes = classDuration.$ms / 60000;//Convert miliseconds to minutes.
+
+                  classHeight = getHeight(totalClassMinutes);
+
                 }else{
                   // Check if we should print an empty class
                   print = matchActive == 0 && minute == 0 ? 1 : 0;
                 }
 
+
+
                 // DEFINING CLASS-ENDS
                 if(matchActive){
-                  let [h, m] = matchEnds.split(':').map(Number);
 
-                  //Define when we are at the classEnds point
-                  const nextClassMin  = String(m).padStart(2, '0');
-                  const classEnds = h +':'+ nextClassMin === hour +':'+ minute ? 1 : 0
+                  //Format current time in a '09:00' format.
+                  const currentTime = String(hour).padStart(2, '0') + ':' + minute;
+
+                  const classEnds = matchEnds === currentTime;
 
                   if(classEnds) {
-                    // Deactivate matchActive and activate print
+                    //Deactivate matchActive and activate print.
                     print = 1;
                     matchActive = 0;
 
-                    // DEFINING HEIGHT OF EMPTY CLASS
-                    // (BEFORE THE START OF THE NEXT CLASS)
+                    //DEFINING HEIGHT OF EMPTY CLASS
+                    //(BEFORE THE START OF THE NEXT CLASS)
                     if(minute != '00'){
-                      classHeight = spaceAfterClass(nextClassMin);										
+                      classHeight = getHeight(60, minute);
                     }
-                  
+
                   //If we reach the column limit, reset 
                   // print and matchActive values
                   }else if(hour +':'+ minute === endOfDay){
@@ -182,33 +170,39 @@ export default function Home() {
                   }
                 }
 
+
+
                 //RENDER AN EMPTY CLASS
                 if(print && matchActive == 0){
                   //DEFINING HEIGHT OF EMPTY CLASS
                   //(BEFORE THE START OF THE NEXT CLASS)
-                  //Search for the next class getting just the hour part of "starts"
-                  //and compare if it matches with the current hour
-                  //Example: if we are in the 08:10 block, we look for a class in the 
-                  // same hour range, like 08:30
-
+                  //Search for the next class that matches with the current hour
+                  //and is more than a minute later than the current minute.
+                  //Example: If we are in the 08:10 block, we look for a class in the 
+                  //         same hour range, like 08:30, 8:45...
                   const nextClass = classes?.find(cls => {
                                       const nextStartHr = Number(cls.starts?.split(':')[0]);
+                                      const nextStartMn = Number(cls.starts?.split(':')[1]);
 
                                       return (
                                         nextStartHr === hour &&
+                                        nextStartMn > minute &&
                                         cls.days?.some((d) => d.id === day.id));
-                                    })
+                                    });
 
                   if(nextClass){
-                    const startMinute = nextClass?.starts?.split(':')[1];
 
-                    classHeight = spaceBeforeClass(startMinute);
+                    const nextClassStartMin = nextClass?.starts?.split(':')[1];
+                    classHeight = getHeight(nextClassStartMin, minute);
 
                     //Store the minute when the next class starts
-                    nextClassMin = startMinute;
+                    nextClassMin = nextClassStartMin;
                   }else{nextClassMin = '';}//Clean nextClassMin
                 }
 
+
+
+                //Render a space
                 if(match || print){
                   const emptyClassEnd = nextClassMin != '' ? nextClassMin : null;
                   const currTime = hour.toString().padStart(2, '0')+':'+minute
@@ -219,13 +213,11 @@ export default function Home() {
                       hour   = { hour }
                       day    = { day }
                       match  = { match }
-                      isHighLighted = { isHighLighted }
                       classHeight   = { classHeight }
                       onClick = {() => {
                         handleClickModal();
                         handleSetTime({day, currTime, emptyClassEnd, match});
                         handleClassModal(match);
-                        //handleSetSearch({match})
                       }}
                     />
                   )

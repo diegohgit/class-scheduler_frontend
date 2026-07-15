@@ -1,50 +1,44 @@
-export default function Class({onClick, minute, hour, day, isHighLighted, match, classHeight}) {
+export default function Class({onClick, minute, hour, day, match, classHeight}) {
 
-  //Formato para mostrar label cuando un cuadro está vacío
-  const dayLabel 		  = day.label.slice(0,3);
-  const color 		    = match ? match.color : '#d1d5db';
-  const hiddenStudent = match ? '' : 'hidden'
-  const student 	= match ? match.student : '';
-  const matchEnds = match ? ' - '+match.ends : '';
+  //Format day label to show it in empty spaces.
+  const dayLabel 	= match ?? day?.label?.slice(0,3);
+  const matchEnds = match ? ` - ${match.ends}` : '';
+  const color 		= match?.color   ?? '#d1d5db';
+  const student 	= match?.student ?? '';
 
-  //Get the numeric value of the class height
-  const heightValue = Number(classHeight.replace('h-', ''));
-  
-  let hiddenDay = '';
-  let hiddenHr  = '';
+  const showDay  = classHeight > 20 && !match ? true : false;
+  const showTime = match ? (classHeight > 50 ? true : false) 
+                         : (classHeight > 20 ? true : false);
 
-  if (!match && heightValue < 9) {
-    hiddenDay = hiddenHr = 'hidden';
-  } else if (match) {
-    hiddenDay = 'hidden';
-  }
+  const startTime = match ? match.starts : hour+":"+minute;
 
-
-  const borderHiglited = isHighLighted ? 'border-2 border-green-300' : '';
-
-  const timeShow = match ? match.starts : hour+":"+minute;
   return (
     <>
-      <div style = {{backgroundColor:color}}
-           className={`
-               ${classHeight}
-               ${borderHiglited}
-              text-center
-              align-middle border-t border-dashed
-              hover:cursor-pointer hover:bg-blue-200`}
-        onClick={onClick}>
-        <div className={`${hiddenStudent}h-12`}>
-          <p className={`${hiddenStudent} 
-                        mx-auto w-11/12 text-sm 
-                        text-center leading-none line-clamp-3`}>
-            {student}
-          </p>
-        </div>
+      <div  style = {{backgroundColor:color,
+                      height: classHeight+'px'}}
+            className=" block text-center align-middle
+                        border-t border-dashed
+                        hover:cursor-pointer hover:bg-blue-200"
+            onClick={onClick}>
 
-        <p className={`${hiddenDay} font-bold leading-none text-transform: uppercase`}>
-          {dayLabel}
-        </p>
-        <p className={`${hiddenHr} text-sm `}>{timeShow}{matchEnds}</p>
+        { match ? (
+            <div className = "h-8/12">
+              <span className = "h-full flex mx-1 text-sm items-center justify-center text-center">
+                {student}
+              </span>
+            </div>
+          ) : (
+            showDay &&
+            <span className="mr-1 font-bold leading-none text-transform:uppercase">
+              {dayLabel}
+            </span>
+          )
+        }
+        { showTime &&
+          <span className="text-sm mb-2">
+            {startTime}{matchEnds}
+          </span>
+        }
       </div>
     </>
   )

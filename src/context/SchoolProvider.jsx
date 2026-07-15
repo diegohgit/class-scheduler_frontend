@@ -95,24 +95,29 @@ const SchoolProvider = ({children}) => {
     let end   = dayjs(`${baseDate} ${time.ends}`);
 
     //In case we were working with a start hour in one day
-    //and end hour in the next day.
-    if(end.isBefore(start)){
-      end = end.add(1, "day");
-    }
+    //and end hour to the next day.
+    // if(end.isBefore(start)){ end = end.add(1, "day"); }
 
-    //Get total minutes and hours
-    const diff   = dayjs.duration(end.diff(start));
+    //Return total minutes and hours
+    return dayjs.duration(end.diff(start));
+  }
+
+
+
+  //Get time in a '24Hr 50min' format.
+  const getFormatedDuration = (time) => {
+
+    const diff = getDuration(time);
+
     const totalH = diff.hours()   ? diff.hours()+'hr' : '';
     const totalM = diff.minutes() ? diff.minutes()+'min' : '';
 
     setClassLength(totalH+' '+totalM);
   }
 
-
-
   //Calculate class duration
   useEffect(() => {
-    getDuration(time);
+    getFormatedDuration(time);
   }, [time])
 
 
