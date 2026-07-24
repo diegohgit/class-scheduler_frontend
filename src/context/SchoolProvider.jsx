@@ -53,29 +53,30 @@ const SchoolProvider = ({children}) => {
 
 
   //Function to set the time parameters to be displayed on the modal.
-  const handleSetTime = ({day, currTime, emptyClassEnd, match}) => {
+  const handleSetTime = ({day, currentTime, finalSpaceMin, matchData}) => {
 
     setSelDay(day);
 
-    if(!match){
-      //Get the hour part from currTime to calculate nextHour
-      const currHour = currTime.split(':')[0];
+    if(!matchData){
+      //Get the hour part from currentTime to calculate nextHour
+      const currHour = currentTime.split(':')[0];
       const nextHour = parseInt(currHour) + 1;
       
       const formatCurrHr = currHour.toString().padStart(2, '0');
       const formatNextHr = nextHour.toString().padStart(2, '0');
 
-      /*  If emptyClassEnd has value, is because there is a class 
+      /*  If finalSpaceMin has value, is because there is a class 
           in the current hour, so 'ends' will be the start of the next class.
-          Else emptyClassEnd has no value is because there's no class
+          Else finalSpaceMin has no value is because there's no class
           in the current hour block, so 'ends' will be the nextHour + ':00'.
       */
-      const ends = emptyClassEnd ? formatCurrHr + ':' +emptyClassEnd 
-                                  :formatNextHr + ':00';
+      const ends = finalSpaceMin ? formatCurrHr + ':' +finalSpaceMin 
+                                 : formatNextHr + ':00';
 
-      setTime({"starts":currTime, "ends": ends});
+      setTime({"starts":currentTime, "ends": ends});
     }else{
-      setTime({"starts":match.starts, "ends": match.ends});
+
+      setTime({"starts":matchData.starts, "ends": matchData.ends});
     }
   }
 

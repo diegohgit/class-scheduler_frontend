@@ -1,4 +1,4 @@
-export default function Class({onClick, minute, hour, day, match, classHeight}) {
+export default function Class({onClick, minute, hour, day, match, spaceHeight}) {
 
   //Format day label to show it in empty spaces.
   const dayLabel 	= match ?? day?.label?.slice(0,3);
@@ -6,16 +6,17 @@ export default function Class({onClick, minute, hour, day, match, classHeight}) 
   const color 		= match?.color   ?? '#d1d5db';
   const student 	= match?.student ?? '';
 
-  const showDay  = classHeight > 20 && !match ? true : false;
-  const showTime = match ? (classHeight > 50 ? true : false) 
-                         : (classHeight > 20 ? true : false);
+  const showDay  = spaceHeight > 20 && !match;
+  const showTime = match ? spaceHeight > 50 : spaceHeight > 20;
 
   const startTime = match ? match.starts : hour+":"+minute;
+
+
 
   return (
     <>
       <div  style = {{backgroundColor:color,
-                      height: classHeight+'px'}}
+                      height: spaceHeight+'px'}}
             className=" block text-center align-middle
                         border-t border-dashed
                         hover:cursor-pointer hover:bg-blue-200"
