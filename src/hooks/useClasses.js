@@ -97,7 +97,8 @@ export const useClassMutation = (options = {}) => {
                                   ? [...old, resClass]
                                   : old.map((c) => c.id === resClass.id ? resClass : c);
 
-            //Sort classes by "starts"
+            //Sort classes by "starts". This is important because the render algorithm
+            //searches classes by starts order.
             const sortClasses = [...updateClasses
                                   .sort((a, b) => (a.starts > b.starts ? 1 : -1))];
 
