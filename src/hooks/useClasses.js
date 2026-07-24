@@ -93,13 +93,17 @@ export const useClassMutation = (options = {}) => {
 
             //If method is POST, add class to list of classes.
             //If method is PUT, replace the old class with the new one.
-            const newClasses = method === "POST" 
-                             ? [...old, resClass]
-                             : old.map((c) => c.id === resClass.id ? resClass : c);
+            const updateClasses = method === "POST" 
+                                  ? [...old, resClass]
+                                  : old.map((c) => c.id === resClass.id ? resClass : c);
+
+            //Sort classes by "starts"
+            const sortClasses = [...updateClasses
+                                  .sort((a, b) => (a.starts > b.starts ? 1 : -1))];
 
             //Replace old class notes data with the new information
             //in everey class of the selected student.
-            return newClasses?.map((c) => c.student_id === resClass.student_id 
+            return sortClasses?.map((c) => c.student_id === resClass.student_id 
                                   ? {...c, class_notes      : resClass.class_notes,
                                            class_notes_date : resClass.class_notes_date}
                                   : c);
