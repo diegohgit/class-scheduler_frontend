@@ -218,7 +218,7 @@ export default function ModalClass() {
         <div className="w-85 mx-auto">
           <div className="h-15">
             <b>Student:</b>
-            <DivInput info = {selStudent}/>
+            <DivInput/>
           </div>
           <div className="mt-2">
             <b className="mr-2">Days:</b>

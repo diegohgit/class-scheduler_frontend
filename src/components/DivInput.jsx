@@ -5,9 +5,10 @@ import { useStudents } from "../hooks/useStudents";
 //This component is used to display and modify data.
 //When its displaying data the user can click on it
 //and it will switch to an input usefull to search students
-export default function DivInput({info, style = ""}) {
+export default function DivInput() {
 
   const { selStudent, filterStudents, setSelStudent } = useSchool()
+
 
 
   //editInfo state is used to show the search input 
@@ -15,15 +16,16 @@ export default function DivInput({info, style = ""}) {
   const [ editInfo, setEditInfo ] = useState(0)
   const inputRef = useRef(null);
 
+  
 
   //Manage search input's behavior and hide search results list
   useEffect(() => {
     /*Select all text contained in the search input 
        when user wants to edit student
        or focus input If the block selected doesn't have info. */
-    if(editInfo || !info.length) inputRef.current?.select();
+    if(editInfo || !selStudent?.length) inputRef.current?.select();
 
-  }, [editInfo, info]);
+  }, [editInfo, selStudent]);
 
 
 
@@ -33,15 +35,13 @@ export default function DivInput({info, style = ""}) {
   */
   const [showResults, setShowResults] = useState(false);
 
-  useEffect(() => {
-    setSelStudent(info);
-  }, [])
 
 
   //Get students using useStudents()
   const { data:records = [],
           isLoading,
         } = useStudents();
+
 
 
   const [results, setResults] = useState([]);
@@ -63,6 +63,7 @@ export default function DivInput({info, style = ""}) {
     setResults(filterStudents(records, inpValue))
     setShowResults(true);
   }
+
 
 
   //Handle div where the search results are displayed
@@ -95,6 +96,7 @@ export default function DivInput({info, style = ""}) {
   }, [showResults, editInfo])
 
 
+
   return (
     <>
       {/* Display student's name
@@ -103,11 +105,11 @@ export default function DivInput({info, style = ""}) {
            opened an empty block.
       */}
       <div className={`${editInfo || !selStudent?.name ? 'hidden':''} flex hover:cursor-pointer`}
-           onClick={() => setEditInfo(1)}
+           onClick={() => {setEditInfo(1)}}
            title="Click to edit student"
       >
         <p className="underline underline-offset-2 mr-2">
-          {selStudent.name}
+          {selStudent?.name}
         </p>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -117,16 +119,18 @@ export default function DivInput({info, style = ""}) {
       {/* Div container to show/hide search input and list of results */}
       <div ref={divResultsRef}>
         {/* search input */}
+
         <input type="text" 
-            className={`${editInfo || !selStudent?.name ? '':'hidden'} input-base ${style}`}
-            defaultValue={selStudent.name}
+            className={`${editInfo || !selStudent?.name ? '':'hidden'} input-base`}
+            defaultValue={selStudent?.name}
             placeholder="Search for student..."
             ref={inputRef}
             onChange={(e) => handleSearch(e.target.value)}
             />
-        {/* List of results */}
- 
-        
+
+
+
+      {/* List of results */}
       { showResults 
         && <ul className="w-9/10 bg-white absolute 
                           rounded-b-lg border border-sky-300">
@@ -150,13 +154,17 @@ export default function DivInput({info, style = ""}) {
                             - Set search input's value to the selected student
                               in case the user wanted to make another search.
                         */
-                          setSelStudent(result);
+                          setSelStudent({id   : result?.student_id,
+                                         name : result?.first_name 
+                                                +" "+ (result?.last_name ?? ""),
+                                         class_notes      : result?.class_notes,
+                                         class_notes_date : result?.class_notes_date,});
                           setEditInfo(0);
                           setShowResults(false);
-                          inputRef.current.value = result.name;
+                          inputRef.current.value = result?.first_name +" "+ (result?.last_name ?? "");
                         }}
                       >
-                        {result?.name}
+                        {result?.first_name +" "+ (result?.last_name ?? "")}
                       </li>
              })
           }

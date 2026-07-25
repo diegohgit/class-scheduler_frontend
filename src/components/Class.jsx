@@ -1,10 +1,11 @@
 export default function Class({onClick, minute, hour, day, match, spaceHeight}) {
 
   //Format day label to show it in empty spaces.
-  const dayLabel 	= match ?? day?.label?.slice(0,3);
-  const matchEnds = match ? ` - ${match.ends}` : '';
-  const color 		= match?.color   ?? '#d1d5db';
-  const student 	= match?.student ?? '';
+  const dayLabel 	 = match ?? day?.label?.slice(0,3);
+  const matchEnds  = match ? ` - ${match.ends}` : '';
+  const color 		 = match?.color   ?? '#d1d5db';
+  const first_name = match?.first_name ?? '';
+  //const last_name  = match?.last_name ?? '';
 
   const showDay  = spaceHeight > 20 && !match;
   const showTime = match ? spaceHeight > 50 : spaceHeight > 20;
@@ -25,7 +26,7 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
         { match ? (
             <div className = "h-8/12">
               <span className = "h-full flex mx-1 text-sm items-center justify-center text-center">
-                {student}
+                {first_name}
               </span>
             </div>
           ) : (

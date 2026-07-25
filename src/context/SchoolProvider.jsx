@@ -39,10 +39,10 @@ const SchoolProvider = ({children}) => {
 
     setClassModal(classModal);
 
-    setSelStudent({id   : classModal.student_id,
-                   name : classModal.student,
-                   class_notes      : classModal.class_notes,
-                   class_notes_date : classModal.class_notes_date,});
+     setSelStudent({id   : classModal.student_id,
+                    name : classModal.first_name +" "+ (classModal.last_name ?? ""),
+                    class_notes      : classModal.class_notes,
+                    class_notes_date : classModal.class_notes_date,});
   }
 
 
@@ -192,8 +192,9 @@ const SchoolProvider = ({children}) => {
       const studentsName = inpValue.toLowerCase();
 
       const filteredRecords = records.filter(student => { 
-        return student?.name?.toLowerCase().includes(studentsName) ||
-               student?.level?.toLowerCase().includes(studentsName);
+        return student?.first_name?.toLowerCase().includes(studentsName) 
+               || student?.last_name?.toLowerCase().includes(studentsName)  
+               || student?.level?.toLowerCase().includes(studentsName);
       })
       return filteredRecords;
     }
