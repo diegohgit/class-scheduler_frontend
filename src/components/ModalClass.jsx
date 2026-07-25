@@ -1,4 +1,4 @@
-import DivInput from "./DivInput";
+import StudentSelector from "./StudentSelector";
 import TimeSelector from "./TimeSelector";
 import useSchool from "../hooks/useSchool";
 import { toast } from "react-toastify";
@@ -218,7 +218,7 @@ export default function ModalClass() {
         <div className="w-85 mx-auto">
           <div className="h-15">
             <b>Student:</b>
-            <DivInput/>
+            <StudentSelector/>
           </div>
           <div className="mt-2">
             <b className="mr-2">Days:</b>
