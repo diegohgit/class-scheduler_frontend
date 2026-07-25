@@ -38,7 +38,10 @@ export default function StudentList() {
   const columns = [
     {
       name: "Name",
-      selector: row => row.name,
+      selector: row => {//Add a lastName format because if it's null 
+                        //it shows 'null' as last name in the list.
+                        const lastName = row.last_name ?? "";  
+                        return row.first_name+" "+ lastName},
       sortable: true,
     },
     {
@@ -72,7 +75,8 @@ export default function StudentList() {
         progressPending = {isLoading}
         progressComponent = {<p>Loading Students...</p>}
         columns = {columns}
-        data    = {filter?.sort((a, b) => a.name?.localeCompare(b.name))}
+        data    = {filter?.sort((a, b) => a.first_name?.localeCompare(b.first_name)
+                                        ||a.last_name?.localeCompare(b.last_name))}
         pagination
         paginationPerPage = {10}
         onRowClicked      = {(row, e) => {
