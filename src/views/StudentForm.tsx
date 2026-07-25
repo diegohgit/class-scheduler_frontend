@@ -41,7 +41,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     formState: { isDirty },
   } = useForm<Student>({
     defaultValues: {
-      name        : "",
+      first_name  : "",
+      last_name   : "",
       birthdate   : initialValues?.birthdate ?? "",
       level_id    : "1",
       class_notes : null,
@@ -115,8 +116,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   //Validate form data (name and birthdate in this case).
   const validation = (): boolean => {
 
-    if(watch("name") === ""){
-      toast.error("Name is required");
+    if(watch("first_name") === ""){
+      toast.error("First name is required");
       return false;
     }
 
@@ -184,7 +185,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   <>
 
     <h1 className="title-base">
-      {mode === "create" ? "New Student" : watch("name")}
+      {mode === "create" ? "New Student" : watch("first_name")}
     </h1>
 
     {initialValues || mode === "create" ? (
@@ -197,13 +198,23 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PUT"))}
             className="w-8/12"
           >
-            <div className="mb-4">
-              <p className="font-bold mb-1">Name:</p>
-              <input
-                {...register("name")}
-                className="input-base"
-                placeholder="Student's name"
-              />
+            <div className="flex mb-4">
+              <div className="w-1/2 mb-6">
+                <p className="font-bold mb-1">First name:</p>
+                <input
+                  {...register("first_name")}
+                  className="input-base w-10/12!"
+                  placeholder="Student's first name"
+                />
+              </div>
+              <div className="w-1/2 mb-6">
+                <p className="font-bold mb-1">Last name:</p>
+                <input
+                  {...register("last_name")}
+                  className="input-base w-10/12!"
+                  placeholder="(Optional)"
+                />
+              </div>
             </div>
 
             <div className="flex mb-4">

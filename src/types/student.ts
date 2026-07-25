@@ -1,6 +1,7 @@
 export interface Student {
   id:           number;
-  name:         string;
+  first_name:   string;
+  last_name:    string|null;
   phone:        string|null;
   email:        string|null;
   birthdate?:   Date|""|null;
