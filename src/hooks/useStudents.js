@@ -104,10 +104,11 @@ export const useStudentMutation = (options = {}) => {
               if(!old) return old;
 
                return old?.map((c) => c.student_id === resStudent.id
-                                  ? {...c,  student_id : resStudent.id,
-                                            student    : resStudent.name,
-                                            color      : resStudent.color.name,
-                                            class_notes      : resStudent.class_notes,
+                                  ? {...c,  student_id  : resStudent.id,
+                                            first_name  : resStudent.first_name,
+                                            last_name   : resStudent.last_name,
+                                            color       : resStudent.color.name,
+                                            class_notes : resStudent.class_notes,
                                             class_notes_date : resStudent.class_notes_date}
                                   : c);
             });
@@ -115,14 +116,17 @@ export const useStudentMutation = (options = {}) => {
             //Update list.
             return [...old].map((stu) => stu.id === resStudent.id 
                                     ? {...stu,
-                                       id    : resStudent.id,
-                                       name  : resStudent.name,
-                                       level : resStudent.level.name,
-                                       class_notes      : resStudent.class_notes,
-                                       class_notes_date : resStudent.class_notes_date,
+                                        id          : resStudent.id,
+                                        first_name  : resStudent.first_name,
+                                        last_name   : resStudent.last_name,
+                                        level       : resStudent.level.name,
+                                        class_notes : resStudent.class_notes,
+                                        class_notes_date : resStudent.class_notes_date,
                                       }
                                     : stu
-                            ).sort((a, b) => a.name.localeCompare(b.name));
+                            ).sort();
+                            //.sort((a, b) => a.first_name.localeCompare(b.first_name)
+                            //                || (a.last_name ?? '').localeCompare(b.last_name ?? ''));
 
           //****** DELETE ******
           }else if(method === "DELETE"){
