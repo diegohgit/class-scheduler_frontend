@@ -140,7 +140,7 @@ export default function Home() {
                 printMatch        = false;
                 let spaceHeight   = 100;
                 const currentTime = getFormattedTime(hour) + ":" + minute;
-
+                endSpaceMin       = null;//Clean endSpaceMin.
 
 
                 //Use this to log specific parts of the cycle.
@@ -227,7 +227,6 @@ export default function Home() {
                 //- Get spaceHeight.
                 //- Set spaceEnd.
                 if(!isPrinting){
-                  endSpaceMin = null; //Clean endSpaceMin
 
                   if(match && !printMatch){
 
@@ -249,7 +248,7 @@ export default function Home() {
 
                   //Store info in a constant to send the 
                   //correspondent information to other functions.
-                  const finalSpaceMin = endSpaceMin || null;
+                  const finalSpaceMin = endSpaceMin;
                   const matchData = printMatch ? match : null;
 
 
