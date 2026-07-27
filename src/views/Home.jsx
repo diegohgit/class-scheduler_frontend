@@ -86,9 +86,8 @@ export default function Home() {
   let spaceEnd    = null;
   let endSpaceMin = null;
 
-  const hours = [7, 8, 9, 10, 11, 12];
   const blocksPerHr = 12;
-  const endOfDay    = `${getFormattedTime(blocksPerHr)}:55`;
+  const endOfDay    = "00:00";
 
 
 
@@ -98,41 +97,24 @@ export default function Home() {
       {isError   && <p className="text-center mt-40">Couldn't fetch classes.</p>}
 
       {isSuccess && Array.isArray(classes) &&
-      (<div className="mt-15 grid grid-cols-8 gap-2">
-        {/* Fixed time column */}
-        <div className="w-20">
-          <div className="text-center font-semibold bg-gray-300 
-                          rounded">
-            Time
-          </div>
-          {hours.map((hour) =>(
-            <div
-              key={hour}
-              className="text-center h-[100px] font-medium
-                       bg-gray-200 rounded"
-            >
-              {hour}:00
-            </div>
-          ))}
-        </div>
+      (<div className="mx-auto border border-amber-500 w-11/12 mt-15 grid grid-cols-8 gap-2">
 
         {/* Columns for days */}
         {days.map((day) => (
 
-          <div key = {day.id}>
+          <div 
+               key = {day.id}>
             <div className="text-center h-8 font-semibold
                    bg-gray-300 rounded">
               {day.label}
             </div>
 
             {/* Rows for time blocks */}
-            {hours.map((hour) => (
+            {Array.from({length: 24}).map((_, hour) => {
 
               // Create an array
               // 12 blocks (representing each hour) of 5 minutes each one to divide the hour
-              Array.from({ length: blocksPerHr }).map((value, i) => {
-
-
+              return Array.from({ length: blocksPerHr }).map((_, i) => {
 
                 // Calculate the minute for each block (0, 5, 10, ..., 55)
                 const minute = getFormattedTime(i * 5);
@@ -145,7 +127,6 @@ export default function Home() {
 
                 //Use this to log specific parts of the cycle.
                 //if(day.id === 1 && currentTime === "09:15")console.log("spaceEnd", spaceEnd)
-
 
 
                 //SEARCH FOR NEW CLASSES.
@@ -176,13 +157,19 @@ export default function Home() {
 
                   if(!match){
 
-                    if(spaceEnd === currentTime)isPrinting = false;
-                    
-                    // Check if an empty space should be printed.
+                    //If a space was being printed, restart isPrinting.
+                    //OR
+                    //If its the final cycle of the day,, restart isPrinting. 
+                    if(spaceEnd === currentTime || currentTime === endOfDay)
+                    {isPrinting = false;}
+
+                    //If the cycle is in a 'minute = 00' cycle
+                    //&& nothing is being printed
+                    //print an empty space.
                     if(minute === "00" && !isPrinting){
-                      
+
                       isPrinting = print = true;
-                      
+
                       spaceEnd = getFormattedTime(hour + 1) + ":" + minute;
                     }
                   }
@@ -216,9 +203,7 @@ export default function Home() {
                   printMatch = match?.starts === currentTime;
                     
                   spaceEnd = match ? match.starts : getFormattedTime(hour + 1) +":00";
-
-                //If we reach the column limit, reset print values
-                }else if(currentTime === endOfDay) print = isPrinting = false;
+                }
 
 
 
@@ -269,7 +254,7 @@ export default function Home() {
                   )
                 }
               })
-            ))}
+          })}
           </div>
         ))}
       </div>)}

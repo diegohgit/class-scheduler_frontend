@@ -92,8 +92,10 @@ const SchoolProvider = ({children}) => {
     //in order to work with a "yyyy-mm-dd 00:00" format.
     const baseDate = "2026-01-01";
 
+    const timeEnds = time.ends === "00:00" ? "24:00" : time.ends;
+
     let start = dayjs(`${baseDate} ${time.starts}`);
-    let end   = dayjs(`${baseDate} ${time.ends}`);
+    let end   = dayjs(`${baseDate} ${timeEnds}`);
 
     //In case we were working with a start hour in one day
     //and end hour to the next day.

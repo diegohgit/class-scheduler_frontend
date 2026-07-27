@@ -1,13 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import useSchool from "../hooks/useSchool";
 
+
+
 export default function TimeSelector({initialTime, auxiliar}) {
+
+  const { setTime, expanded, setExpanded } = useSchool();
+
+
 
   //States to define if the hour/minute selector will be shown.
   const [showHr, setShowHr]   = useState(0);
   const [showMin, setShowMin] = useState(0);
   //Get hour and minute from the initialTime prop.
   const [h, m] = initialTime.split(':').map(Number);
+
+
 
   //States to handle the selected hour and minute.
   const [selHr,  setSelHr]  = useState(h.toString().padStart(2, '0'));
@@ -16,14 +24,27 @@ export default function TimeSelector({initialTime, auxiliar}) {
   //State to show the selected time.
   const [selTime, setSelTime] = useState(selHr+':'+selMin);
 
-  const { setTime, expanded, setExpanded } = useSchool();
+  //Format selHr so that it doesn't show '24' as an hour
+  useEffect(() => {
+
+    const hr24 = selHr === "24" ? "00" : selHr;
+
+    setSelTime(hr24+":"+selMin)
+
+  },[selHr])
+
+
 
   //Update 'time' state to calculate 'duration' state.
   useEffect(() => {
+
     //Modify only 'starts' or only 'ends' from the time state.
     if(auxiliar === "start")    setTime(prev => ({...prev, 'starts': selTime}));
     else if(auxiliar === "end") setTime(prev => ({...prev, 'ends': selTime}));
+
   }, [selTime, auxiliar]);
+
+
 
   //State to manage the showing/hidding of time selector
   //when user clicks outside of it.
@@ -57,6 +78,8 @@ export default function TimeSelector({initialTime, auxiliar}) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showHr, showMin]);
 
+
+
   //Render the time selector title. Example: "Select Hour"
   const getTittle = (title) => {
     return <div className="relative flex items-center">
@@ -81,6 +104,8 @@ export default function TimeSelector({initialTime, auxiliar}) {
            </div>
   }
 
+
+
   return (
     <>
       {/*Div to show selected time*/}
@@ -98,6 +123,8 @@ export default function TimeSelector({initialTime, auxiliar}) {
           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
         </svg>
       </div>
+
+
 
       {/*Div to show the HOUR selector*/}
       <div  ref={divHrRef}
@@ -133,12 +160,15 @@ export default function TimeSelector({initialTime, auxiliar}) {
         </div>
       </div>
 
+
+
       {/*Div to show the MINUTE selector*/}
       <div  ref={divMinRef}
             className={`${showMin ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} 
                       border-2 border-sky-200 bg-white 
-                      shadow-xl rounded absolute 
-                      w-40 bottom-3 transition-opacity duration-300`}
+                      shadow-xl rounded w-40
+                      absolute z-50 bottom-3
+                      transition-opacity duration-300`}
       >
         {getTittle("Minute")}
         {/*Grid to show minutes*/}
