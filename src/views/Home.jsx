@@ -96,19 +96,33 @@ export default function Home() {
       {isLoading && <LoadingMessage text="Loading Classes..."/>}
       {isError   && <p className="text-center mt-40">Couldn't fetch classes.</p>}
 
+
+
+      {/* Topbar for days */}
+      <div className="w-full fixed mt-18 
+                      h-8 left-1/2 
+                      -translate-x-1/2 -translate-y-1/2 
+                    bg-white/50 backdrop-blur-sm
+                      shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] ">
+
+        <div className="w-[1000px] mx-auto text-center 
+                        grid grid-cols-7 font-bold ">
+           {days.map((day) => (
+              <span key={day.id}>{day.label}</span>)
+            )}
+        </div>
+      </div>
+
+
+
+      {/* Grid starts */}
       {isSuccess && Array.isArray(classes) &&
-      (<div className="mx-auto border border-amber-500 w-11/12 mt-15 grid grid-cols-8 gap-2">
+      (<div className="w-[1000px] mx-auto mt-24
+                       mb-4 grid grid-cols-7">
 
         {/* Columns for days */}
         {days.map((day) => (
-
-          <div 
-               key = {day.id}>
-            <div className="text-center h-8 font-semibold
-                   bg-gray-300 rounded">
-              {day.label}
-            </div>
-
+          <div key = {day.id}>
             {/* Rows for time blocks */}
             {Array.from({length: 24}).map((_, hour) => {
 
@@ -249,12 +263,12 @@ export default function Home() {
                         handleClickModal();
                         handleSetTime({day, currentTime, finalSpaceMin, matchData});
                         handleClassModal(matchData);
-                      }}
+                      }} 
                     />
                   )
                 }
               })
-          })}
+            })}
           </div>
         ))}
       </div>)}

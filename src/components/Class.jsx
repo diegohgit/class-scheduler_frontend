@@ -18,9 +18,9 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
     <>
       <div  style = {{backgroundColor:color,
                       height: spaceHeight+'px'}}
-            className=" block text-center align-middle
-                        border-t border-dashed
-                        hover:cursor-pointer hover:bg-blue-200"
+            className=" w-[140px] text-center
+                        border-t border-r  border-dashed border-white
+                        hover:cursor-pointer hover:bg-blue-200!"
             onClick={onClick}>
 
         { match ? (
