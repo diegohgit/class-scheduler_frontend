@@ -9,12 +9,8 @@ export default function Layout() {
 	<>
 		<div className="h-full">
 			<Topbar/>
-			<main className="md:flex-1 h-screen overflow-y-scroll bg-indigo-10 p-3">
-				{/** Importamos Outlet y agregamos <Outlet />
-				 * para que se puedan importar los children 
-				 * de este componente, los cuales se definieron en 
-				 * el router
-					*/}
+			<main className="md:flex-1 h-screen overflow-y-scroll bg-indigo-10">
+				{/* Show Layout's children using <Outlet />.*/}
 				<Outlet />
 			</main>
 			<ToastContainer />
