@@ -44,38 +44,58 @@ export default function Login() {
     loginMutation.mutate({data, method: "POST"});
   }
 
+
+
   return (
 
     <>
-      <div className=" items-center justify-center grid h-screen ">
-        <div className="w-90 h-80 border rounded-lg  ">
+      <div className="min-h-screen text-white
+                      bg-linear-to-tr from-blue-400 to-indigo-950">
 
-          <form onSubmit={handleSubmit}>
-            <h1 className="title-base">Login</h1>
+        <div className="justify-center grid h-screen ">
 
-            <div className="flex h-20 flex-col ">
-              <span className=" ml-3 font-bold">E-mail:</span>
-              <input type="text"
-                    className="border h-8 rounded-lg mx-3"
-                    name="email"
-              />
-            </div>
+          <div className="h-fit mt-4">
+            <img  src="../img/scheduler_white.png"
+                  alt="logo"
+                  className="w-70 mx-auto"
+            />
+          </div>
 
-            <div className="h-20 flex flex-col">
-              <span className=" ml-3 font-bold">Password:</span>
-              <input type="password"
-                    className="border h-8 rounded-lg mx-3"
-                    name="password"
-              />
+          <div className="w-90 h-80 -translate-y-6
+                          border border-white rounded-lg"
+          >
+            <h1 className="title-base mt-6!">Login</h1>
 
-            </div>
+            <form onSubmit={handleSubmit}
+                  className="font-bold w-11/12 mx-auto">
+
+              <div className="flex h-20 flex-col ">
+                <span>E-mail:</span>
+                <input type="text"
+                       className="input-base font-normal 
+                                 focus:border-cyan-400!"
+                       name="email"
+                />
+              </div>
+
+              <div className="h-16 flex flex-col">
+                <span className=" ml-3 font-bold">Password:</span>
+                <input type="password"
+                       className="input-base font-normal 
+                                 focus:border-cyan-400!"
+                       name="password"
+                />
+              </div>
+
               <button className="button-base block mx-auto!
-                                bg-indigo-400"
+                                border border-white
+                                hover:bg-cyan-400 hover:border-0"
                       type="submit"
               >
-                  Log in
+                Login
               </button>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 

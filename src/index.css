@@ -20,9 +20,13 @@
 
 /* input-base */
 .input-base {
-  @apply 	w-full h-8 border border-gray-300
-          focus:border focus:border-blue-600
-          rounded px-2 mt-2;
+  @apply 	w-full h-8
+          border-t-0
+          border-x-0 
+          border-b-2 
+          border-gray-200 
+          focus:border-blue-500  
+          focus:outline-none transition-colors duration-500
 }
 
 .textarea-base {
