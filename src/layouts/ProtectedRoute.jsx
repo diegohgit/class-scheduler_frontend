@@ -1,6 +1,7 @@
 import { Outlet, Navigate } from "react-router";
 import { useUser } from "../hooks/useAuth";
 import { use, useEffect } from "react";
+import Loading from "./Loading";
 
 export default function ProtectedRoute() {
 
@@ -11,7 +12,7 @@ export default function ProtectedRoute() {
       isError,
   } = useUser();
 
-  if(isLoading) return <div>Loading...</div>;
+  if(isLoading) return <Loading />;
 
 
 
