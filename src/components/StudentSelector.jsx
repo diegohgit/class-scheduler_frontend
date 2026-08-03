@@ -80,11 +80,12 @@ export default function StudentSelector() {
         /*- Hide divResults and search input.
           - Set inputRef value back to selStudent.name
             in case the user had written something.
-          - Deactivate editInfo state.
+          - If theres a student selected, deactivate editInfo state.
         */
         setShowResults(false);
         inputRef.current.value = selStudent?.name || null;
-        setEditInfo(false);
+        
+        if(selStudent?.id) setEditInfo(false);
       }
     }
 
