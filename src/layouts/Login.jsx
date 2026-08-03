@@ -13,7 +13,7 @@ export default function Login() {
     onSuccess: () => {
       navigate('/');
     }
-  })
+  });
 
 
 
@@ -79,7 +79,7 @@ export default function Login() {
               </div>
 
               <div className="h-16 flex flex-col">
-                <span className=" ml-3 font-bold">Password:</span>
+                <span className="font-bold">Password:</span>
                 <input type="password"
                        className="input-base font-normal 
                                  focus:border-cyan-400!"
@@ -92,7 +92,7 @@ export default function Login() {
                                 hover:bg-cyan-400 hover:border-0"
                       type="submit"
               >
-                Login
+                { loginMutation.isPending ? 'Loading...' : 'Login' }
               </button>
             </form>
           </div>
