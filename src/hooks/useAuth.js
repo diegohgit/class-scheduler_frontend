@@ -11,7 +11,7 @@ const getUser = async () => {
                                               "/api/user");
 
   if(!success) throw new Error("Failed to login");
-  return response.data;
+  return response?.data;
 }
 
 
@@ -64,3 +64,37 @@ export const useLoginMutation = (options = {}) => {
 }
 
 
+
+//Function used to send logout request using axiosClient.
+export const handleLogout = async () => {
+
+  const { data } = await axiosClient({method:'POST', url:'/logout', });
+
+  const success = data?.success;
+
+  if(!success) throw new Error('Failed to logout');
+ 
+  return success;
+}
+
+
+
+//Logout mutation.
+export const useLogoutMutation = (options = {}) => {
+
+  const queryClient = useQueryClient();
+
+  return useMutation({
+      mutationFn: handleLogout,
+      onSuccess: (success) => {
+
+        if(success){
+          queryClient.removeQueries(
+             ['user'],
+          );
+        }
+
+      options?.onSuccess(success);
+    },
+  });
+}
