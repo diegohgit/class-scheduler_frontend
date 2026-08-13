@@ -52,7 +52,14 @@ const router = createBrowserRouter([
     path: 'login',
     element: <Login />
   },
-], {future: {v7_startTransition: true,},}
+], {
+    //This basename is to use this project as a subdirectory
+    //example.com/class.scheduler-daniel
+    basename: '/class-scheduler-daniel',
+    future: {
+      v7_startTransition: true,
+    },
+  }
 )
 
 export default router
