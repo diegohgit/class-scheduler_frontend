@@ -53,9 +53,10 @@ const router = createBrowserRouter([
     element: <Login />
   },
 ], {
+
     //This basename is to use this project as a subdirectory
     //example.com/class.scheduler-daniel
-    basename: '/class-scheduler-daniel',
+    basename: '/class-scheduler',
     future: {
       v7_startTransition: true,
     },
