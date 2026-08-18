@@ -17,7 +17,7 @@ export default function Loading() {
                       justify-center items-center grid h-screen">
 
         <div>
-          <img src="../img/scheduler_white.png"
+          <img src={`${import.meta.env.BASE_URL}img/scheduler_white.png`}
                alt="logo"
                onLoad={() => setIsLoaded(true)}
                className="w-70 mx-auto"
