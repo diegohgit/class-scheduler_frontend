@@ -5,13 +5,14 @@ import { toast } from "react-toastify";
 import { useClasses, useClassMutation } from "../hooks/useClasses";
 import { useEffect, useState } from "react";
 import { days } from "../data/days";
+import dayjs from "dayjs";
 
 export default function ModalClass() {
 
   const { time, classLength, selStudent,
           selDay, setModal, handleClickModal,
           classModal, expanded, setExpanded, 
-          getFormattedDate, } = useSchool();
+          getFormattedDate, getDuration} = useSchool();
 
   //State to define if the delete confirmation options will be shown.
   const [ showConfirm, setShowConfirm ] = useState(false);
@@ -100,7 +101,19 @@ export default function ModalClass() {
     {
       toast.error("Missing required fields.");
       return false;
-    }  
+    }
+
+    //Validate that the class doesn't last longer than 3hrs.
+    if(getDuration(time).asHours() > 3 ){
+      toast.error("Classes can't last longer than 3 hours.");
+      return false;
+    }
+
+    //Validate that the class doesn't last less than 15min.
+    if(getDuration(time).asMinutes() < 15 ){
+      toast.error("Classes can't last less than 15 minutes.");
+      return false;
+    }
 
     //Validate that student doesn't have a class in the selected time.
     if(matchSchedule?.student_id === selStudent?.id
