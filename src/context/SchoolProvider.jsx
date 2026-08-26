@@ -214,6 +214,15 @@ const SchoolProvider = ({children}) => {
 
 
 
+  //states to handle configuration's modal.
+  const [modalConfiguration, setModalConfiguration] = useState(0);
+
+  const handleModalConfiguration = () => {
+    setModalConfiguration(!modalConfiguration);
+  }
+
+
+
   //states to handle section's modal.
   const [modalSection, setModalSection] = useState(0);
   const [ selSection, setSelSection ]   = useState([]);
@@ -231,6 +240,8 @@ const SchoolProvider = ({children}) => {
 
       if(spacesFree.length) return true;
     }
+
+    return false;
   }
 
 
@@ -271,6 +282,8 @@ const SchoolProvider = ({children}) => {
         modalChapter, setModalChapter,
         handleModalChapter,
         selChapter, setSelChapter,
+        modalConfiguration, setModalConfiguration,
+        handleModalConfiguration,
         validString,
         modalSection, setModalSection,
         handleModalSection,

@@ -1,40 +1,56 @@
 import Class from "../components/Class";
 import ModalClass from "../components/ModalClass";
+import ModalConfiguration from "../components/ModalConfiguration";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { days } from "../data/days";
 import { toast } from "react-toastify";
 import LoadingMessage from "../components/LoadingMessage";
 import { useClasses } from "../hooks/useClasses";
+import { useActiveHours } from "../hooks/useActiveHours";
 
 
 
 Modal.setAppElement('#root')
 export default function Home() {
 
-  const { handleClickModal, modal, handleSetTime,
-          handleClassModal, expanded, setExpanded,
-          getDuration } = useSchool();
 
-  const [ searchStudent, setSearchStudent ] = useState(0);
+
+  //Get active hours using useActiveHours()
+  const { data:active_hours = {},
+          isLoading : isLoadingActiveHrs,
+          isSuccess : isSuccessActiveHrs,
+          isError   : isErrorActiveHrs,
+        } = useActiveHours();
+
+  //Get only the hour in numeric format.
+  const fromHr  = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : null;
+  const untilHr = active_hours?.until ? Number(active_hours.until.split(':')[0]) : null;
+
+
+
+  const { handleClickModal, modal, handleSetTime,
+          handleClassModal, expanded, getDuration,
+          modalConfiguration, handleModalConfiguration,
+        } = useSchool();
+
 
 
 
   //Get scheduled classes using useClasses()
   const { data:classes = [],
-          isLoading,
-          isSuccess,
-          isError,
-          error,
+          isLoading : isLoadingClasses,
+          isSuccess : isSuccessClasses,
+          isError   : isErrorClasses,
         } = useClasses();
 
   useEffect(() => {
 
-    if(isSuccess && classes?.length === 0){
+    if(isSuccessClasses && classes?.length === 0){
       toast.warning("You have no classes scheduled.");
     }
-  }, [isSuccess, classes]);
+  }, [isSuccessClasses, classes]);
 
 
 
@@ -87,14 +103,17 @@ export default function Home() {
   let endSpaceMin = null;
 
   const blocksPerHr = 12;
-  const endOfDay    = "00:00";
+  const startOfDay  = active_hours.from;
 
 
 
   return (
     <>
-      {isLoading && <LoadingMessage text="Loading Classes..."/>}
-      {isError   && <p className="text-center mt-40">Couldn't fetch classes.</p>}
+      {(isLoadingClasses || isLoadingActiveHrs)
+        && <LoadingMessage text="Loading Classes..."/>}
+
+      {(isErrorClasses || isErrorActiveHrs)
+       && <p className="text-center mt-40">Couldn't fetch classes.</p>}
 
 
 
@@ -116,15 +135,18 @@ export default function Home() {
 
 
       {/* Grid starts */}
-      {isSuccess && Array.isArray(classes) &&
+      {isSuccessClasses && isSuccessActiveHrs && Array.isArray(classes) &&
       (<div className="w-[1000px] mx-auto mt-24
                        mb-4 grid grid-cols-7">
 
         {/* Columns for days */}
         {days.map((day) => (
           <div key = {day.id}>
-            {/* Rows for time blocks */}
-            {Array.from({length: 24}).map((_, hour) => {
+            {/* Calculate how many hours will be rendered */}
+            {Array.from({length: untilHr - fromHr }).map((_, hr) => {
+
+              //Start from fromHr + hr
+              const hour = fromHr + hr;
 
               // Create an array
               // 12 blocks (representing each hour) of 5 minutes each one to divide the hour
@@ -173,9 +195,9 @@ export default function Home() {
 
                     //If a space was being printed, restart isPrinting.
                     //OR
-                    //If its the final cycle of the day,, restart isPrinting. 
-                    if(spaceEnd === currentTime || currentTime === endOfDay)
-                    {isPrinting = false;}
+                    //If its the first cycle of the day, restart isPrinting. 
+                    if(spaceEnd === currentTime || currentTime === startOfDay)
+                    { isPrinting = false; }
 
                     //If the cycle is in a 'minute = 00' cycle
                     //&& nothing is being printed
@@ -250,7 +272,6 @@ export default function Home() {
                   const finalSpaceMin = endSpaceMin;
                   const matchData = printMatch ? match : null;
 
-
                   return(
                     <Class
                       key    = {`${day.id}-${hour}-${minute}`}
@@ -273,11 +294,23 @@ export default function Home() {
         ))}
       </div>)}
 
+
+      <div className="w-full flex justify-center">
+        <button className="button-base bg-indigo-500 hover:bg-indigo-600"
+                onClick={() => handleModalConfiguration()}
+        >
+          Configuration
+        </button>
+      </div>
+
       <Modal isOpen={modal}  className= {`modal-base w-95 transition-all
                                           duration-300 ease-in-out
-                                          ${expanded ? "h-110" : "h-95"}
-                                        `}>
+                                          ${expanded ? "h-110" : "h-95"}`}>
           <ModalClass />
+      </Modal>
+
+      <Modal isOpen={modalConfiguration} className="modal-base w-95 h-55">
+          <ModalConfiguration />
       </Modal>
     </>
   )
