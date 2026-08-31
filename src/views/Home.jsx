@@ -15,8 +15,6 @@ import { useActiveHours } from "../hooks/useActiveHours";
 Modal.setAppElement('#root')
 export default function Home() {
 
-
-
   //Get active hours using useActiveHours()
   const { data:active_hours = {},
           isLoading : isLoadingActiveHrs,
@@ -28,13 +26,15 @@ export default function Home() {
   const fromHr  = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : null;
   const untilHr = active_hours?.until ? Number(active_hours.until.split(':')[0]) : null;
 
+  const fromMin  = active_hours?.from  ? Number(active_hours.from.split(':')[1])  : null;
+  const untilMin = active_hours?.until ? Number(active_hours.until.split(':')[1]) : null;
+
 
 
   const { handleClickModal, modal, handleSetTime,
           handleClassModal, expanded, getDuration,
           modalConfiguration, handleModalConfiguration,
         } = useSchool();
-
 
 
 
@@ -96,14 +96,12 @@ export default function Home() {
 
 
   //Variables useful to render the schedule.
-  let print       = false;
-  let printMatch  = false;
-  let isPrinting  = false;
-  let spaceEnd    = null;
-  let endSpaceMin = null;
+  let isPrinting = false;
+  let spaceEnd   = null;
 
   const blocksPerHr = 12;
   const startOfDay  = active_hours.from;
+  const extraBlock  = untilMin > 0 ? 1 : 0;//if untilMin > 0 add an extra block to the schedule.
 
 
 
@@ -113,7 +111,7 @@ export default function Home() {
         && <LoadingMessage text="Loading Classes..."/>}
 
       {(isErrorClasses || isErrorActiveHrs)
-       && <p className="text-center mt-40">Couldn't fetch classes.</p>}
+        && <p className="text-center mt-40">Couldn't fetch classes.</p>}
 
 
 
@@ -142,124 +140,92 @@ export default function Home() {
         {/* Columns for days */}
         {days.map((day) => (
           <div key = {day.id}>
+
+
             {/* Calculate how many hours will be rendered */}
-            {Array.from({length: untilHr - fromHr }).map((_, hr) => {
+            {Array.from({length: extraBlock + untilHr - fromHr }).map((_, hr) => {
 
               //Start from fromHr + hr
+              //It's something similar to start i=5 instead of i=0
+              //in this case would be fromHr=7; 7+1, 7+2, 7+3...
               const hour = fromHr + hr;
 
               // Create an array
               // 12 blocks (representing each hour) of 5 minutes each one to divide the hour
               return Array.from({ length: blocksPerHr }).map((_, i) => {
 
-                // Calculate the minute for each block (0, 5, 10, ..., 55)
-                const minute = getFormattedTime(i * 5);
+                // Calculate the minute for each block (0, 5, 10, ..., 55).
+                // If the current cicle is in the first hr, 
+                // take the fromMin and add the current index (i * 5).
+                const preMinute = hour === fromHr ? fromMin + (i * 5) : i * 5;
 
-                printMatch        = false;
-                let spaceHeight   = 100;
+                const minute = getFormattedTime(preMinute);
+
+                //Reset variables
+                let print       = false;
+                let printMatch  = false;
+                let endSpaceMin = null;
+                let spaceHeight = 100;
                 const currentTime = getFormattedTime(hour) + ":" + minute;
-                endSpaceMin       = null;//Clean endSpaceMin.
-
 
                 //Use this to log specific parts of the cycle.
                 //if(day.id === 1 && currentTime === "09:15")console.log("spaceEnd", spaceEnd)
 
 
+
                 //SEARCH FOR NEW CLASSES.
-                const match = minute === "00" || spaceEnd === currentTime 
+                const match = currentTime === spaceEnd || currentTime === startOfDay
                               ? findClasses(day.id, hour, minute) : null;
 
 
 
-                //PRINT A CLASS OR A COMPLETELY EMPTY SPACE.
+                //PRINT A CLASS.
                 //If the current time is the same as the begining of a class
                 //- Set to true all necessary variables to print a space.
-                //- Set spaceEnd.
                 //- Get class duration.
+                //- Set spaceEnd.
                 if(currentTime === match?.starts ){
 
                     isPrinting = printMatch = print = true;
-
-                    spaceEnd = match.ends;
 
                     const classDuration = getDuration({starts: match.starts, ends: match.ends});
                     const totalClassMinutes = classDuration.$ms / 60000;//Convert miliseconds to minutes.
 
                     spaceHeight = getHeight(totalClassMinutes);
-
-                }else{
-
-                  print = false;
-
-                  if(!match){
-
-                    //If a space was being printed, restart isPrinting.
-                    //OR
-                    //If its the first cycle of the day, restart isPrinting. 
-                    if(spaceEnd === currentTime || currentTime === startOfDay)
-                    { isPrinting = false; }
-
-                    //If the cycle is in a 'minute = 00' cycle
-                    //&& nothing is being printed
-                    //print an empty space.
-                    if(minute === "00" && !isPrinting){
-
-                      isPrinting = print = true;
-
-                      spaceEnd = getFormattedTime(hour + 1) + ":" + minute;
-                    }
-                  }
+                    spaceEnd    = match.ends;
                 }
 
 
 
-                //SPACE END
-                //- Check if the next space is going to be a class.
-                //- Get next space height.
-                //- Activate print variables.
-                //- Set spaceEnd.
-                if(spaceEnd === currentTime){
+                //PRINT A BLANK SPACE
+                //- Set variables to print blank spaces.
+                if(currentTime === spaceEnd || currentTime === startOfDay)
+                {
+                  //If a match has been detected,
+                  //calculate height of a blank space
+                  //BEFORE rendering the match space.
+                  if(match && currentTime != match.starts){
 
-                  if(match){
                     const nextClassStartMin = match.starts?.split(':')[1];
 
                     spaceHeight = getHeight(nextClassStartMin, minute);
                     endSpaceMin = nextClassStartMin;
 
-                  //If the current minute != "00"
-                  //calculate how many minutes left to 60
-                  }else if(minute != '00'){
+                    //The current space will finish where the match starts.
+                    spaceEnd = match.starts
+                  }
 
-                    spaceHeight = getHeight(60, minute);
-                    endSpaceMin = null;
+
+                  //Calculate height of a blank space.
+                  //Empty hours and last spaces in the schedule.
+                  if(!match){
+                    spaceHeight = hour === untilHr ? getHeight(untilMin, minute) : getHeight(60, minute);
+                    endSpaceMin = hour === untilHr ? untilMin : null;
+
+                    spaceEnd = getFormattedTime(hour + 1) +":00";
                   }
 
                   print = isPrinting = true;
-
-                  printMatch = match?.starts === currentTime;
-                    
-                  spaceEnd = match ? match.starts : getFormattedTime(hour + 1) +":00";
-                }
-
-
-
-                //RENDER AN EMPTY CLASS
-                //(BEFORE THE START OF THE NEXT CLASS)
-                //- Get spaceHeight.
-                //- Set spaceEnd.
-                if(!isPrinting){
-
-                  if(match && !printMatch){
-
-                    const nextClassStartMin = match.starts?.split(':')[1];
-
-                    spaceHeight = getHeight(nextClassStartMin, minute);
-                    spaceEnd    = match.starts;
-
-                    //Store the minute when the next class starts
-                    endSpaceMin = nextClassStartMin;
-                    print = isPrinting = true
-                  }
                 }
 
 
