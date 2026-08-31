@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "../hooks/useApi";
-import useSchool from "./useSchool";
+
 
 const { request } = useApi();
 //Send get request.
