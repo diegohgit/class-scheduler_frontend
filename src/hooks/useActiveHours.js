@@ -21,3 +21,34 @@ export const useActiveHours = () => {
                     retry: false,
                   });
 }
+
+
+
+//Async function to send chapter/section mutation requests.
+const handleMyRequest = async(data) => {
+
+  const { success, response } = await request('PUT',
+                                              'api/active_hours/1',
+                                              data,
+                                              'Active hours updated.');
+  return {success, response};
+}
+
+
+
+//Mutation to create/update/delete students.
+export const useActiveHrsMutation = (options = {}) => {
+
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: handleMyRequest,
+    onSuccess: (response) =>{
+      if(response?.success){
+        queryClient.invalidateQueries({ queryKey: ['active_hours'] });
+      }
+
+      options?.onSuccess(response?.success);
+    }
+  });
+}

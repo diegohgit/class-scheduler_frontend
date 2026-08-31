@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { useClasses, useClassMutation } from "../hooks/useClasses";
 import { useEffect, useState } from "react";
 import { days } from "../data/days";
-import dayjs from "dayjs";
 
 export default function ModalClass() {
 
@@ -262,14 +261,14 @@ export default function ModalClass() {
               <b className="mr-2">Starts:</b>
               <TimeSelector
                 initialTime={time.starts}
-                auxiliar = "start"
+                auxiliary = "start"
               />
             </div>
             <div className="w-5/12 flex">
               <b className="ml-8 mr-2">Ends:</b>
               <TimeSelector
                 initialTime={time.ends}
-                auxiliar = "end"
+                auxiliary = "end"
               />
             </div>
           </div>

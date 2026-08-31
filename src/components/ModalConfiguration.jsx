@@ -1,15 +1,36 @@
 import useSchool from "../hooks/useSchool";
-import { useState, useRef, useEffect } from "react";
-import { useContent, useChapterMutation } from "../hooks/useContent";
 import TimeSelector from "./TimeSelector";
+import { useActiveHours, useActiveHrsMutation } from "../hooks/useActiveHours";
+
+
 
 export default function ModalConfiguration() {
 
-  const { handleModalConfiguration, } = useSchool();
+  //Get active hours using useActiveHours()
+  const { data:active_hours = {},
+          isLoading : isLoadingActiveHrs,
+          isSuccess : isSuccessActiveHrs,
+          isError   : isErrorActiveHrs,
+        } = useActiveHours();
 
 
-  const handleSubmit = () => {
-    console.log('HELLO')
+  const { handleModalConfiguration, time } = useSchool();
+
+
+
+  const activeHrsMutation = useActiveHrsMutation({
+    onSuccess:() => {
+        handleModalConfiguration();
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const data = {'from'  : time.starts,
+                  'until' : time.ends,};
+
+    activeHrsMutation.mutate(data);
   }
 
 
@@ -41,22 +62,28 @@ export default function ModalConfiguration() {
       >
         <div className="w-10/12 mx-auto ">
           <span>Change active hours:</span>
-          <div className="h-10 mt-4 flex">
-            <div className="w-5/12 flex">
-              <b className="mr-2">From:</b>
-              <TimeSelector
-                initialTime={'06:00'}
-                auxiliar = "start"
-              />
-            </div>
-            <div className="w-5/12 flex">
-              <b className="ml-8 mr-2">To:</b>
-              <TimeSelector
-                initialTime={'22:00'}
-                auxiliar = "end"
+
+          {isErrorActiveHrs   && <span><br />An error has occurred.</span>}
+          {isLoadingActiveHrs && <span><br />Loading active hours...</span>}
+
+          {isSuccessActiveHrs &&
+            <div className="h-10 mt-4 flex">
+              <div className="w-5/12 flex">
+                <b className="mr-2">From:</b>
+                <TimeSelector
+                  initialTime={active_hours.from}
+                  auxiliary = "start"
                 />
+              </div>
+              <div className="w-5/12 flex">
+                <b className="ml-8 mr-2">To:</b>
+                <TimeSelector
+                  initialTime={active_hours.until}
+                  auxiliary = "end"
+                  />
+              </div>
             </div>
-          </div>
+          }
         </div>
 
         <div className=" flex mt-2">
@@ -70,7 +97,7 @@ export default function ModalConfiguration() {
           <button type="submit"
                   className="button-base bg-indigo-500 hover:bg-indigo-600"
           >
-            Save
+            {activeHrsMutation.isPending ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

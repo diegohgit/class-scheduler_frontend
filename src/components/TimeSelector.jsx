@@ -3,7 +3,7 @@ import useSchool from "../hooks/useSchool";
 
 
 
-export default function TimeSelector({initialTime, auxiliar}) {
+export default function TimeSelector({initialTime, auxiliary}) {
 
   const { setTime, expanded, setExpanded } = useSchool();
 
@@ -39,10 +39,10 @@ export default function TimeSelector({initialTime, auxiliar}) {
   useEffect(() => {
 
     //Modify only 'starts' or only 'ends' from the time state.
-    if(auxiliar === "start")    setTime(prev => ({...prev, 'starts': selTime}));
-    else if(auxiliar === "end") setTime(prev => ({...prev, 'ends': selTime}));
+    if(auxiliary === "start")    setTime(prev => ({...prev, 'starts': selTime}));
+    else if(auxiliary === "end") setTime(prev => ({...prev, 'ends': selTime}));
 
-  }, [selTime, auxiliar]);
+  }, [selTime, auxiliary]);
 
 
 
