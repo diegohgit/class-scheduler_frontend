@@ -9,6 +9,8 @@ import StudentProgress from './views/StudentProgress'
 import Login from './layouts/Login'
 import ProtectedRoute from './layouts/ProtectedRoute'
 
+const basename = import.meta.env.VITE_BASE_PATH.replace(/\/$/, '')
+
 const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
@@ -56,7 +58,7 @@ const router = createBrowserRouter([
 
     //This basename is to use this project as a subdirectory
     //example.com/class.scheduler-daniel
-    basename: '/class-scheduler',
+    basename: basename,
     future: {
       v7_startTransition: true,
     },
