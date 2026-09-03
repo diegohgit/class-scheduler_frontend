@@ -34,7 +34,7 @@ const handleRequest = async({data}) => {
   await axiosClient({method: "GET", url: '/sanctum/csrf-cookie', });
 
   const { success, response } = await request("POST",
-                                              "/api/login/",
+                                              "/login",
                                               data,);
 
   return {success, response};
@@ -68,7 +68,7 @@ export const useLoginMutation = (options = {}) => {
 //Function used to send logout request using axiosClient.
 export const handleLogout = async () => {
 
-  const { data } = await axiosClient({method:'POST', url:'/api/logout', });
+  const { data } = await axiosClient({method:'POST', url:'/logout', });
 
   const success = data?.success;
 
