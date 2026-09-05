@@ -1,7 +1,8 @@
 import useSchool from "../hooks/useSchool";
 import TimeSelector from "./TimeSelector";
 import { useActiveHours, useActiveHrsMutation } from "../hooks/useActiveHours";
-
+import { useClasses } from "../hooks/useClasses";
+import { toast } from "react-toastify";
 
 
 export default function ModalConfiguration() {
@@ -13,8 +14,26 @@ export default function ModalConfiguration() {
           isError   : isErrorActiveHrs,
         } = useActiveHours();
 
+  //Get scheduled classes using useClasses()
+  const { data:classes = [], } = useClasses();
+
+
 
   const { handleModalConfiguration, time } = useSchool();
+
+
+
+  //Validate that the selected time range includes all the classes.
+  const validateActiveHrs = () => {
+
+    const validation = classes?.some((cls) => {
+                        return cls.starts < time.starts || cls.ends > time.ends;
+                      });
+
+    if(validation)toast.error('You have classes scheduled outside the selected time range.');
+
+    return !validation;
+  }
 
 
 
@@ -27,10 +46,13 @@ export default function ModalConfiguration() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = {'from'  : time.starts,
-                  'until' : time.ends,};
+    if(validateActiveHrs()){
 
-    activeHrsMutation.mutate(data);
+      const data = {'from'  : time.starts,
+                    'until' : time.ends,};
+
+      activeHrsMutation.mutate(data);
+    }
   }
 
 
