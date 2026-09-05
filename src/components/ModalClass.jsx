@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useClasses, useClassMutation } from "../hooks/useClasses";
 import { useEffect, useState } from "react";
 import { days } from "../data/days";
+import { useActiveHours } from "../hooks/useActiveHours";
 
 export default function ModalClass() {
 
@@ -20,10 +21,11 @@ export default function ModalClass() {
 
 
 
+  //Get active hours using useActiveHours()
+  const { data:active_hours = {}, } = useActiveHours();
+
   //Get scheduled classes using useClasses()
   const { data:classes = [], } = useClasses();
-
-
 
   //Check if there's another class with same time range and same student.
   const matchSchedule = classes?.find(cls => {
@@ -124,7 +126,8 @@ export default function ModalClass() {
 
     //Validate that the selected time range doesn't overlapse with another class.
     const findOverlapse = classes?.some(cls => {
-      const checkTime    = cls.starts < time.ends && cls.ends > time.starts;
+      //Validate that the selected time range doesn't overlapse with another class.
+      const checkTime = cls.starts < time.ends && cls.ends > time.starts;
       //If the class has different student and different class_id
       //it won't be possible to schedule the class 
       //unless it is scheduled on a different day.
@@ -151,6 +154,12 @@ export default function ModalClass() {
       return false;
     }
 
+    //Validate that the selected time range is inside the ActiveHours range.
+    if(time.starts < active_hours.from || time.ends > active_hours.until){
+      toast.error("This time range is outside the active hours.");
+      return false;
+    }
+
     return true;
   }
 
@@ -173,7 +182,6 @@ export default function ModalClass() {
 
       setClassNotesDate(getFormattedDate(selStudent.class_notes_date));
     }
-
   }, [selStudent]);
 
 
