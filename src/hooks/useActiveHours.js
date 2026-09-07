@@ -7,12 +7,13 @@ const { request } = useApi();
 const fetchActiveHours = async () => {
 
   const { response } = await request("GET", 'api/active_hours/', );
-  if(response?.data) return response.data[0]
+
+  if(response?.data) return response.data;
 }
 
 
 
-//Fetch all chapters.
+//Fetch active hours
 export const useActiveHours = () => {
   return useQuery({ queryKey:  ["active_hours"],
                     queryFn:   () => fetchActiveHours(),
@@ -24,7 +25,7 @@ export const useActiveHours = () => {
 
 
 
-//Async function to send chapter/section mutation requests.
+//Async function to send active_hours mutation requests.
 const handleMyRequest = async(data) => {
 
   const { success, response } = await request('PUT',
