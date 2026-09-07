@@ -19,20 +19,31 @@ export default function ModalConfiguration() {
 
 
 
-  const { handleModalConfiguration, time } = useSchool();
+  const { handleModalConfiguration, time, getDuration } = useSchool();
 
 
 
-  //Validate that the selected time range includes all the classes.
   const validateActiveHrs = () => {
 
-    const validation = classes?.some((cls) => {
-                        return cls.starts < time.starts || cls.ends > time.ends;
-                      });
+    //Validate that active hours are more than 3 and less than 24 hours.
+    const totalHours = getDuration(time).asHours();
 
-    if(validation)toast.error('You have classes scheduled outside the selected time range.');
+    if(totalHours < 3 || totalHours > 24){
+      toast.error('Active hours must be more than 3hrs and less than 24hrs.')
+      return false;
+    }
 
-    return !validation;
+    //Validate that the selected time range includes all the classes.
+    const validateClasses = classes?.some((cls) => {
+                              return cls.starts < time.starts || cls.ends > time.ends;
+                            });
+
+    if(validateClasses){
+      toast.error('You have classes scheduled outside the selected time range.');
+      return false;
+    }
+
+    return true;
   }
 
 
