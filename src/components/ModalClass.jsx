@@ -206,8 +206,8 @@ export default function ModalClass() {
     const data = {id          : classId,
                   student_id  : selStudent.id,
                   days_ids    : selectedDays,
-                  starts      : time.starts,
-                  ends        : time.ends,
+                  starts      : time.starts+':00',
+                  ends        : time.ends+':00',
                   class_notes : sendClassNotes,
                 };
 

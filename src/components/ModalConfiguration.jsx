@@ -48,8 +48,8 @@ export default function ModalConfiguration() {
 
     if(validateActiveHrs()){
 
-      const data = {'from'  : time.starts,
-                    'until' : time.ends,};
+      const data = {'from'  : time.starts+':00',
+                    'until' : time.ends+':00',};
 
       activeHrsMutation.mutate(data);
     }
