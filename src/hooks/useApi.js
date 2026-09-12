@@ -16,7 +16,7 @@ export const useApi = () => {
          || method === "PUT"
          || method === "DELETE" ){
 
-        if(response?.data?.id) success = true;
+        if(response?.data?.id || response?.data?.success) success = true;
       }
       else if(method === "GET"){
         //Validate if data structure is correct.
@@ -31,8 +31,8 @@ export const useApi = () => {
     } catch (error){
       console.log(error)
 
-      message = error.response?.status === 422 ? error.response.data.message
-                                               : "Something went wrong.";
+      message = error.response?.status === 422 || 401 ? error.response.data.message
+                                                      : "Something went wrong.";
       throw error;
 
     } finally{

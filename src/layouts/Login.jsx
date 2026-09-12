@@ -1,8 +1,8 @@
-import { useState } from "react"
 import { useNavigate } from "react-router";
 import useSchool from "../hooks/useSchool";
 import { ToastContainer, toast } from "react-toastify";
 import { useLoginMutation } from "../hooks/useAuth";
+import { Link } from "react-router-dom"; 
 
 
 export default function Login() {
@@ -94,6 +94,15 @@ export default function Login() {
               >
                 { loginMutation.isPending ? 'Loading...' : 'Login' }
               </button>
+
+              <Link to='/forgot-password'
+              >
+                <span className="block w-full text-center
+                                 mt-4 hover:underline hover:cursor-pointer"
+                                 >
+                  I forgot my password
+                </span>
+              </Link>
             </form>
           </div>
         </div>

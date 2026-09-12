@@ -8,6 +8,8 @@ import CreateStudent from './views/CreateStudent'
 import StudentProgress from './views/StudentProgress'
 import Login from './layouts/Login'
 import ProtectedRoute from './layouts/ProtectedRoute'
+import ForgotPassword from './views/ForgotPassword'
+import ResetPassword from './views/ResetPassword'
 
 const basename = import.meta.env.VITE_BASE_PATH.replace(/\/$/, '')
 
@@ -49,10 +51,15 @@ const router = createBrowserRouter([
         },
       ]
     }]
-  }
-  ,{
+  },{
     path: 'login',
     element: <Login />
+  },{
+    path: 'forgot-password',
+    element: <ForgotPassword />
+  },{
+    path: 'reset-password',
+    element: <ResetPassword />
   },
 ], {
 
