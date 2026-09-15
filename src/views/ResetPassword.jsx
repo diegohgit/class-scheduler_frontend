@@ -1,9 +1,12 @@
 import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
-
-
+import { useState } from "react";
 
 export default function ResetPassword() {
+
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   const { request } = useApi();
 
@@ -16,6 +19,7 @@ export default function ResetPassword() {
 
     const message = response?.data?.message;
 
+    setIsLoading(false);
     return {success, message};
   }
 
@@ -55,6 +59,7 @@ export default function ResetPassword() {
   //Submit function.
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const token = params.get('token');
     const email = params.get('email');
@@ -73,7 +78,7 @@ export default function ResetPassword() {
       const {success, message} = await handleRequest({data});
 
       if(success)toast.success(message);
-    }
+    }else setIsLoading(false);
   }
 
 
@@ -95,7 +100,7 @@ export default function ResetPassword() {
                   className="font-bold w-11/12 mx-auto">
 
               <div className="flex h-20 mt-8 flex-col ">
-                <span>Type your new password:</span>
+                <span>New password:</span>
                 <input type="password"
                         className="input-base font-normal 
                                   focus:border-cyan-400!"
@@ -114,10 +119,12 @@ export default function ResetPassword() {
 
               <button className="button-base block mx-auto!
                                 border border-white
-                                hover:bg-cyan-400 hover:border-0"
+                                hover:bg-cyan-400 hover:border-0
+                                disabled:cursor-not-allowed!"
                       type="submit"
+                      disabled={isLoading}
               >
-                Send
+                {isLoading ? "Saving..." : "Save"}
               </button>
             </form>
           </div>

@@ -1,8 +1,13 @@
 import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import axiosClient from "../config/axios";
+import { useState } from "react";
 
 export default function ForgotPassword() {
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log('isloading', isLoading)
 
   const { request } = useApi();
 
@@ -14,6 +19,7 @@ export default function ForgotPassword() {
                                                 '/api/auth/forgot-password',
                                                 data,
                                                 message);
+    setIsLoading(false);
     return {success, response};
   }
 
@@ -22,6 +28,7 @@ export default function ForgotPassword() {
   //Submit function.
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setIsLoading(true);
   
     const formData = new FormData(e.currentTarget);
     const email    = formData.get('email');
@@ -30,6 +37,8 @@ export default function ForgotPassword() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
+
+      setIsLoading(false);
       toast.error('Invalid email.');
       return false;
     }
@@ -73,10 +82,13 @@ export default function ForgotPassword() {
 
               <button className="button-base block mx-auto!
                                 border border-white
-                                hover:bg-cyan-400 hover:border-0"
+                                hover:bg-cyan-400 
+                                hover:border-0
+                                disabled:cursor-not-allowed!"
                       type="submit"
+                      disabled={isLoading}
               >
-                Send
+                {isLoading ? "Sending..." : "Send"}
               </button>
             </form>
 
