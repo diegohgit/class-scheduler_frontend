@@ -21,6 +21,35 @@ export default function ResetPassword() {
 
 
 
+  const validation = (password, password_confirmation) => {
+    if(password != password_confirmation){
+      toast.error("Your password confirmation doesn't match.");
+      return false;
+    }
+
+    if(password.length < 8){
+      toast.error("Password must contain at least 8 characters.");
+      return false;
+    }
+
+    //Validate that password contains at least:
+    //- 8 characters.
+    //- One uppercase letter.
+    //- One lowercase letter.
+    //- One number.
+    //- One Symbol.
+    const emailRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/i;
+
+    if (!emailRegex.test(password)) {
+      toast.error('Password must contain uppercase, lowercase, number and symbol.');
+      return false;
+    }
+
+    return true;
+  }
+
+
+
   const params = new URLSearchParams(window.location.search);
 
   //Submit function.
@@ -34,15 +63,16 @@ export default function ResetPassword() {
     const password = formData.get('password');
     const password_confirmation = formData.get('password_confirmation');
 
-    const data = {token,
-                  password,
-                  password_confirmation,
-                  email,};
+    if(validation(password, password_confirmation))
+    {
+      const data = {token,
+                    password,
+                    password_confirmation,
+                    email,};
 
-    const {success, message} = await handleRequest({data});
+      const {success, message} = await handleRequest({data});
 
-    if(success){
-      toast.success(message)
+      if(success)toast.success(message);
     }
   }
 
