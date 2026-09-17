@@ -1,4 +1,4 @@
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import axiosClient from "../config/axios";
 import { useState } from "react";
@@ -99,9 +99,6 @@ export default function ForgotPassword() {
           </div>
         </div>
       </div>
-
-
-    	<ToastContainer />
     </>
 
   )

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import useSchool from "../hooks/useSchool";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useLoginMutation } from "../hooks/useAuth";
 import { Link } from "react-router-dom"; 
 
@@ -107,10 +107,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-
-
-
-			<ToastContainer />
     </>
   )
 }

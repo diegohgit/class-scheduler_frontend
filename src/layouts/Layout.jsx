@@ -1,4 +1,3 @@
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Topbar from "../components/Topbar";
 import { Outlet } from "react-router";
@@ -13,7 +12,6 @@ export default function Layout() {
 				{/* Show Layout's children using <Outlet />.*/}
 				<Outlet />
 			</main>
-			<ToastContainer />
 		</div>
 	</>
   )

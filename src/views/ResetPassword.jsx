@@ -1,4 +1,4 @@
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -135,9 +135,6 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
-
-
-    	<ToastContainer />
     </>
   )
 }
