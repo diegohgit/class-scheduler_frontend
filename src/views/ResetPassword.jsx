@@ -81,6 +81,7 @@ export default function ResetPassword() {
       const {success, message} = await handleRequest({data});
 
       if(success){
+        toast.success(message);
         navigate('/');
       }
     }else setIsLoading(false);
