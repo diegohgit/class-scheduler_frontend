@@ -1,6 +1,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function ResetPassword() {
 
@@ -25,6 +26,7 @@ export default function ResetPassword() {
 
 
 
+  //Validate password and password_confirmation fields.
   const validation = (password, password_confirmation) => {
     if(password != password_confirmation){
       toast.error("Your password confirmation doesn't match.");
@@ -54,6 +56,7 @@ export default function ResetPassword() {
 
 
 
+  const navigate = useNavigate();
   const params = new URLSearchParams(window.location.search);
 
   //Submit function.
@@ -77,7 +80,9 @@ export default function ResetPassword() {
 
       const {success, message} = await handleRequest({data});
 
-      if(success)toast.success(message);
+      if(success){
+        navigate('/');
+      }
     }else setIsLoading(false);
   }
 
