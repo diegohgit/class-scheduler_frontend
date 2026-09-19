@@ -43,6 +43,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     defaultValues: {
       first_name  : "",
       last_name   : "",
+      phone       : "",
+      email       : "",
       birthdate   : initialValues?.birthdate ?? "",
       level_id    : "1",
       class_notes : null,
