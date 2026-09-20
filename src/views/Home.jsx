@@ -22,9 +22,14 @@ export default function Home() {
           isError   : isErrorActiveHrs,
         } = useActiveHours();
 
+
+
   //Get only the hour in numeric format.
-  const fromHr  = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : null;
-  const untilHr = active_hours?.until ? Number(active_hours.until.split(':')[0]) : null;
+  const fromHr = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : null;
+  const until  = active_hours?.until ? Number(active_hours.until.split(':')[0]) : null;
+  //If until = midnight, handle it as 24 instead of 0
+  //so the algorithm can render until the 24 hour.
+  const untilHr = until === 0 ? 24 : until;
 
   const fromMin  = active_hours?.from  ? Number(active_hours.from.split(':')[1])  : null;
   const untilMin = active_hours?.until ? Number(active_hours.until.split(':')[1]) : null;

@@ -35,7 +35,12 @@ export default function ModalConfiguration() {
 
     //Validate that the selected time range includes all the classes.
     const validateClasses = classes?.some((cls) => {
-                              return cls.starts < time.starts || cls.ends > time.ends;
+                              //if time.ends === midnight
+                              //Turn timeEnds into '24:00' so we can compare cls.ends > timeEnds.
+                              //Example: 22:00 > 00:00 would be true, 22:00 > 24:00 would be false.
+                              const timeEnds = time.ends === '00:00' ? '24:00' : time.ends;
+
+                              return cls.starts < time.starts || cls.ends > timeEnds;
                             });
 
     if(validateClasses){
