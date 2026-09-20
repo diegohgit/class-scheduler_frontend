@@ -154,8 +154,9 @@ export default function ModalClass() {
       return false;
     }
 
+    const until = active_hours.until === '00:00' ? '24:00' : active_hours.until;
     //Validate that the selected time range is inside the ActiveHours range.
-    if(time.starts < active_hours.from || time.ends > active_hours.until){
+    if(time.starts < active_hours.from || time.ends > until){
       toast.error("This time range is outside the active hours.");
       return false;
     }
