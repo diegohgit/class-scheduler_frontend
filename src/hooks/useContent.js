@@ -76,7 +76,8 @@ export const useChapterMutation = (options = {}) => {
     onSuccess: (response) =>{
 
       if(response?.success){
-        const resChapter = response?.response?.data;
+
+        const resChapter = response?.response?.data?.data;
 
         queryClient.setQueryData(["chapters"], (old) => {          
           //Prevent errors when the cache doesn't contain any data yet.
@@ -86,9 +87,13 @@ export const useChapterMutation = (options = {}) => {
           if(response.method === "POST"){
 
             //Add the section array so user can add new sections.
-            const formatChapter = {...resChapter, section: []};
+            const formatChapter = resChapter.map((chapter) =>{
+                                    return {...chapter, section:[]}
+                                  });
 
-            return [...old, formatChapter].sort((a, b) => a.name.localeCompare(b.name, undefined, {
+            const newChapters = [...old, ...formatChapter];
+
+            return newChapters.sort((a, b) => a.name.localeCompare(b.name, undefined, {
                                                                         numeric: true,
                                                                         sensitivity: "base"}
                                                 ));

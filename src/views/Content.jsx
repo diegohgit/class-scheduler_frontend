@@ -68,7 +68,7 @@ export default function Content() {
       </button>
     </div>
 
-      <Modal isOpen={modalChapter} className="modal-base w-95 h-55">
+      <Modal isOpen={modalChapter} className="modal-base w-95 h-65">
           <ModalChapter />
       </Modal>
 

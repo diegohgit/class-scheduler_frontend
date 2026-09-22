@@ -43,15 +43,24 @@ export default function ModalChapter() {
     if(validString(name)) {
       setValidName(1);
 
-      const chapter_id = selChapter?.id ?? null;
-      const method     = chapter_id ? "PUT" : "POST";
+      const id     = selChapter?.id ?? null;
+      const method = id ? "PUT" : "POST";
 
-      const data = {"id"   : chapter_id,
-                    "name" : name,};
+      //If method === "POST"
+      //apply a split to separate each chapter in an array
+      //so we can do a multi-insert.
+      const chapters = method === "POST"  ? name.split('***')//Remove empty spaces.
+                                                .map(chapter => chapter.trim())
+                                                .filter(chapter => chapter.length > 0)
+                                          : name;
+
+      const data = { id, "name" : chapters,};
 
       chapterMutation.mutate({"table": "chapters", data, method});
     }else setValidName(0);
   }
+
+
 
   return (
     <>
@@ -81,18 +90,18 @@ export default function ModalChapter() {
       >
         <div className="h-22">
           <b>Chapter name:</b>
-          <input ref={inputRef}
+          <textarea ref={inputRef}
                  name="name"
                  id="name"
                  defaultValue={selChapter?.name ?? null}
-                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-                 maxLength={150}
-          />
+                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } 
+                            textarea-base resize-none`}
+          ></textarea>
           { !validName && 
             <p className="text-md text-red-500">Name is required</p> }
         </div>
 
-        <div className=" flex mt-2">
+        <div className=" flex mt-10">
           <button type="button"
                   onClick={() => console.log("Cancel")}
                   className="button-base bg-red-500 hover:bg-red-600"
