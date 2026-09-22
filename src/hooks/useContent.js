@@ -77,7 +77,7 @@ export const useChapterMutation = (options = {}) => {
 
       if(response?.success){
 
-        const resChapter = response?.response?.data?.data;
+        const resChapter = response?.response?.data;
 
         queryClient.setQueryData(["chapters"], (old) => {          
           //Prevent errors when the cache doesn't contain any data yet.
@@ -86,8 +86,10 @@ export const useChapterMutation = (options = {}) => {
       //****** POST ******
           if(response.method === "POST"){
 
+            const postChapter = resChapter?.data;
+
             //Add the section array so user can add new sections.
-            const formatChapter = resChapter.map((chapter) =>{
+            const formatChapter = postChapter.map((chapter) =>{
                                     return {...chapter, section:[]}
                                   });
 
@@ -107,7 +109,6 @@ export const useChapterMutation = (options = {}) => {
           }else if(response.method === "DELETE"){
 
             return old.filter((chap) => chap.id !== resChapter.id);
-
           }
           return old;
         });
