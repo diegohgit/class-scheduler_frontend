@@ -145,11 +145,13 @@ export const useSectionMutation = (options = {}) => {
           //****** POST ******
               if(response.method === "POST"){
 
-                if(chapter.id === Number(resSection.chapter_id)){
+                const postSection = resSection?.data;
+
+                if(chapter.id === Number(postSection[0].chapter_id)){
 
                   //Concatenate new section to list of sections.
                   return {...chapter,
-                          section: [ ...chapter.section, resSection]
+                          section: [ ...chapter.section, ...postSection]
                           //order alphabetically
                           .sort((a, b) => a.name.localeCompare(b.name, undefined, {
                                                                     numeric: true,

@@ -72,7 +72,7 @@ export default function Content() {
           <ModalChapter />
       </Modal>
 
-      <Modal isOpen={modalSection} className="modal-base w-95 h-72">
+      <Modal isOpen={modalSection} className="modal-base w-95 h-80">
           <ModalSection />
       </Modal>
   </>

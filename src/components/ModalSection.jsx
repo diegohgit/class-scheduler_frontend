@@ -49,12 +49,19 @@ export default function ModalSection() {
     if(validString(name)){
       setValidName(1);
 
-      const section_id = selSection?.id ?? null;
-      const method     = section_id ? "PUT" : "POST";
+      const id     = selSection?.id ?? null;
+      const method = id ? "PUT" : "POST";
 
-      const data = {"id"         : section_id,
-                    "name"       : name,
-                    "chapter_id" : chapter_id,};
+      //If method === "POST"
+      //apply a split to separate each section in an array
+      //so we can do a multi-insert.
+      const sections = method === "POST"  ? name.split('***')//Remove empty spaces.
+                                                .map(section => section.trim())
+                                                .filter(section => section.length > 0)
+                                          : name;
+      const data = {id,
+                    chapter_id,
+                    "name" : sections,};
 
       sectionMutation.mutate({"table": "sections", data, method});
     }
@@ -107,18 +114,18 @@ export default function ModalSection() {
 
         <div className="h-22">
           <b>Section name:</b>
-          <input ref={inputRef}
-                name="name"
-                id="name"
-                defaultValue={selSection?.name ?? null}
-                className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } input-base ` }
-                maxLength={150}                
-          />
+          <textarea ref={inputRef}
+                 name="name"
+                 id="name"
+                 defaultValue={selSection?.name ?? null}
+                 className={`${validName ? '' : 'border-2! border-red-500! focus:border-0!' } 
+                            textarea-base resize-none`}
+          ></textarea>
           { !validName &&
             <p className="text-md text-red-500">Section field is required.</p>}
         </div>
 
-        <div className=" flex ">
+        <div className="flex mt-10">
           <button
             type="button"
             onClick={() => console.log("Cancel")}
