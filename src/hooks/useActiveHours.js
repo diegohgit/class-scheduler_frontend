@@ -13,7 +13,7 @@ const fetchActiveHours = async () => {
 
 
 
-//Fetch active hours
+//Get active hours.
 export const useActiveHours = () => {
   return useQuery({ queryKey:  ["active_hours"],
                     queryFn:   () => fetchActiveHours(),
@@ -46,7 +46,18 @@ export const useActiveHrsMutation = (options = {}) => {
     mutationFn: handleMyRequest,
     onSuccess: (response) =>{
       if(response?.success){
-        queryClient.invalidateQueries({ queryKey: ['active_hours'] });
+
+        const resActiveHrs = response?.response?.data;
+
+        //Modify local caché data for active_hours
+        queryClient.setQueryData(['active_hours'], (old) => {
+          if(!old) return old;
+
+          return {...old,
+                  from  : resActiveHrs?.from,
+                  until : resActiveHrs?.until
+          }
+        });
       }
 
       options?.onSuccess(response?.success);
