@@ -98,6 +98,59 @@ export default function StudentSelector() {
 
 
 
+  //Handle navigation throught results using arrow keys.
+  const [selIndex, setSelIndex] = useState(-1);
+
+  const handleKeyDown = (e) => {
+    if(!results?.length) return;
+
+    if(e.key === 'ArrowDown'){
+      e.preventDefault();
+
+      //Adjust index:
+      //Add +1 to the current index when the user presses ArrowDown.
+      //In the last position it ask if 3 is greater than results.length -1
+      //As response is false, it sets the state to position 0.
+      setSelIndex((prev) => prev < results.length -1 ? prev + 1 : 0);
+    }
+
+    if(e.key === 'ArrowUp'){
+      e.preventDefault();
+
+      setSelIndex((prev) => prev > 0 ? prev -1 : results.length -1 );
+    }
+
+    if(e.key === 'Enter'){
+      e.preventDefault();
+
+      if(selIndex >= 0){
+        const student = results[selIndex];
+
+        handleSelectStudent(student);
+      }
+    }
+  }
+
+
+
+  /* If user clicks a result
+      - Set selStudent state to the selected student.	
+      - Set editInfo state to false to hide search input.
+      - Set showResults state to false to hide list of results.
+  */
+  const handleSelectStudent = (student) => {
+
+    setSelStudent({ id   : student?.id,
+                    name : student?.first_name +" "+ (student?.last_name ?? ""),
+                    class_notes      : student?.class_notes ?? null,
+                    class_notes_date : student?.class_notes_date ?? null,});
+
+    setEditInfo(false);
+    setShowResults(false);
+  }
+
+
+
   return (
     <>
 
@@ -132,7 +185,11 @@ export default function StudentSelector() {
                className="input-base"
                defaultValue={selStudent?.name}
                placeholder="Search for student..."
-               onChange={(e) => handleSearch(e.target.value)}
+               onChange={(e) => {
+                            handleSearch(e.target.value)
+                            setSelIndex(-1)
+               }}
+               onKeyDown={handleKeyDown}
             />
 
 
@@ -147,26 +204,15 @@ export default function StudentSelector() {
           { isLoading && showResults 
             && <li className="h-8 text-center">Searching...</li>}
 
-          { results?.map((result) => 
+          { results?.map((result, index) => 
             {
               return <li  key={result.id}
                         className={`${isLoading ? 'hidden' : ''}
+                                    ${selIndex === index ? 'bg-gray-200' : ''}
                                     h-8 hover:bg-gray-200 hover:cursor-pointer
                                     pl-2`}
-                        onClick={() => {
-                        /* If user clicks a result
-                            - Set selStudent state to the selected student.	
-                            - Set editInfo state to false to hide search input.
-                            - Set showResults state to false to hide list of results.
-                        */
-                          setSelStudent({id   : result?.id,
-                                         name : result?.first_name 
-                                                +" "+ (result?.last_name ?? ""),
-                                         class_notes      : result?.class_notes,
-                                         class_notes_date : result?.class_notes_date,});
-                          setEditInfo(false);
-                          setShowResults(false);
-                        }}
+                        onMouseEnter={() => setSelIndex(index)}
+                        onClick={() => handleSelectStudent(result)}
                       >
                         {result?.first_name +" "+ (result?.last_name ?? "")}
                       </li>
