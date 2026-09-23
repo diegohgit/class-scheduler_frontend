@@ -173,16 +173,16 @@ export default function ModalClass() {
   //State used to store the result of getLastEntry().
   const [classNotesDate, setClassNotesDate] = useState("");
 
-  //If theres a student loaded in the modal, 
+  //If theres a student loaded in the modal,
   //load its class notes into the textarea and initialize initialClassNotes.
   useEffect(() => {
 
-    if(selStudent.class_notes){
-      setClassNotes(selStudent.class_notes);
-      setInitialClassNotes(selStudent.class_notes)
+    setClassNotes(selStudent.class_notes ?? '');
+    setInitialClassNotes(selStudent.class_notes ?? undefined);
 
-      setClassNotesDate(getFormattedDate(selStudent.class_notes_date));
-    }
+    const notesDate = selStudent.class_notes_date ? getFormattedDate(selStudent.class_notes_date) : ''
+    setClassNotesDate(notesDate);
+
   }, [selStudent]);
 
 
