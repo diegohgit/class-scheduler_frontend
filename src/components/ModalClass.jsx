@@ -11,8 +11,8 @@ export default function ModalClass() {
 
   const { time, classLength, selStudent,
           selDay, setModal, handleClickModal,
-          classModal, expanded, setExpanded, 
-          getFormattedDate, getDuration} = useSchool();
+          classModal, setClassModal, expanded,
+          setExpanded, getFormattedDate, getDuration} = useSchool();
 
   //State to define if the delete confirmation options will be shown.
   const [ showConfirm, setShowConfirm ] = useState(false);
@@ -27,6 +27,8 @@ export default function ModalClass() {
   //Get scheduled classes using useClasses()
   const { data:classes = [], } = useClasses();
 
+
+
   //Check if there's another class with same time range and same student.
   const matchSchedule = classes?.find(cls => {
                 return (
@@ -38,31 +40,30 @@ export default function ModalClass() {
 
 
 
-  //blockSearch is used to prevent the system of doing day searches (matchSchedule)
-  //every time the user changes time range or student.
-  const [blockSearch, setBlockSearch]   = useState(false);
+  //State used to store list of days of a class.
   const [selectedDays, setSelectedDays] = useState([]);
 
   //If theres no class loaded in the current modal, check only the current day.
   //Load all days of a class into selectedDays to show them in the checkboxes.
   useEffect(() => {
 
-    if(!classModal){
+    if(!matchSchedule){
       setSelectedDays([selDay.id]);
+      setClassModal([]);
       return;
     }
 
-    if(blockSearch === false){
+    //If a match was found, add that class to setClassModal
+    //so the requeest method can be switched to PUT instead of POST.
+    setClassModal(matchSchedule);
 
-      //Store every day id from the match class scheduled into dayIds.0
-      const dayIds =  matchSchedule?.days?.map(day => day.id) ?? [];
+    //Store every day id from the match class scheduled into dayIds.
+    const dayIds =  matchSchedule?.days?.map(day => day.id) ?? [];
 
-      //new Set() is to avoid duplicated items.
-      setSelectedDays([...new Set([...dayIds, selDay.id])]);
+    //new Set() is to avoid duplicated items.
+    setSelectedDays([...new Set([...dayIds, selDay.id])]);
 
-      if(classModal) setBlockSearch(true);
-    }
-  }, [matchSchedule, classModal, blockSearch]);
+  }, [matchSchedule]);
 
 
 
@@ -113,14 +114,6 @@ export default function ModalClass() {
     //Validate that the class doesn't last less than 15min.
     if(getDuration(time).asMinutes() < 15 ){
       toast.error("Classes can't last less than 15 minutes.");
-      return false;
-    }
-
-    //Validate that student doesn't have a class in the selected time.
-    if(matchSchedule?.student_id === selStudent?.id
-       && matchSchedule?.id !== classModal?.id)
-    {
-      toast.error("This student already has scheduled classes in this time range.");
       return false;
     }
 

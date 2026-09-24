@@ -274,7 +274,7 @@ const SchoolProvider = ({children}) => {
         getDuration,
         classLength,
         handleClassModal,
-        classModal,
+        classModal, setClassModal,
         expanded, setExpanded,
         today,
         useChangesProtection,
