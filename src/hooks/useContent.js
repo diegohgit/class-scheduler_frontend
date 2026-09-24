@@ -2,14 +2,36 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "../hooks/useApi";
 
 
+
+//Order alphabetically considering numbers too.
+const alphabetical = (a, b) => a.name.localeCompare(b.name,
+                                                  undefined,
+                                                  {numeric: true,
+                                                   sensitivity: "base"}
+                                                );
+
+
+
 const { request } = useApi();
+
+
+
 //Send get request.
 const fetchChapters = async (id) => {
   const url = id ? `api/students/${id}/progress`
                   : "api/chapters/";
 
   const { response } = await request("GET", url, );
-  if(response?.data) return response.data
+
+  if(response?.data) 
+  {
+    //Sort chapters and its sections.
+    return [...response.data].sort(alphabetical)
+                             .map((chapter) => ({
+                               ...chapter,
+                               section: [...chapter.section].sort(alphabetical)
+                             }));
+  }
 }
 
 
@@ -86,7 +108,7 @@ export const useChapterMutation = (options = {}) => {
       //****** POST ******
           if(response.method === "POST"){
 
-            const postChapter = resChapter?.data;
+            const postChapter = resChapter?.data || [];
 
             //Add the section array so user can add new sections.
             const formatChapter = postChapter.map((chapter) =>{
@@ -95,10 +117,7 @@ export const useChapterMutation = (options = {}) => {
 
             const newChapters = [...old, ...formatChapter];
 
-            return newChapters.sort((a, b) => a.name.localeCompare(b.name, undefined, {
-                                                                        numeric: true,
-                                                                        sensitivity: "base"}
-                                                ));
+            return newChapters.sort(alphabetical);
       //****** PUT ******
           }else if(response.method === "PUT"){
 
@@ -152,11 +171,7 @@ export const useSectionMutation = (options = {}) => {
                   //Concatenate new section to list of sections.
                   return {...chapter,
                           section: [ ...chapter.section, ...postSection]
-                          //order alphabetically
-                          .sort((a, b) => a.name.localeCompare(b.name, undefined, {
-                                                                    numeric: true,
-                                                                    sensitivity: "base"
-                                                              }))
+                          .sort(alphabetical)
                         };
                 }
           //****** PUT ******
@@ -183,14 +198,9 @@ export const useSectionMutation = (options = {}) => {
                                               sec.id === resSection.section.id 
                                                 ? resSection.section
                                                 : sec)
+                                            .sort(alphabetical)
                                           : [...chapter.section, resSection.section]
-                                            //order alphabetically
-                                            .sort((a, b) => 
-                                              a.name.localeCompare(b.name, undefined, {
-                                                                    numeric: true,
-                                                                    sensitivity: "base"
-                                                                  }
-                                              ))
+                                            .sort(alphabetical)
                   };
                 }
 
