@@ -6,6 +6,7 @@ export interface Student {
   email:        string|null;
   birthdate?:   Date|""|null;
   level_id:     string|number;
+  level:        {id : string|number; name: string};
   color_id:     string|number;
   progress?:    string|null;
   class_notes?: string|null;

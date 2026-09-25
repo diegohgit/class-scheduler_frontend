@@ -45,7 +45,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
       last_name   : "",
       phone       : "",
       email       : "",
-      birthdate   : initialValues?.birthdate ?? "",
+      birthdate   : "",
       level_id    : "1",
       class_notes : null,
       //Parse color to string because in the radio inputs this 
@@ -57,29 +57,18 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
 
 
-  /*Some data comes from Backend as null, but forms handle this as "".
-    With this we create a copy of the data that comes from backend
-    and switch every null to "" in order to make a comparission 
-    and know if the user has made some changes to the form. */
-  const normalizeFromBackend = (data: any) => ({
-    ...data,
-    birthdate: data?.birthdate ?? "",
-    email:     data?.email ?? "",
-    progress:  data?.progress  ?? "",
-    //Color_id and level_id come from Backend as integer so we must switch it to string
-    //so it can be seen in the colors list.
-    color_id: data?.color?.id != null ? String(data.color?.id) : "",
-    level_id: data?.level?.id != null ? String(data.level?.id) : "",
-  })
-
-
-
-  //When initialValues is loaded, normalize it and pass it to reset().
-  //reset() will load the information into the form.
+  //Load initialValues into form inputs. 
   useEffect(() =>{
     if(!initialValues) return;
 
-    reset(normalizeFromBackend(initialValues));
+    //This values must be converted to String so they can be
+    //read by their inputs.
+    const initVal = {...initialValues,
+                      color_id: String(initialValues.color_id), 
+                      level_id: String(initialValues.level.id) }
+
+    //Load initialValues into form inputs. 
+    reset(initVal);
   }, [initialValues, reset]);
 
 
@@ -127,32 +116,23 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     //an @ symbol, a domain name, a dot (.), 
     //and a domain extension, with no spaces anywhere.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const watchEmail = watch('email') ?? "";
+    const watchEmail = watch('email') ?? '';
 
     if(watchEmail && !emailRegex.test(watchEmail)){
       toast.error("The email field must be a valid email address.");
       return false;
     }
 
-    const birthdateValidation = String(watch("birthdate"));
+    //Validate birthdate.
+    const birthdateValidation = watch("birthdate") ?? '';
 
-    if(!validDate && birthdateValidation.length > 0){
+    if(!validDate && birthdateValidation !== ''){
       toast.error("You must enter a valid birthdate");
       return false;
-    }else return true;
+    }
+
+    return true;
   }
-
-
-
-  //Normalize data so it can be processed by backend.
-  const normalizeToBackend = (data: any) => ({
-    ...data,
-    birthdate : data?.birthdate ? data.birthdate: null,
-    email     : data?.email || null,
-    progress  : data?.progress || null,
-    level_id  : Number(data?.level_id),
-    color_id  : Number(data?.color_id),
-  });
 
 
 
@@ -166,7 +146,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
     if(!validation() && method !== "DELETE") return;
 
-    const success = await onSubmit(normalizeToBackend(data), method);
+    //const success = await onSubmit(normalizeToBackend(data), method);
+    const success = await onSubmit(data, method);
 
     if(success){
       //reset() will switch isDirty to "false" so we can navigate().
@@ -251,7 +232,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 control={control}
                 render={({field}) =>(
                     <BirthdateInput
-                      initialBirthdate = {field.value ?? null }
+                      initialBirthdate = {field.value ?? '' }
                       mode = {mode}
                       onChange={field.onChange}
                     />)}
