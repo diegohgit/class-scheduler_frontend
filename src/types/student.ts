@@ -8,6 +8,7 @@ export interface Student {
   level_id:     string|number;
   level:        {id : string|number; name: string};
   color_id:     string|number;
+  color:        {id : string|number; name: string};
   progress?:    string|null;
   class_notes?: string|null;
   class_notes_date?: string|null;

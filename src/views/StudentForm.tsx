@@ -64,7 +64,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     //This values must be converted to String so they can be
     //read by their inputs.
     const initVal = {...initialValues,
-                      color_id: String(initialValues.color_id), 
+                      color_id: String(initialValues.color.id), 
                       level_id: String(initialValues.level.id) }
 
     //Load initialValues into form inputs. 
