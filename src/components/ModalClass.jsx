@@ -40,30 +40,37 @@ export default function ModalClass() {
 
 
 
+  //blockSearch is used to prevent the system from doing day searches (matchSchedule)
+  //every time the user changes time range or student.
+  const [blockSearch, setBlockSearch]     = useState(false);
+
   //State used to store list of days of a class.
   const [selectedDays, setSelectedDays] = useState([]);
+  //State used to compare if the initial student was changed
+  const [initStudentId, setInitStudentId] = useState(selStudent?.id ?? null);
 
-  //If theres no class loaded in the current modal, check only the current day.
-  //Load all days of a class into selectedDays to show them in the checkboxes.
+  //Handle changes of student and time range in modalClass.
   useEffect(() => {
+    //If student keeps being the same, do nothing.
+    if(blockSearch && selStudent?.id === initStudentId) return;
 
-    if(!matchSchedule){
-      setSelectedDays([selDay.id]);
-      setClassModal([]);
-      return;
+    const matchFound = matchSchedule;
+
+    //If there isn't a matchFound but a classModal was already loaded in the modal,
+    //keep using it to change only student.
+    //If there isn't neither matchFound nor classModal, use the selDay.id.
+    const daysSource = matchFound?.id ? (matchFound.days ?? [])
+                                      : classModal?.id ? (classModal.days ?? []) : [{id : selDay?.id}];
+
+    const dayIds =  daysSource?.map(day => day.id);
+    setSelectedDays(dayIds);
+
+    if(matchFound){
+      setClassModal(matchFound);
+      setInitStudentId(selStudent?.id);
+      setBlockSearch(true);
     }
-
-    //If a match was found, add that class to setClassModal
-    //so the requeest method can be switched to PUT instead of POST.
-    setClassModal(matchSchedule);
-
-    //Store every day id from the match class scheduled into dayIds.
-    const dayIds =  matchSchedule?.days?.map(day => day.id) ?? [];
-
-    //new Set() is to avoid duplicated items.
-    setSelectedDays([...new Set([...dayIds, selDay.id])]);
-
-  }, [matchSchedule]);
+  }, [selStudent, time,]);
 
 
 
@@ -121,13 +128,13 @@ export default function ModalClass() {
     const findOverlapse = classes?.some(cls => {
       //Validate that the selected time range doesn't overlapse with another class.
       const checkTime = cls.starts < time.ends && cls.ends > time.starts;
-      //If the class has different student and different class_id
-      //it won't be possible to schedule the class 
-      //unless it is scheduled on a different day.
-      const checkStudent = cls.student_id !== selStudent.id;
-      const checkClass   = cls.id !== classModal?.id;
+      //If the class has different class_id
+      //it won't be possible to schedule the class
+      //unless it's scheduled on a different day.
+      //const checkStudent = cls.student_id !== selStudent.id;
+      const checkClass = cls.id !== classModal?.id;
 
-      if(checkTime && checkStudent && checkClass){
+      if(checkTime && checkClass){
         //Validate days.
         const checkDay = cls.days?.some(d =>{
 
