@@ -22,9 +22,11 @@ export default function Sidebar() {
   //Mark active option when the component is mounted in case the user 
   // entered directly from a link without doing a click on the option.
   useEffect(() => {
-    //Set the 3th segment from current url to the path state.
+
     const ref = window.location.href
-    const segment = ref.split('/')[3];
+
+    //Set the 4th segment from current url to the path state.
+    const segment = ref.split('/')[4] ?? '';
     setPath("/"+segment);
   }, [])
 
