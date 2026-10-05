@@ -9,14 +9,12 @@ export default function ModalSection() {
   const { validString, selSection, setSelSection,
           handleModalSection, } = useSchool();
 
-  const { useSectionMutation } = useContent();
+  const { useChapters, useSectionMutation } = useContent();
 
   const inputRef = useRef(null);
 
   //load list of chapters
-  const { data:chapters = [],
-          isLoading,
-        } = useContent();
+  const { data:chapters = [], } = useChapters();
 
 
 
