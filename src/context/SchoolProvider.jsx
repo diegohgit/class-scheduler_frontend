@@ -1,9 +1,9 @@
 import { createContext, useState, useEffect } from "react"
 import { useBlocker } from "react-router-dom";
-import axiosClient from "../config/axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import { useApi } from "../hooks/useApi";
+
+
 
 const SchoolContext = createContext();
 
@@ -214,6 +214,16 @@ const SchoolProvider = ({children}) => {
 
 
 
+  //Order alphabetically considering numbers too.
+  const alphabetical = (a, b) => a.name
+                                .localeCompare(b.name,
+                                              undefined,
+                                              {numeric: true,
+                                              sensitivity: "base"}
+                                            );
+
+
+
   //states to handle configuration's modal.
   const [modalConfiguration, setModalConfiguration] = useState(0);
 
@@ -282,6 +292,7 @@ const SchoolProvider = ({children}) => {
         modalChapter, setModalChapter,
         handleModalChapter,
         selChapter, setSelChapter,
+        alphabetical,
         modalConfiguration, setModalConfiguration,
         handleModalConfiguration,
         validString,

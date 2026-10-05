@@ -1,13 +1,15 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
-import { useContent, useChapterMutation } from "../hooks/useContent";
+import useContent from "../hooks/useContent";
+
+
 
 export default function ModalChapter() {
 
   const { handleModalChapter, validString, selChapter,
           setSelChapter } = useSchool();
 
-
+  const { useChapterMutation } = useContent();
 
   const inputRef = useRef(null);
 

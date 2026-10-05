@@ -4,7 +4,7 @@ import useSchool from "../hooks/useSchool";
 import { useApi } from "../hooks/useApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingMessage from "./LoadingMessage";
-import { useChapterMutation, useSectionMutation } from "../hooks/useContent";
+import useContent from "../hooks/useContent";
 
 export default function Accordion({mode, chapter, sections}) {
 
@@ -13,6 +13,8 @@ export default function Accordion({mode, chapter, sections}) {
 
   const { handleModalChapter, setSelChapter, setSelSection,
           handleModalSection, getFormattedDate, } = useSchool();
+
+  const { useChapterMutation, useSectionMutation } = useContent();
 
   const { id } = useParams();
 
@@ -34,6 +36,7 @@ export default function Accordion({mode, chapter, sections}) {
                                       message);
     return success;
   }
+
 
 
   //Mutation to mark/unmark a section as seen.
@@ -150,7 +153,6 @@ export default function Accordion({mode, chapter, sections}) {
 
     const label = formattedDate.includes("/") ? `Seen on ${formattedDate}` 
                                               : `Seen ${formattedDate}`;
-
     return label;
   }
 

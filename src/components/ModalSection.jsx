@@ -1,11 +1,15 @@
 import useSchool from "../hooks/useSchool";
 import { useState, useRef, useEffect } from "react";
-import { useContent, useSectionMutation } from "../hooks/useContent";
+import useContent from "../hooks/useContent";
+
+
 
 export default function ModalSection() {
 
   const { validString, selSection, setSelSection,
           handleModalSection, } = useSchool();
+
+  const { useSectionMutation } = useContent();
 
   const inputRef = useRef(null);
 

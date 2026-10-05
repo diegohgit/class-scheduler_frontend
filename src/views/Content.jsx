@@ -3,8 +3,8 @@ import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
 import ModalChapter from "../components/ModalChapter";
 import ModalSection from "../components/ModalSection";
-import { useEffect, useState } from "react";
-import { useContent } from "../hooks/useContent";
+import useContent from "../hooks/useContent";
+
 
 
 export default function Content() {
@@ -13,10 +13,12 @@ export default function Content() {
           modalSection, setModalSection, handleModalSection,
           setSelSection, setSelChapter } = useSchool();
 
+  const { useChapters } = useContent();
+
 
   const { data: chapters = [],
           isLoading,
-        } = useContent();
+        } = useChapters();
 
 
   return (

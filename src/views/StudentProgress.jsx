@@ -1,10 +1,14 @@
 import Accordion from "../components/Accordion";
 import useSchool from "../hooks/useSchool";
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useContent, useStudentProgress } from "../hooks/useContent";
+import useContent from "../hooks/useContent";
+
 
 export default function StudentProgress() {
+
+  const { alphabetical } = useSchool();
+
+  const { useChapters, useStudentProgress } = useContent();
 
   const {id} = useParams();
   const navigate = useNavigate();
@@ -13,8 +17,10 @@ export default function StudentProgress() {
   const { data:chapters = [],
           isLoading: isLoadingChapters,
           isError: isErrorChapters,
-        } = useContent();
+        } = useChapters();
 
+
+  
   //Fetch only chapters seen by a single student.
   const { data:studentProgress = [],
           isLoading: isLoadingProgress,
@@ -22,11 +28,12 @@ export default function StudentProgress() {
         } = useStudentProgress(id);
 
 
+
   // Create a new data structure that combines all sections
   // with the student's progress.
-  const progress = chapters.map( (chapter) => ({
+  const progress = chapters.sort(alphabetical).map( (chapter) => ({
     ...chapter,
-    section: chapter.section.map( (section) => {
+    section: chapter.section.sort(alphabetical).map( (section) => {
 
       const sp = studentProgress.find(
         (sp) => sp.section_id === section.id
