@@ -174,7 +174,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   <>
 
     <h1 className="title-base">
-      {mode === "create" ? "New Student" : watch("first_name")}
+      {mode === "create" ? "New Student" : 
+                          watch("first_name").length ? watch("first_name") : 'Edit Student'}
     </h1>
 
     {initialValues || mode === "create" ? (
