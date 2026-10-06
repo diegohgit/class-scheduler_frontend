@@ -39,17 +39,20 @@ export default function StudentList() {
   //Columns for the DataTable component
   const columns = [
     {
-      name: "Name",
-      selector: row => {//Add a lastName format because if it's null 
+      name     : "Name",
+      selector : row => {//Add a lastName format because if it's null 
                         //it shows 'null' as last name in the list.
                         const lastName = row.last_name ?? "";  
                         return row.first_name+" "+ lastName},
-      sortable: true,
+      sortable : true,
+      grow     : 2,//width proportion.
     },
     {
-      name: "Level",
-      selector: row => row.level,
-      sortable: true,
+      name     : "Level",
+      selector : row => row.level,
+      sortable : true,
+      grow     : 1,
+      center   : true,
     },
   ]
 
@@ -90,7 +93,7 @@ export default function StudentList() {
   <>
     <h1 className="title-base">Students</h1>
 
-    <div className="w-6/12 h-fit mx-auto mt-3 mb-15">
+    <div className="w-full max-w-xl px-4 h-fit mx-auto mt-3 mb-15">
       <div className="relative w-64 mx-auto">
         <input
           type="text"
