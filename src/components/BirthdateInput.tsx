@@ -110,12 +110,12 @@ export default function BirthdateInput({initialBirthdate, mode, onChange}: Props
 
   return (
     <>
-      <div className="w-6/12 mb-0 mr-3">
+      <div className="w-full md:w-1/2 mb-6">
         <p className="font-bold mb-1">Birthdate (MM/DD/YYYY):</p>
         <div className="flex ">
-          <div>
+          <div className="w-1/2">
             <input
-              className={`input-base  ${markInput === true ? "focus:border-0! border-red-500! border-2!":"" } `}
+              className={`input-base ${markInput === true ? "focus:border-0! border-red-500! border-2!":"" } `}
               placeholder="(optional)"
               type="text"
               value={String(initialBirthdate)}
@@ -127,6 +127,7 @@ export default function BirthdateInput({initialBirthdate, mode, onChange}: Props
             />
             <p className={`${ageMessage !== "" ? '' : 'hidden' } text-md text-red-500` }>{`${ageMessage}`}</p>
           </div>
+
           { age > 0 && validDate &&  <p className ='m-2'>({age} years old)</p> }
         </div>
       </div>

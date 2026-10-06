@@ -159,6 +159,12 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
 
 
+  //Styles
+  const rowContainer = 'flex flex-col md:flex-row gap-4 mb-4';
+  const fieldContainder = 'w-full md:w-1/2 mb-6';
+
+
+
   {/**
     *
     *     FORM
@@ -176,50 +182,50 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
         {/* Loading request message */}
         {isPending && <LoadingMessage text={loadingAction} />}
 
-        <div className="flex items-center justify-center">
+        <div className="flex justify-center">
           <form
             onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PUT"))}
-            className="w-8/12"
+            className="w-full max-w-3xl px-4"
           >
-            <div className="flex mb-4">
-              <div className="w-1/2 mb-6">
+            <div className={rowContainer}>
+              <div className={fieldContainder}>
                 <p className="font-bold mb-1">First name:</p>
                 <input
                   {...register("first_name")}
-                  className="input-base w-10/12!"
+                  className="input-base md:w-10/12!"
                   placeholder="Student's first name"
                 />
               </div>
-              <div className="w-1/2 mb-6">
+              <div className={fieldContainder}>
                 <p className="font-bold mb-1">Last name:</p>
                 <input
                   {...register("last_name")}
-                  className="input-base w-10/12!"
+                  className="input-base md:w-10/12!"
                   placeholder="(Optional)"
                 />
               </div>
             </div>
 
-            <div className="flex mb-4">
-              <div className="w-1/2 mb-6">
+            <div className={rowContainer}>
+              <div className={fieldContainder}>
                 <p className="font-bold mb-1">Phone:</p>
                 <input
                   {...register("phone")}
-                  className="input-base w-10/12!"
+                  className="input-base w-full md:w-10/12"
                   placeholder="Phone number (optional)"
                 />
               </div>
-              <div className="w-1/2 mb-6">
+              <div className={fieldContainder}>
                 <p className="font-bold mb-1">E-mail:</p>
                 <input
                   {...register("email")}
-                  className="input-base w-10/12!"
+                  className="input-base w-full md:w-10/12"
                   placeholder="(Optional)"
                 />
               </div>
             </div>
 
-            <div className="flex">
+            <div className={rowContainer}>
 
             {/* Birthdate input 
                 Handle it with Controller so we can use isDirty 
@@ -238,11 +244,11 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                     />)}
               />
 
-              <div className="w-6/12 mb-6">
+              <div className={fieldContainder}>
                 <p className="font-bold mb-1">English level:</p>
                 <select 
                   {...register("level_id")}
-                  className="input-base"
+                  className="input-base w-full md:w-10/12"
                 >
                   <option value="1">A1</option>
                   <option value="2">A2</option>
