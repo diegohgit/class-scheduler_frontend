@@ -287,7 +287,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
             { isError && (<p>Couldn't fetch colors.</p>) }
 
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-wrap gap-3 mb-4 ">
               { isLoading && (<p>Loading colors...</p>) }
 
               {colors.map((color:any)=>{
@@ -340,10 +340,15 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
             <div className="bottom-bar">
               <button type="button"
-                      className="button-base bg-blue-500 hover:bg-blue-600"
+                      className="button-base flex items-center 
+                                 justify-center bg-indigo-500 hover:bg-indigo-600
+                                 w-fit! p-1 gap-1"
                       onClick={() => navigate("/students")}
               >
-                Back to list
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+                <span>Back</span>
               </button>
 
               {isDirty &&
