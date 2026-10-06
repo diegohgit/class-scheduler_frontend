@@ -51,8 +51,7 @@ export default function StudentProgress() {
   <>
     <h1 className="title-base">Content</h1>
 
-    <div className="w-8/12 p-4 mb-10
-                    mx-auto bg-gray-200 rounded-lg">
+    <div className="accordion-container">
       { isLoadingProgress || isLoadingChapters 
         ? (<span>Fetching progress...</span>) : null}
 

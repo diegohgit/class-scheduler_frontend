@@ -9,9 +9,8 @@ import useContent from "../hooks/useContent";
 
 export default function Content() {
 
-  const { handleModalChapter, modalChapter, setModalChapter,
-          modalSection, setModalSection, handleModalSection,
-          setSelSection, setSelChapter } = useSchool();
+  const { handleModalChapter, modalChapter, modalSection,
+          handleModalSection, setSelSection, setSelChapter } = useSchool();
 
   const { useChapters } = useContent();
 
@@ -25,8 +24,7 @@ export default function Content() {
 	<>
     <h1 className="title-base">Content</h1>
 
-    <div className="w-8/12 p-4 mb-10
-                    mx-auto bg-gray-200 rounded-lg">
+    <div className="accordion-container">
       {chapters?.length ? (
         chapters.map( (chapter) => (
           <Accordion 

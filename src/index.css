@@ -54,3 +54,9 @@
 			  text-white font-bold m-2
           hover:cursor-pointer shadow-lg ;
 }
+
+.accordion-container {
+  @apply  mb-20 px-2 md:px-4
+          mx-auto w-full md:w-8/12
+          bg-sky-100 rounded-lg;
+}

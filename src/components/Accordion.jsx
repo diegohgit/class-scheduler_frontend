@@ -165,17 +165,13 @@ export default function Accordion({mode, chapter, sections}) {
       {chapterMutation.isPending && <LoadingMessage text="Deleting chapter..."/>}
 
       {/* CHAPTER HEADER */}
-      <div
-        className="w-full relative flex
-                   py-2 px-2 font-bold 
-                   text-lg bg-gray-200"
-      >
+      <div className="w-full relative flex">
 
         {/* CHAPTER NAME */}
         <span className={`${activeChapter === chapter.id ? "bg-blue-200 " 
-                                                         : "bg-gray-200 hover:bg-gray-300" }
-                          w-9/12 text-lg font-bold
-                          p-2 cursor-pointer hover:bg-gray-300`}
+                                                         : "bg-sky-100 hover:bg-sky-200" }
+                          w-9/12 text-lg font-bold 
+                          py-2 cursor-pointer hover:bg-sky-200`}
               onClick={() => setIsOpen(!isOpen)}
         >{chapter.name}</span>
 
@@ -186,7 +182,7 @@ export default function Accordion({mode, chapter, sections}) {
 
           {mode === "manage" && (
             confirmChapterDelete === false ?
-            ( <div className='group-hover:block text-base 
+            ( <div className='group-hover:block text-base
                               font-medium my-auto
                               *:ml-2 *:hover:underline *:cursor-pointer'
               >
@@ -226,7 +222,7 @@ export default function Accordion({mode, chapter, sections}) {
 
 
 
-      {/* ACCORDION CONTENT */}
+      {/* CHAPTER CONTENT */}
       <div className={`${isOpen ? "max-h-[1000px] overflow-visible"
                                 : "max-h-0 overflow-hidden"}
                      transition-all duration-300 `}
@@ -239,19 +235,19 @@ export default function Accordion({mode, chapter, sections}) {
           >
             {/* SECTION ROW */}
             <div className={`${activeSection === section.id ? "bg-blue-200 " 
-                                                            : "bg-gray-200 hover:bg-gray-300" }
+                                                            : "bg-sky-100 hover:bg-sky-200" }
                             items-center flex w-full
-                            cursor-pointer px-2 py-2`}
+                            cursor-pointer py-2`}
             >
               {/* CHECKED ICON */}
               {mode === "student" && (
                 section.seenDate !== null ? (
 
                   <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" 
-                        className="ml-2 size-5.5 rounded-full bg-green-400 ">
+                        className="ml-2 size-5.5 min-w-5.5 rounded-full bg-green-400 ">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                   </svg>
-                ) : ( <div className="ml-2 h-5.5 w-5.5 rounded-full border border-gray-500 "></div>))
+                ) : ( <div className="ml-2 h-5.5 min-w-5.5 rounded-full border border-gray-500 "></div>))
               }
 
               {/* SECTION NAME */}
