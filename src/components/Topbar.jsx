@@ -93,7 +93,7 @@ export default function Sidebar() {
                 <p className="text-center w-full">{option.label}</p>
               </div>
               {/* Mark active option*/}
-              <div className={`${path === option.route ? "bg-blue-500" : ""}
+              <div className={`${path === option.route ? "bg-sky-400" : ""}
                               h-2 w-full `}></div>
             </div>
           </Link>
