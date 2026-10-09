@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import axiosClient from "../config/axios";
 import { useState } from "react";
+import { Link } from "react-router-dom"; 
 
 export default function ForgotPassword() {
 
@@ -96,6 +97,15 @@ export default function ForgotPassword() {
               We will send you a link where you'll be able to reset 
               your password.
             </span>
+
+            <Link to='/login'>
+              <span className="block w-full text-center
+                                mt-4 font-bold
+                                hover:underline hover:cursor-pointer"
+                                >
+                Back to login
+              </span>
+            </Link>
           </div>
         </div>
       </div>
