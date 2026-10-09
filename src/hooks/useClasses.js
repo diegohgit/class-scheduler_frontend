@@ -44,9 +44,12 @@ const handleRequest = async({data, method}) => {
                                               url,
                                               data,
                                               `Class ${action}.`);
+  const deleteId = data.delete_id ?? null;
+
   return {success,
           response,
-          method};
+          method,
+          deleteId };
 }
 
 
@@ -61,6 +64,7 @@ export const useClassMutation = (options = {}) => {
       if(response?.success){
         const resClass = response?.response?.data;
         const method   = response?.method;
+        const deleteId = response?.deleteId;
 
         queryClient.setQueryData(["classes"], (old) => {
           //Prevent errors when the cache doesn't contain any data yet.
@@ -97,9 +101,14 @@ export const useClassMutation = (options = {}) => {
                                   ? [...old, resClass]
                                   : old.map((c) => c.id === resClass.id ? resClass : c);
 
+            //Remove class in case user did a merge of classes.
+            const filterClasses = method === 'PUT' && deleteId
+                                  ? updateClasses.filter((c) => c.id != deleteId)
+                                  : updateClasses;
+
             //Sort classes by "starts". This is important because the render algorithm
             //searches classes by starts order.
-            const sortClasses = [...updateClasses
+            const sortClasses = [...filterClasses
                                   .sort((a, b) => (a.starts > b.starts ? 1 : -1))];
 
             //Replace old class notes data with the new information

@@ -30,44 +30,71 @@ export default function ModalClass() {
 
 
   //Check if there's another class with same time range and same student.
-  const matchSchedule = classes?.find(cls => {
+  const matchFound = () => classes?.find(cls => {
                 return (
-                   cls.starts === time.starts &&
-                   cls.ends   === time.ends   &&
-                   cls.student_id === selStudent.id
+                  cls.starts === time.starts &&
+                  cls.ends   === time.ends   &&
+                  cls.student_id === selStudent.id
                 );
   });
 
 
 
-  //blockSearch is used to prevent the system from doing day searches (matchSchedule)
-  //every time the user changes time range or student.
-  const [blockSearch, setBlockSearch]     = useState(false);
-
+  //blockSearch is used to prevent the system from doing day searches (matchFound)
+  //every time the user changes time range or student. This is useful to update 
+  //time range or student of a class without losing the current classModal.
+  const [blockSearch, setBlockSearch] = useState(false);
   //State used to store list of days of a class.
   const [selectedDays, setSelectedDays] = useState([]);
-  //State used to compare if the initial student was changed
+  //States used to compare if the initial student or class were changed.
   const [initStudentId, setInitStudentId] = useState(selStudent?.id ?? null);
+  const [ initClass, setInitClass ]       = useState(classModal ?? null);
+  //State used to store the class_id that will be deleted in case of merging.
+  const [deleteClassId, setDeleteClassId] = useState(null);
 
   //Handle changes of student and time range in modalClass.
   useEffect(() => {
-    //If student keeps being the same, do nothing.
-    if(blockSearch && selStudent?.id === initStudentId) return;
 
-    const matchFound = matchSchedule;
+    //If time range is invalid or there's no selStudent 
+    //just mark the current day and don't do anything else.
+    if(!validTime(time) || !selStudent?.id){ 
+      if(!selectedDays.length) setSelectedDays([selDay?.id]);
+      return;
+    }
 
-    //If there isn't a matchFound but a classModal was already loaded in the modal,
-    //keep using it to change only student.
-    //If there isn't neither matchFound nor classModal, use the selDay.id.
-    const daysSource = matchFound?.id ? (matchFound.days ?? [])
-                                      : classModal?.id ? (classModal.days ?? []) : [{id : selDay?.id}];
+    let daysSource = [];
 
-    const dayIds =  daysSource?.map(day => day.id);
-    setSelectedDays(dayIds);
+    const classFound = matchFound();
 
-    if(matchFound){
-      setClassModal(matchFound);
+    if(blockSearch && selStudent?.id === initStudentId)
+    {
+      //If user selects a class and then finds another class of the same student, 
+      //merge both classes.  
+      if(classFound && classFound?.id !== initClass?.id)
+      {
+        //Merge days of classFound and initClass.
+        daysSource = [...(classFound.days ?? []),
+                      ...(initClass?.days ?? []) ];
+        setDeleteClassId(initClass?.id);
+      }
+      else return;//If user is changing time range using the same student,
+                  //don't do anything because it would lose the current classModal.
+    }
+
+    if(!daysSource.length){
+      //If there isn't a classFound but a classModal was already loaded in the modal,
+      //keep using it to change only student.
+      //If there isn't neither classFound nor classModal, use the selDay.id.
+      daysSource = classFound?.id ? (classFound.days ?? [])
+                                  : classModal?.id ? (classModal.days ?? []) : [{id : selDay?.id}];
+    }
+
+    setSelectedDays( daysSource?.map(day => day.id) );
+
+    if(classFound){
+      setClassModal(classFound);
       setInitStudentId(selStudent?.id);
+      setInitClass(classFound);
       setBlockSearch(true);
     }
   }, [selStudent, time,]);
@@ -96,6 +123,28 @@ export default function ModalClass() {
 
 
 
+  //Validate time range.
+  const validTime = (time, notification) => {
+
+    //Validate that the class doesn't last longer than 3hrs.
+    if(getDuration(time).asHours() > 3 ){
+
+      if(notification) toast.error("Classes can't last longer than 3 hours.");
+      return false;
+    }
+
+    //Validate that the class doesn't last less than 15min.
+    if(getDuration(time).asMinutes() < 15 ){
+
+      if(notification) toast.error("Classes can't last less than 15 minutes.");
+      return false;
+    }
+
+    return true;
+  }
+
+
+
   //Validate data and overlapses.
   const validation = (formData) => {
 
@@ -112,17 +161,7 @@ export default function ModalClass() {
       return false;
     }
 
-    //Validate that the class doesn't last longer than 3hrs.
-    if(getDuration(time).asHours() > 3 ){
-      toast.error("Classes can't last longer than 3 hours.");
-      return false;
-    }
-
-    //Validate that the class doesn't last less than 15min.
-    if(getDuration(time).asMinutes() < 15 ){
-      toast.error("Classes can't last less than 15 minutes.");
-      return false;
-    }
+    if(!validTime(time, true)) return false;
 
     //Validate that the selected time range doesn't overlapse with another class.
     const findOverlapse = classes?.some(cls => {
@@ -210,6 +249,7 @@ export default function ModalClass() {
                   starts      : time.starts+':00',
                   ends        : time.ends+':00',
                   class_notes : sendClassNotes,
+                  delete_id   : deleteClassId,
                 };
 
     classMutation.mutate({data, method});
