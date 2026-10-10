@@ -212,7 +212,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 <p className="font-bold mb-1">Phone:</p>
                 <input
                   {...register("phone")}
-                  className="input-base w-full md:w-10/12"
+                  className="input-base md:w-10/12!"
                   placeholder="Phone number (optional)"
                 />
               </div>
@@ -220,7 +220,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 <p className="font-bold mb-1">E-mail:</p>
                 <input
                   {...register("email")}
-                  className="input-base w-full md:w-10/12"
+                  className="input-base md:w-10/12!"
                   placeholder="(Optional)"
                 />
               </div>
@@ -249,7 +249,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 <p className="font-bold mb-1">English level:</p>
                 <select 
                   {...register("level_id")}
-                  className="input-base w-full md:w-10/12"
+                  className="input-base md:w-10/12!"
                 >
                   <option value="1">A1</option>
                   <option value="2">A2</option>
@@ -315,7 +315,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               }
             </div >
 
-            <div className="mb-10">
+            <div className="mb-15">
               <div className="flex">
                 <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
 
