@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import useSchool from "../hooks/useSchool";
 import { useStudents } from "../hooks/useStudents";
 import axiosClient from "../config/axios";
+import { toast } from "react-toastify";
+
 
 
 export default function StudentList() {
@@ -60,6 +62,11 @@ export default function StudentList() {
 
   //Download students excel file.
   const downloadStudentsExcel = async () => {
+
+    if(!records.length){
+      toast.warning("There are no students registered.");
+      return;
+    }
 
     const response = await axiosClient({method : 'GET', 
                                         url : '/api/students/export',
