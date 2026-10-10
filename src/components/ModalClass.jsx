@@ -400,8 +400,8 @@ export default function ModalClass() {
           {/* SUBMIT BUTTON */}
           <button 
             type="submit"
-            className={`button-base bg-indigo-500 
-                      ${classMutation.isPending ? 'bg-indigo-300 hover:cursor-not-allowed' : 'hover:bg-indigo-600'}`}
+            className="button-base bg-indigo-500 hover:bg-indigo-600
+                       disabled:bg-indigo-300 disabled:cursor-not-allowed!"
             disabled={classMutation.isPending}
           >
             {classMutation.isPending && !isDeleting ? "Saving Class..." : "Save"}
