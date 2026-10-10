@@ -89,8 +89,10 @@ export default function Login() {
 
               <button className="button-base block mx-auto!
                                 border border-white
-                                hover:bg-cyan-400 hover:border-0"
+                                hover:bg-cyan-400 hover:border-0
+                                disabled:cursor-not-allowed!"
                       type="submit"
+                      disabled={loginMutation.isPending}
               >
                 { loginMutation.isPending ? 'Loading...' : 'Login' }
               </button>
