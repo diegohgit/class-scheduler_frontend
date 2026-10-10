@@ -354,10 +354,12 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
               {isDirty &&
                 <button type="submit"
-                        className="button-base bg-green-500 hover:bg-green-600"
+                        className="button-base bg-green-500 hover:bg-green-600
+                                  disabled:cursor-not-allowed!"
                         onClick={() => setLoadingAction(mode === "edit" 
                                                           ? "Saving changes..." 
                                                           : "Saving student...")}
+                        disabled={isPending}
                 >
                   {mode === "create" ? "Create student" : "Save changes"}
                 </button>
@@ -381,8 +383,10 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                       <span onClick={() => setConfirmDelete(false)}
                       >No</span>
 
-                      <span onClick={handleSubmit((data) => {submit(data, "DELETE")
-                                                             setLoadingAction("Deleting student...")})}
+                      <span onClick={handleSubmit((data) => { if(!isPending)return
+                                                              submit(data, "DELETE")
+                                                              setLoadingAction("Deleting student...")
+                                                              })}
                       >Yes</span>
                     </div>
                   </div>
