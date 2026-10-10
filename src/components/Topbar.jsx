@@ -140,7 +140,9 @@ export default function Sidebar() {
                   if(!logoutMutation.isPending)logoutMutation.mutate();
                 }}
           >
-            <span className="text-sm hover:underline">
+            <span className={`text-sm
+                              ${logoutMutation.isPending  ? 'hover:cursor-not-allowed'
+                                                          : 'hover:underline'}`}>
               {logoutMutation.isPending || logoutMutation.isSuccess
                ? "Logging out..." : "Click here to log out."}
             </span>
