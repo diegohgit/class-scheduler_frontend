@@ -2,6 +2,7 @@ import Accordion from "../components/Accordion";
 import useSchool from "../hooks/useSchool";
 import { useParams, useNavigate } from "react-router";
 import useContent from "../hooks/useContent";
+import { useEffect, useState, useRef } from "react";
 
 
 export default function StudentProgress() {
@@ -35,7 +36,7 @@ export default function StudentProgress() {
     ...chapter,
     section: chapter.section.sort(alphabetical).map( (section) => {
 
-      const sp = studentProgress.find(
+      const sp = studentProgress?.progress?.find(
         (sp) => sp.section_id === section.id
       );
 
@@ -47,9 +48,61 @@ export default function StudentProgress() {
   }));
 
 
+
+  function StudentTitle({studentName}){
+    const titleRef = useRef(null);
+    const [showFixedTitle, setShowFixedTitle] = useState(false);
+
+    useEffect(() => {
+      //IntersectionObserver is a browser API for detecting when an element 
+      //enters or leaves the visible area of the page.
+      const observer = new IntersectionObserver(
+        //entry contains information about the element being observed.
+        ([entry]) => {
+          //is the element intersecting the viewport?
+          setShowFixedTitle(!entry.isIntersecting);
+        },
+        {threshold: 1}//threshold tells the observer how much of the observed element 
+                      //needs to be visible before it considers the intersection 
+                      //to have reached the threshold.
+                      //0->0% , 0.5->50% , 1->100%
+      );
+
+      if(titleRef.current){
+        observer.observe(titleRef.current);
+      }
+
+      return () => observer.disconnect();
+    }, []);
+
+    return (
+      <>
+        <h1 ref={titleRef} className="title-base">
+          {studentName}
+        </h1>
+
+        <div className={`
+              fixed inset-x-0 top-14 z-50
+              bg-white/50 backdrop-blur-sm
+              shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] 
+              transition-all duration-300
+              ${showFixedTitle ? "translate-y-0 opacity-100"
+                               : "-translate-y-full opacity-0 pointer-events-none"
+              }`}
+        >
+          <span className="flex font-bold items-center justify-center ">
+            {studentName}
+          </span>
+        </div>
+      </>
+    );
+  }
+
+  const student = studentProgress?.student?.length ? studentProgress?.student+"'s progress" : 'Content';
+
   return (
   <>
-    <h1 className="title-base">Content</h1>
+    <StudentTitle studentName={student} />
 
     <div className="accordion-container">
       { isLoadingProgress || isLoadingChapters 
