@@ -3,7 +3,7 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
   //Format day label to show it in empty spaces.
   const dayLabel 	 = match ?? day?.label?.slice(0,3);
   const matchEnds  = match ? ` - ${match.ends}` : '';
-  const color 		 = match?.color   ?? '#d1d5db';
+  const color 		 = match?.color ?? '#e0e7ff';
   const first_name = match?.first_name ?? '';
   //const last_name  = match?.last_name ?? '';
 
@@ -20,12 +20,12 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
                       height: spaceHeight+'px'}}
             className=" w-[140px] text-center
                         border-t border-r  border-dashed border-white
-                        hover:cursor-pointer hover:bg-blue-200!"
+                        hover:cursor-pointer hover:bg-sky-200!"
             onClick={onClick}>
 
         { match ? (
             <div className = "h-8/12">
-              <span className = "h-full flex mx-1 text-sm items-center justify-center text-center">
+              <span className = "h-full font-bold flex items-center justify-center text-center">
                 {first_name}
               </span>
             </div>
