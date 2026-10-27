@@ -119,9 +119,10 @@ const useContent = () => {
         //****** PUT ******
             }else if(response.method === "PUT"){
 
-              return old.map((chapter) => chapter.id === resChapter.id 
-                                          ? {...chapter, name: resChapter.name}
-                                          : chapter);
+              const updatedChapters =  old.map((c) => c.id === resChapter.id 
+                                                      ? {...c, name: resChapter.name}
+                                                      : c);
+              return updatedChapters.sort(alphabetical);
         //****** DELETE ******
             }else if(response.method === "DELETE"){
 
