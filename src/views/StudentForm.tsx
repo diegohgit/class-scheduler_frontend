@@ -8,6 +8,9 @@ import { useApi } from "../hooks/useApi";
 import { useQuery } from "@tanstack/react-query";
 import BirthdateInput from "../components/BirthdateInput";
 import LoadingMessage from "../components/LoadingMessage";
+import type { FieldNamesMarkedBoolean } from "react-hook-form";
+
+
 
 type Props = {
   initialValues?: Student | undefined;
@@ -38,7 +41,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
     handleSubmit,
     reset,
     control,
-    formState: { isDirty },
+    formState: { isDirty, dirtyFields },
   } = useForm<Student>({
     defaultValues: {
       first_name  : "",
@@ -141,13 +144,44 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
 
 
+  //Get only modified fields to send a PATCH request.
+  const getModifiedFields = ( data: Student,
+                              dirtyFields: FieldNamesMarkedBoolean<Student>
+                            ): Partial<Student> => {
+
+      const modified: Partial<Student> = {};
+
+      //Get the dirtyFields keys and tell TypeScript that they are not just
+      //generic strings, because they're specific keys that exist inside Student. We need
+      //to convert them into an array so they can be correctly compared by TypeScript.
+      (Object.keys(dirtyFields) as (keyof Student)[]).forEach(key => {
+
+          //Check if the current property has been modified (will have true as value).
+          if (dirtyFields[key]) {
+            //Create an object with the current property 
+            //use Object.assign to copy the object into 'modified'.
+            Object.assign(modified, { [key]: data[key] });
+          }
+      });
+
+      if(id) modified.id = Number(id);
+
+      return modified;
+  };
+
+
+
   //Submit handler
   const submit = async (data:Student | null, method: string) => {
 
     if(!validation() && method !== "DELETE") return;
 
-    //const success = await onSubmit(normalizeToBackend(data), method);
-    const success = await onSubmit(data, method);
+    let submitData : Student | Partial<Student> | null = data;
+
+    //If method is PATCH, send only getModifiedFields();
+    if(method === "PATCH" && data) submitData = getModifiedFields(data, dirtyFields);
+
+    const success = await onSubmit(submitData, method);
 
     if(success){
       //reset() will switch isDirty to "false" so we can navigate().
@@ -185,7 +219,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
 
         <div className="flex justify-center">
           <form
-            onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PUT"))}
+            onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PATCH"))}
             className="w-full max-w-3xl px-4"
           >
             <div className={rowContainer}>

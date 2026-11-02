@@ -14,6 +14,7 @@ export const useApi = () => {
 
       if(   method === "POST"
          || method === "PUT"
+         || method === "PATCH"
          || method === "DELETE" ){
 
         if(response?.data?.id || response?.data?.success) success = true;

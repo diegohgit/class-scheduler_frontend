@@ -44,12 +44,13 @@ export const useStudent = (id) => {
 //Async function to send student mutation requests.
 const handleRequest = async({data, method}) => {
 
-  const id   = data?.id ?? null;
+  const id = data.id ?? null;
+
   const url  = id ? `api/students/${id}` : `/api/students`;
   let action = "";
 
        if(method === "POST")   action = "created";
-  else if(method === "PUT")    action = "updated";
+  else if(method === "PATCH")  action = "updated";
   else if(method === "DELETE") action = "deleted";
 
   const { success, response } = await request(method,
@@ -89,8 +90,8 @@ export const useStudentMutation = (options = {}) => {
 
             return [...old, resStudent].sort();
 
-          //****** PUT ******
-          }else if(method === "PUT"){
+          //****** PATCH ******
+          }else if(method === "PATCH"){
 
             //Modify student local cache data.
             queryClient.setQueryData(["student", String(resStudent.id)], (old) => {
