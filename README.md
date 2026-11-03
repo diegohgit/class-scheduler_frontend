@@ -1,16 +1,71 @@
-# React + Vite
+<p align="center">
+    <a href="https://diegomysite.com/class-scheduler-demo/login" target="_blank">
+        <img src="./public/img/scheduler_sky-blue.png" width="400" alt="Class Scheduler logo">
+    </a>
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1>Class Scheduler - Frontend</h1>
 
-Currently, two official plugins are available:
+A frontend project built with React + Vite to manage students, class schedules, and students' progress.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is part of Class Scheduler, a web application designed to help teachers organize their students and manage their weekly classes.
 
-## React Compiler
+Some features Class Scheduler includes:
+- Schedule classes.
+</br>
+<img src="./public/img/screenshots/schedule.jpg" width="400" alt="Class Scheduler logo">
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Administrate students.
+</br>
+<img src="./public/img/screenshots/student.jpg" width="400" alt="Class Scheduler logo">
 
-## Expanding the ESLint configuration
+- Keep track of each student's progress.
+</br>
+<img src="./public/img/screenshots/progress.jpg" width="400" alt="Class Scheduler logo">
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Register course content.
+- Download full list of students in an Excel file.
+- And more...
+
+
+
+<h2>React Features</h2>
+
+Some features included in this React project:
+- React Router for client-side navigation.
+- React Hook Form for form management and validation.
+- TanStack Query (React Query).
+- Tailwind CSS.
+- Axios for HTTP requests.
+- And more...
+
+
+
+<h2>Try The Demo</h2>
+You can visit the demo version in the following link:
+</br>
+
+<p>
+    <a href="https://diegomysite.com/class-scheduler-demo/login" target="_blank">
+        Class Scheduler - Demo.
+    </a>
+</p>
+
+
+You will need the following credentials:
+</br>
+<b>Demo user:</b> demo-user@class-scheduler.com 
+</br>
+<b>Password:</b> Cl4ss$chedul3r
+
+
+
+<h2>About The Developer</h2>
+You can learn more about me visiting my web site: 
+<a href="https://diegomysite.com" target="_blank">diegomysite.com</a>
+
+
+
+## License
+
+Class Scheduler is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
