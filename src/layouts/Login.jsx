@@ -17,7 +17,9 @@ export default function Login() {
 
 
 
-  const { validString } = useSchool();
+  const { validString, isProduction } = useSchool();
+
+
 
   //Validate data and run mutation.
   const handleSubmit = (e) => {
@@ -46,9 +48,15 @@ export default function Login() {
 
 
 
+
+
+
+
   return (
 
     <>
+
+
       <div className="min-h-screen text-white
                       bg-linear-to-tr from-blue-400 to-indigo-950">
 
@@ -102,13 +110,21 @@ export default function Login() {
                               mt-4">
                 <Link to='/forgot-password'
                       className="hover:underline"
+                      onClick={(e) => {
+                                if(!isProduction)
+                                {
+                                  e.preventDefault();
+                                  toast.warning('This feature is not available in the demo version.');
+                                }
+                              }
+                      }
                 >
                   I forgot my password
                 </Link>
               </div>
             </form>
 
-            
+
             <a href={`${import.meta.env.BASE_URL}Class Scheduler - User manual.pdf`}
                download
                className='flex gap-2 mt-6 

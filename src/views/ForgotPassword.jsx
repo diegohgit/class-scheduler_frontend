@@ -3,12 +3,15 @@ import { useApi } from "../hooks/useApi";
 import axiosClient from "../config/axios";
 import { useState } from "react";
 import { Link } from "react-router-dom"; 
+import useSchool from "../hooks/useSchool";
+
+
 
 export default function ForgotPassword() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log('isloading', isLoading)
+  const { isProduction } = useSchool();
 
   const { request } = useApi();
 
@@ -29,6 +32,12 @@ export default function ForgotPassword() {
   //Submit function.
   const handleSubmit = async(e) => {
     e.preventDefault();
+
+    if(!isProduction){
+      toast.warning('This feature is not available in the demo version.');
+      return;
+    }
+
     setIsLoading(true);
   
     const formData = new FormData(e.currentTarget);
