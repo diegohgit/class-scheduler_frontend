@@ -9,6 +9,14 @@ const SchoolContext = createContext();
 
 const SchoolProvider = ({children}) => {
 
+
+
+  //Get version to know if the current app version is production.
+  const version = import.meta.env.VITE_BASE_PATH;
+  const [isProduction, setIsProduction] = useState(version === "/class-scheduler/")
+
+
+
   //States to store student, day and time selected to schedule a class.
   const [ selStudent, setSelStudent ] 	= useState([]);
   const [ selDay, setSelDay ] = useState([]);
@@ -275,6 +283,7 @@ const SchoolProvider = ({children}) => {
   return (
     <SchoolContext.Provider 
       value = {{
+        isProduction,
         handleClickModal,
         modal, setModal,
         selStudent, setSelStudent,
