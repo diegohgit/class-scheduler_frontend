@@ -14,10 +14,20 @@ export default function ResetPassword() {
   //Async function to send POST reset-password request.
   const handleRequest = async({data}) => {
 
+    //Get csrf-cookie.
+    try { await axiosClient.get('/sanctum/csrf-cookie'); }
+    catch (error) {
+        console.log(error);
+        setIsLoading(false);
+        toast.error('Something went wrong.');
+
+        return { success: false, };
+    }
+
+    //Send new password request.
     const { success, response } = await request('POST', 
                                                 '/api/auth/reset-password', 
                                                 data,);
-
     const message = response?.data?.message;
 
     setIsLoading(false);
