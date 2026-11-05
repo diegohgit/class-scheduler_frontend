@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { useApi } from "../hooks/useApi";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import axiosClient from "../config/axios";
 
 export default function ResetPassword() {
 
