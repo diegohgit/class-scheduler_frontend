@@ -103,20 +103,12 @@ export default function ModalChapter() {
             <p className="text-md text-red-500">Name is required</p> }
         </div>
 
-        <div className=" flex mt-10">
-          <button type="button"
-                  onClick={() => console.log("Cancel")}
-                  className="button-base bg-red-500 hover:bg-red-600"
-          >
-            Cancel
-          </button>
-
-          <button type="submit"
-                  className="button-base bg-indigo-500 hover:bg-indigo-600"
-          >
-            {chapterMutation.isPending ? "Saving Chapter..." : "Save"}
-          </button>
-        </div>
+        <button type="submit"
+                className="button-base bg-indigo-500 hover:bg-indigo-600
+                           mx-auto! block! mt-10!"
+        >
+          {chapterMutation.isPending ? "Saving Chapter..." : "Save"}
+        </button>
       </form>
     </>
   )

@@ -127,21 +127,13 @@ export default function ModalSection() {
             <p className="text-md text-red-500">Section field is required.</p>}
         </div>
 
-        <div className="flex mt-10">
-          <button
-            type="button"
-            onClick={() => console.log("Cancel")}
-            className="button-base bg-red-500 hover:bg-red-600"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit"
-            className="button-base bg-indigo-500 hover:bg-indigo-600"
-          >
-            {sectionMutation.isPending ? "Saving Section..." : "Save"}
-          </button>
-        </div>
+        <button 
+          type="submit"
+          className="button-base bg-indigo-500 hover:bg-indigo-600
+                         mx-auto! block! mt-10!"
+        >
+          {sectionMutation.isPending ? "Saving Section..." : "Save"}
+        </button>
       </form>
     </>
   )
