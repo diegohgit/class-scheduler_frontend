@@ -38,7 +38,7 @@ export default function Home() {
 
   const { handleClickModal, modal, handleSetTime,
           handleClassModal, expanded, getDuration,
-          modalConfiguration, handleModalConfiguration,
+          modalConfiguration, handleModalConfiguration, today,
         } = useSchool();
 
 
@@ -145,10 +145,22 @@ export default function Home() {
                       shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] ">
 
         <div className="w-[1000px] mx-auto text-center 
-                        grid grid-cols-7 font-bold ">
+                        grid grid-cols-7 font-bold">
            {days.map((day) => (
-              <span key={day.id}>{day.label}</span>)
-            )}
+              <span key={day.id}
+                    className='flex h-8 items-center justify-center'
+              >
+              {/* 'Play' icon */}
+                <svg  xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 24 24"
+                      className={`${day.label !== today && 'hidden'}
+                                  size-6 fill-sky-400 animate-pulse`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                </svg>
+
+                {day.label}
+              </span>
+            ))}
         </div>
       </div>
 
