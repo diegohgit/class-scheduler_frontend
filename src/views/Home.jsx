@@ -3,7 +3,7 @@ import ModalClass from "../components/ModalClass";
 import ModalConfiguration from "../components/ModalConfiguration";
 import Modal from 'react-modal'
 import useSchool from "../hooks/useSchool";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { days } from "../data/days";
 import { toast } from "react-toastify";
 import LoadingMessage from "../components/LoadingMessage";
@@ -56,6 +56,23 @@ export default function Home() {
       toast.warning("You have no classes scheduled.");
     }
   }, [isSuccessClasses, classes]);
+
+
+
+  //Scroll to the current hour.
+  const currentHour = new Date().getHours();
+  const currentHourRef = useRef(null);
+
+  useEffect(() => {
+
+    if (!isSuccessActiveHrs || !isSuccessClasses) return;
+
+    currentHourRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+    });
+
+  }, [isSuccessActiveHrs, isSuccessClasses]);
 
 
 
@@ -246,6 +263,10 @@ export default function Home() {
                   return(
                     <Class
                       key    = {`${day.id}-${hour}-${minute}`}
+                      ref    = { day.id === 1 && hour === currentHour && i === 0
+                                  ? currentHourRef
+                                  : null
+                                }
                       minute = { minute }
                       hour   = { hour }
                       day    = { day }

@@ -1,4 +1,11 @@
-export default function Class({onClick, minute, hour, day, match, spaceHeight}) {
+export default function Class({ onClick,
+                                minute,
+                                hour,
+                                day,
+                                match,
+                                spaceHeight,
+                                ref })
+{
 
   //Format day label to show it in empty spaces.
   const dayLabel 	 = match ?? day?.label?.slice(0,3);
@@ -21,7 +28,9 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
             className=" w-[140px] text-center
                         border-t border-r  border-dashed border-white
                         hover:cursor-pointer hover:bg-sky-200!"
-            onClick={onClick}>
+            onClick={onClick}
+            ref={ref /* ref useful to scroll schedule to the current hour. */}
+      >
 
         { match ? (
             <div className = "h-8/12">
@@ -44,4 +53,4 @@ export default function Class({onClick, minute, hour, day, match, spaceHeight}) 
       </div>
     </>
   )
-}
+};
