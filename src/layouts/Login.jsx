@@ -62,11 +62,12 @@ export default function Login() {
 
         <div className="justify-center grid h-screen ">
 
-          <div className="h-fit mt-4">
+          <div className="h-fit mt-4 text-center">
             <img  src={`${import.meta.env.BASE_URL}img/scheduler_white.png`}
                   alt="logo"
                   className="w-70 mx-auto"
             />
+            {!isProduction && <span>DEMO Version</span>}
           </div>
 
           <div className="w-90 h-80 -translate-y-6
