@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   //Routes and options shown in toolbar.
   const options = [
-            {label:"Schedule", route:"/"},
+            {label:"Schedule", route:"/schedule"},
             {label:"Students", route:"/students"},
             {label:"Content",   route:"/content"},
           ];
@@ -67,7 +67,7 @@ export default function Sidebar() {
 
   const logoutMutation = useLogoutMutation({
     onSuccess: () => {
-      navigate('/login');
+      navigate('/');
     }
   });
 

@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://diegomysite.com/class-scheduler-demo/login" target="_blank">
+    <a href="https://diegomysite.com/class-scheduler-demo/" target="_blank">
         <img src="./public/img/scheduler_sky-blue.png" width="400" alt="Class Scheduler logo">
     </a>
 </p>
@@ -46,7 +46,7 @@ You can visit the demo version in the following link:
 </br>
 
 <p>
-    <a href="https://diegomysite.com/class-scheduler-demo/login" target="_blank">
+    <a href="https://diegomysite.com/class-scheduler-demo/" target="_blank">
         Class Scheduler - Demo.
     </a>
 </p>

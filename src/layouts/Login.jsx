@@ -11,7 +11,7 @@ export default function Login() {
 
   const loginMutation = useLoginMutation({
     onSuccess: () => {
-      navigate('/');
+      navigate('/schedule');
     }
   });
 
@@ -45,10 +45,6 @@ export default function Login() {
     //Send credentials to loging user.
     loginMutation.mutate({data, method: "POST"});
   }
-
-
-
-
 
 
 

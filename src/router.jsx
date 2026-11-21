@@ -15,14 +15,14 @@ const basename = import.meta.env.VITE_BASE_PATH.replace(/\/$/, '')
 
 const router = createBrowserRouter([
   {
+    //Protected routes
     element: <ProtectedRoute />,
     children:[
     {
-      path: '/',
       element: <Layout />,
       children: [
         {
-          index: true,
+          path: 'schedule',
           element: <Home />
         },
         {
@@ -52,7 +52,8 @@ const router = createBrowserRouter([
       ]
     }]
   },{
-    path: 'login',
+    //Public routes
+    path: '/',
     element: <Login />
   },{
     path: 'forgot-password',
@@ -62,9 +63,8 @@ const router = createBrowserRouter([
     element: <ResetPassword />
   },
 ], {
-
     //This basename is to use this project as a subdirectory
-    //example.com/class.scheduler-daniel
+    //example.com/class-scheduler
     basename: basename,
     future: {
       v7_startTransition: true,

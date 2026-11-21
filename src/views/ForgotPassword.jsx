@@ -107,7 +107,7 @@ export default function ForgotPassword() {
               your password.
             </span>
 
-            <Link to='/login'>
+            <Link to='/'>
               <span className="block w-full text-center
                                 mt-4 font-bold
                                 hover:underline hover:cursor-pointer"

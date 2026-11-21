@@ -22,7 +22,7 @@ export default function ProtectedRoute() {
 
     //'replace' is so the user can't go back to the 
     //url that he couldn't reach.
-    return <Navigate to="/login" replace/>;
+    return <Navigate to="/" replace/>;
 
     //Note: navigate() can't be used here because 
     //it would cause and error if it tryes to update
