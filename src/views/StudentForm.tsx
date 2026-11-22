@@ -207,7 +207,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
   return (
   <>
 
-    <h1 className="title-base">
+    <h1 className="title-base ">
       {mode === "create" ? "New Student" : 
                           watch("first_name").length ? watch("first_name") : 'Edit Student'}
     </h1>
@@ -222,6 +222,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             onSubmit={handleSubmit((data) => submit(data, mode === "create" ? "POST":"PATCH"))}
             className="w-full max-w-3xl px-4"
           >
+
+          {/* First & Last Name */}
             <div className={rowContainer}>
               <div className={fieldContainder}>
                 <p className="font-bold mb-1">First name:</p>
@@ -241,6 +243,9 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               </div>
             </div>
 
+
+
+          {/* Phone & Email */}
             <div className={rowContainer}>
               <div className={fieldContainder}>
                 <p className="font-bold mb-1">Phone:</p>
@@ -251,7 +256,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 />
               </div>
               <div className={fieldContainder}>
-                <p className="font-bold mb-1">E-mail:</p>
+                <p className="font-bold mb-1">Email:</p>
                 <input
                   {...register("email")}
                   className="input-base md:w-10/12!"
@@ -260,8 +265,10 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               </div>
             </div>
 
-            <div className={rowContainer}>
 
+
+          {/* Birthday & English level */}
+            <div className={rowContainer}>
             {/* Birthdate input 
                 Handle it with Controller so we can use isDirty 
                 with an external input.
@@ -279,6 +286,7 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                     />)}
               />
 
+            {/* English level */}
               <div className={fieldContainder}>
                 <p className="font-bold mb-1">English level:</p>
                 <select 
@@ -295,6 +303,9 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               </div>
             </div>
 
+
+
+          {/* Class Notes */}
             <div className={`${mode === "create" ? "hidden" : ""}`}>
 
               <div className="flex">
@@ -317,6 +328,8 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             </div>
 
 
+
+          {/* Colors */}
             { colors.length > 0 
               && (<p className="font-bold mb-1">Schedule Color:</p>)}
 
@@ -349,18 +362,12 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
               }
             </div >
 
-            <div className="mb-15">
+
+
+          {/* General Progress */}
+            <div>
               <div className="flex">
                 <p className="w-8/12 font-bold mb-1 ">General Progress:</p>
-
-                {mode === "edit" &&
-                  <button type="button"
-                          onClick={() => {
-                            navigate(`/students/${id}/progress`);
-                          }}
-                          className="button-base mx-auto bg-blue-500 hover:bg-blue-600">
-                    See progress
-                </button>}
               </div>
               <textarea 
                 {...register("progress")}
@@ -372,20 +379,59 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
             </div>
 
 
+          {/* Delete button */}
+            <div className="w-fit mx-auto mb-20!">
+              {mode === "edit" && (
+                confirmDelete === false ? 
+                (
+                  <button type="button"
+                          className="button-base bg-red-500 hover:bg-red-600
+                                    block mx-auto!"
+                          onClick={() => setConfirmDelete(true)}
+                  >
+                    Delete student
+                  </button>
+                ) : (
+                  <div className="flex text-xl">
+                    <span>Delete student?</span>
+                    <div className="*:m-1 *:font-bold *:hover:underline
+                                    *:hover:cursor-pointer"
+                    >
+                      <span onClick={() => setConfirmDelete(false)}
+                      >No |</span>
 
+                      <span onClick={handleSubmit((data) => { if(!isPending)return
+                                                              submit(data, "DELETE")
+                                                              setLoadingAction("Deleting student...")
+                                                              })}
+                      >Yes</span>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+
+
+
+          {/* Bottom bar */}
             <div className="bottom-bar">
+            {/* Go back button */}
               <button type="button"
                       className="button-base flex items-center 
-                                 justify-center bg-indigo-500 hover:bg-indigo-600
+                                 justify-center bg-blue-500 hover:bg-blue-600
                                  w-fit! p-1 gap-1"
                       onClick={() => navigate("/students")}
+                      title="Go back to students list"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+              {/* Back icon*/}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+                      strokeWidth={3} stroke="currentColor" className="size-4.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                 </svg>
                 <span>Back</span>
               </button>
 
+            {/* Create/Save student button */}
               {isDirty &&
                 <button type="submit"
                         className="button-base bg-green-500 hover:bg-green-600
@@ -399,32 +445,15 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                 </button>
               }
 
-              {mode === "edit" && (
-                confirmDelete === false ? 
-                (
-                  <button type="button"
-                          className="button-base bg-red-500 hover:bg-red-600"
-                          onClick={() => setConfirmDelete(true)}
-                  >
-                    Delete student
-                  </button>
-                ) : (
-                  <div className="flex items-center">
-                    <span>Delete student?</span>
-                    <div className="*:m-1 *:font-bold *:hover:underline
-                                    *:hover:cursor-pointer"
-                    >
-                      <span onClick={() => setConfirmDelete(false)}
-                      >No</span>
-
-                      <span onClick={handleSubmit((data) => { if(!isPending)return
-                                                              submit(data, "DELETE")
-                                                              setLoadingAction("Deleting student...")
-                                                              })}
-                      >Yes</span>
-                    </div>
-                  </div>
-                ))
+            {/* Progress button */}
+              {mode === "edit" && 
+                <button type="button"
+                        onClick={() => {
+                          navigate(`/students/${id}/progress`);
+                        }}
+                        className="button-base mx-auto bg-blue-500 hover:bg-blue-600">
+                  See progress
+                </button>
               }
 
             </div>
