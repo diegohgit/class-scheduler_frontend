@@ -75,77 +75,92 @@ export const useStudentMutation = (options = {}) => {
 
   return useMutation({
     mutationFn: handleRequest,
-    onSuccess: (response) =>{
+    onSuccess: async (response) =>{
 
-      if(response?.success){
-        const resStudent = response?.response?.data;
-        const method     = response?.method;
+      if (!response?.success) return;
 
-        queryClient.setQueryData(["students"], (old) => {          
-          //Prevent errors when the cache doesn't contain any data yet.
-          if(!old) return old;
+      const resStudent = response?.response?.data;
+      const method     = response?.method;
 
-          //****** POST ******
-          if(method === "POST"){
+      if (!resStudent) return;
+
+      //****** POST ******
+      if(method === "POST"){
+
+        queryClient.setQueryData(["students"], (old) => {
+            if (!Array.isArray(old)) return old;
 
             return [...old, resStudent].sort();
+        });
 
-          //****** PATCH ******
-          }else if(method === "PATCH"){
+      //****** PATCH ******
+      }else if(method === "PATCH"){
 
-            //Modify student local cache data.
-            queryClient.setQueryData(["student", String(resStudent.id)], (old) => {
-              if(!old) return old;
+        //Modify student local cache data.
+        queryClient.setQueryData(
+          ["student", String(resStudent.id)], (old) => {
+            if(!old) return old;
 
-              return resStudent;
-            });
+            return resStudent;
+        });
 
-            //Modify student's info on its classes.
-            queryClient.setQueryData(["classes"], (old) => {
-              if(!old) return old;
+        //Modify student's info on its classes.
+        queryClient.setQueryData(["classes"], (old) => {
+          if (!Array.isArray(old)) return old;
 
-               return old?.map((c) => c.student_id === resStudent.id
-                                  ? {...c,  student_id  : resStudent.id,
-                                            first_name  : resStudent.first_name,
-                                            last_name   : resStudent.last_name,
-                                            color       : resStudent.color.name,
-                                            class_notes : resStudent.class_notes,
-                                            class_notes_date : resStudent.class_notes_date}
-                                  : c);
-            });
+          return old?.map((c) => 
+            c.student_id === resStudent.id
+              ? {...c,  student_id  : resStudent.id,
+                        first_name  : resStudent.first_name,
+                        last_name   : resStudent.last_name,
+                        color       : resStudent.color.name,
+                        class_notes : resStudent.class_notes,
+                        class_notes_date : resStudent.class_notes_date}
+              : c);
+        });
 
-            //Update list.
-            return [...old].map((stu) => stu.id === resStudent.id 
-                                    ? {...stu,
-                                        id          : resStudent.id,
-                                        first_name  : resStudent.first_name,
-                                        last_name   : resStudent.last_name,
-                                        level       : resStudent.level.name,
-                                        class_notes : resStudent.class_notes,
-                                        class_notes_date : resStudent.class_notes_date,
-                                      }
-                                    : stu
-                            ).sort();
-                            //.sort((a, b) => a.first_name.localeCompare(b.first_name)
-                            //                || (a.last_name ?? '').localeCompare(b.last_name ?? ''));
+        //Update list.
+        queryClient.setQueryData(["students"], (old) => {
+          if (!Array.isArray(old)) return old;
 
-          //****** DELETE ******
-          }else if(method === "DELETE"){
+          return [...old].map((stu) => 
+            stu.id === resStudent.id 
+              ? {...stu,
+                  id          : resStudent.id,
+                  first_name  : resStudent.first_name,
+                  last_name   : resStudent.last_name,
+                  level       : resStudent.level.name,
+                  class_notes : resStudent.class_notes,
+                  class_notes_date : resStudent.class_notes_date,
+                }
+              : stu
+          ).sort();
+          //.sort((a, b) => a.first_name.localeCompare(b.first_name)
+          //                || (a.last_name ?? '').localeCompare(b.last_name ?? ''));
+        });
 
-            //Remove student local cache data .
-            queryClient.removeQueries({queryKey: ["student", String(resStudent.id)]});
+      //****** DELETE ******
+      }else if(method === "DELETE"){
 
-            //Remove classes that belong to the deleted student.
-            queryClient.setQueryData(["classes"], (oldClass) => {
-              return oldClass.filter((oc) => oc.student_id !== resStudent.id)});
+        //Remove classes that belong to the deleted student.
+        queryClient.setQueryData(["classes"], (oldClass) => {
+          if (!Array.isArray(oldClass)) return oldClass;
 
-            //Remove student from local cache data list.
-            return old.filter((stud) => stud.id !== resStudent.id);
-          }
+          return oldClass.filter(
+            (oc) => oc.student_id !== resStudent.id
+          );
+        });
 
-          return old;
+        //Remove student from local cache data list.
+        queryClient.setQueryData(["students"], (old) => {
+          if (!Array.isArray(old)) return old;
+
+          return old.filter(
+            (stud) => stud.id !== resStudent.id
+          );
         });
       }
+      
       options?.onSuccess(response?.success);
     }
   });
