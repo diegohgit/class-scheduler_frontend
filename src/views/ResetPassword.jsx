@@ -93,7 +93,7 @@ export default function ResetPassword() {
 
       if(success){
         toast.success(message);
-        navigate('/');
+        navigate('/schedule');
       }
     }else setIsLoading(false);
   }
