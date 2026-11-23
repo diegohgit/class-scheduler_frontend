@@ -392,19 +392,22 @@ export default function StudentForm({ initialValues, mode, onSubmit, isPending }
                     Delete student
                   </button>
                 ) : (
-                  <div className="flex text-xl">
+                  <div className="flex text-xl items-center">
                     <span>Delete student?</span>
                     <div className="*:m-1 *:font-bold *:hover:underline
                                     *:hover:cursor-pointer"
                     >
-                      <span onClick={() => setConfirmDelete(false)}
-                      >No |</span>
-
-                      <span onClick={handleSubmit((data) => { if(!isPending)return
-                                                              submit(data, "DELETE")
-                                                              setLoadingAction("Deleting student...")
-                                                              })}
-                      >Yes</span>
+                    {/* "No" button */}
+                      <button onClick={() => setConfirmDelete(false)}
+                      >No</button>
+                      |
+                    {/* "Yes" button */}
+                      <button onClick={handleSubmit((data) => 
+                                        { submit(data, "DELETE");
+                                          setLoadingAction("Deleting student...");
+                                        })}
+                              disabled={isPending}
+                      >Yes</button>
                     </div>
                   </div>
                 ))
