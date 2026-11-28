@@ -13,6 +13,7 @@ export interface Class {
   ends       : string;
   color      : string;
   days       : Day[];
+  delete_id  : number|null;
 }
 
 //Export utility types for create or update.

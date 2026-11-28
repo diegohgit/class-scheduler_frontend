@@ -17,3 +17,8 @@ export interface Student {
 //Export utility types for create or update.
 export type CreateStudentDTO = Omit<Student, "id">;
 export type UpdateStudentDTO = Partial<CreateStudentDTO>;
+
+
+export type StudentsList = Pick<Student, 
+  'id'|"first_name"|"last_name"|"level"|'class_notes'|'class_notes_date'
+>
