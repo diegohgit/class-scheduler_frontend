@@ -272,7 +272,7 @@ export default function Home() {
                   //Store info in a constant to send the 
                   //correspondent information to other functions.
                   const finalSpaceMin = endSpaceMin;
-                  const matchData = printMatch ? match : null;
+                  const matchData:TypeClass|null = printMatch ? match : null;
 
                   return(
                     <Class
@@ -281,8 +281,8 @@ export default function Home() {
                                   ? currentHourRef
                                   : null
                                 }
-                      minute = { minute }
-                      hour   = { hour }
+                      minute = { formatMinute }
+                      hour   = { String(hour) }
                       day    = { day }
                       match  = { matchData }
                       spaceHeight = { spaceHeight }

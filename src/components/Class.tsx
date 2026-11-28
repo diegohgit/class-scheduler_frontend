@@ -1,21 +1,35 @@
+import { Day, Class as TypeClass } from '../types/class.ts'
+
+interface Props{ onClick : ()=>void;
+                  minute : string;
+                  hour   : string;
+                  day    : Day;
+                  match  : TypeClass|null;
+                  ref    : React.Ref<HTMLDivElement>;
+                  spaceHeight : string;
+                }
+
+
 export default function Class({ onClick,
                                 minute,
                                 hour,
                                 day,
                                 match,
                                 spaceHeight,
-                                ref })
+                                ref }: Props)
 {
 
   //Format day label to show it in empty spaces.
-  const dayLabel 	 = match ?? day?.label?.slice(0,3);
-  const matchEnds  = match ? ` - ${match.ends}` : '';
-  const color 		 = match?.color ?? '#e0e7ff';
-  const first_name = match?.first_name ?? '';
+  const dayLabel:string = day?.label?.slice(0,3);
+
+  const matchEnds    = match ? ` - ${match.ends}` : '';
+  const color 		   = match?.color ?? '#e0e7ff';
+  const first_name   = match?.first_name ?? '';
+  const numberHeight = Number(spaceHeight); 
   //const last_name  = match?.last_name ?? '';
 
-  const showDay  = spaceHeight > 20 && !match;
-  const showTime = match ? spaceHeight > 50 : spaceHeight > 20;
+  const showDay  = numberHeight > 20 && !match;
+  const showTime = match ? numberHeight > 50 : numberHeight > 20;
 
   const startTime = match ? match.starts : hour+":"+minute;
 
