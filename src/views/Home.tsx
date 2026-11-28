@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import LoadingMessage from "../components/LoadingMessage";
 import { useClasses } from "../hooks/useClasses";
 import { useActiveHours } from "../hooks/useActiveHours";
-
+import { Class as TypeClass } from '../types/class'
 
 
 Modal.setAppElement('#root')
@@ -25,14 +25,14 @@ export default function Home() {
 
 
   //Get only the hour in numeric format.
-  const fromHr = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : null;
-  const until  = active_hours?.until ? Number(active_hours.until.split(':')[0]) : null;
+  const fromHr = active_hours?.from  ? Number(active_hours.from.split(':')[0])  : 9;
+  const until  = active_hours?.until ? Number(active_hours.until.split(':')[0]) : 17;
   //If until = midnight, handle it as 24 instead of 0
   //so the algorithm can render until the 24 hour.
-  const untilHr = until === 0 ? 24 : until;
+  const untilHr:number = until === 0 ? 24 : until;
 
-  const fromMin  = active_hours?.from  ? Number(active_hours.from.split(':')[1])  : null;
-  const untilMin = active_hours?.until ? Number(active_hours.until.split(':')[1]) : null;
+  const fromMin  = active_hours?.from  ? Number(active_hours.from.split(':')[1])  : 0;
+  const untilMin = active_hours?.until ? Number(active_hours.until.split(':')[1]) : 30;
 
 
 
@@ -61,7 +61,7 @@ export default function Home() {
 
   //Scroll to the current hour.
   const currentHour = new Date().getHours();
-  const currentHourRef = useRef(null);
+  const currentHourRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
 
@@ -77,7 +77,7 @@ export default function Home() {
 
 
   //Calculate height for a class or empty space.
-  const getHeight = (durationMins, currentMinute) => {
+  const getHeight = (durationMins:number, currentMinute:number|null):string => {
 
     const spaceMinutes = currentMinute ? durationMins - currentMinute : durationMins;
 
@@ -90,7 +90,7 @@ export default function Home() {
 
   //String().padStart is used to ensure that time
   //is always shown in a two digits format (e.g., "00", "05"... "55")
-  const getFormattedTime = (time) => {
+  const getFormattedTime = (time:number):string => {
 
     return String(time).padStart(2, '0');
   }
@@ -98,17 +98,19 @@ export default function Home() {
 
 
   //Search for a class in the current hour.
-  const findClasses = (day_id, hour, minute) => {
+  const findClasses = ( day_id : number,
+                        hour   : number,
+                        minute : number):TypeClass|null => {
 
-    const findClass = classes?.find(cls => {
+    const findClass = classes?.find((cls: TypeClass) => {
       const nextStartHr = Number(cls.starts?.split(':')[0]);
 
-      let nextStartMn = cls.starts?.split(':')[1];
-          nextStartMn = getFormattedTime(nextStartMn);
+      const formatNextStartMn = Number(cls.starts?.split(':')[1]);
+      const nextStartMn = getFormattedTime(formatNextStartMn);
 
       return (
         nextStartHr === hour &&
-        nextStartMn >= minute &&
+        formatNextStartMn >= minute &&
         cls.days?.some((d) => d.id === day_id));
     })?? null;
 
@@ -119,11 +121,11 @@ export default function Home() {
 
   //Variables useful to render the schedule.
   let isPrinting = false;
-  let spaceEnd   = null;
+  let spaceEnd:string|null = null;
 
   const blocksPerHr = 12;
   const startOfDay  = active_hours.from;
-  const extraBlock  = untilMin > 0 ? 1 : 0;//if untilMin > 0 add an extra block to the schedule.
+  const extraBlock  = untilMin && untilMin > 0 ? 1 : 0;//if untilMin > 0 add an extra block to the schedule.
 
 
 
@@ -191,16 +193,16 @@ export default function Home() {
                 // Calculate the minute for each block (0, 5, 10, ..., 55).
                 // If the current cicle is in the first hr, 
                 // take the fromMin and add the current index (i * 5).
-                const preMinute = hour === fromHr ? fromMin + (i * 5) : i * 5;
+                const minute = hour === fromHr ? fromMin + (i * 5) : i * 5;
 
-                const minute = getFormattedTime(preMinute);
+                const formatMinute = getFormattedTime(minute);
 
                 //Reset variables
                 let print       = false;
                 let printMatch  = false;
                 let endSpaceMin = null;
-                let spaceHeight = 100;
-                const currentTime = getFormattedTime(hour) + ":" + minute;
+                let spaceHeight = "100";
+                const currentTime = getFormattedTime(hour) + ":" + formatMinute;
 
                 //Use this to log specific parts of the cycle.
                 //if(day.id === 1 && currentTime === "09:15")console.log("spaceEnd", spaceEnd)
@@ -225,7 +227,7 @@ export default function Home() {
                     const classDuration = getDuration({starts: match.starts, ends: match.ends});
                     const totalClassMinutes = classDuration.$ms / 60000;//Convert miliseconds to minutes.
 
-                    spaceHeight = getHeight(totalClassMinutes);
+                    spaceHeight = getHeight(totalClassMinutes, null);
                     spaceEnd    = match.ends;
                 }
 
@@ -240,7 +242,7 @@ export default function Home() {
                   //BEFORE rendering the match space.
                   if(match && currentTime != match.starts){
 
-                    const nextClassStartMin = match.starts?.split(':')[1];
+                    const nextClassStartMin = Number(match.starts?.split(':')[1]);
 
                     spaceHeight = getHeight(nextClassStartMin, minute);
                     endSpaceMin = nextClassStartMin;
